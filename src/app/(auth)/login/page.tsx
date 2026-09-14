@@ -70,6 +70,7 @@ export default function LoginPage() {
           data: {
             full_name: fullName.trim(),
           },
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       })
 
