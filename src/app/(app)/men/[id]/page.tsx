@@ -17,7 +17,6 @@ import {
   BookOpen,
   Users,
   Briefcase,
-  Ruler,
   Star,
   FileText,
   MessageSquare,
@@ -29,19 +28,36 @@ import {
 import { createClient } from '@/lib/supabase/client'
 import type {
   CandidateMan,
-  CandidateStatus,
-  CandidateAvailability,
+  CandidateManStatus,
   ProposalWithCandidates,
 } from '@/lib/types'
 import {
   calculateAge,
   formatDate,
-  getStatusLabel,
-  getStatusColor,
-  getAvailabilityLabel,
-  getAvailabilityColor,
   cn,
 } from '@/lib/utils'
+import {
+  courantOptions,
+  hassidoutOptions,
+  nousahOptions,
+  kipaTypeOptions,
+  shabbatPracticeOptions,
+  kashrutLevelOptions,
+  tsnioutOptions,
+  torahStudyOptions,
+  communityEthnicOptions,
+  childrenEducationOptions,
+  getCourantLabel,
+  getHassidoutLabel,
+  getNousahLabel,
+  getKipaTypeLabel,
+  getShabbatPracticeLabel,
+  getKashrutLevelLabel,
+  getTsnioutLabel,
+  getTorahStudyLabel,
+  getCommunityEthnicLabel,
+  getChildrenEducationLabel,
+} from '@/lib/constants/orthodox'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
@@ -49,102 +65,28 @@ import Badge from '@/components/ui/Badge'
 
 const ORG_ID = '00000000-0000-0000-0000-000000000001'
 
-const statusOptions: { value: CandidateStatus; label: string }[] = [
-  { value: 'invitation_envoyee', label: 'Invitation envoyee' },
-  { value: 'brouillon', label: 'Brouillon' },
-  { value: 'a_valider', label: 'A valider' },
-  { value: 'validee', label: 'Validee' },
-  { value: 'archivee', label: 'Archivee' },
-]
-
-const availabilityOptions: { value: CandidateAvailability; label: string }[] = [
-  { value: 'a_confirmer', label: 'A confirmer' },
-  { value: 'disponible', label: 'Disponible' },
-  { value: 'en_rencontre', label: 'En rencontre' },
+const statusOptions: { value: CandidateManStatus; label: string }[] = [
+  { value: 'actif', label: 'Actif' },
   { value: 'en_pause', label: 'En pause' },
-  { value: 'fiancee', label: 'Fiancee' },
-  { value: 'mariee', label: 'Mariee' },
+  { value: 'archive', label: 'Archivé' },
 ]
 
-const religiousLevelOptions = [
-  { value: '', label: 'Non renseigne' },
-  { value: 'very_religious', label: 'Tres pratiquant' },
-  { value: 'religious', label: 'Pratiquant' },
-  { value: 'traditional', label: 'Traditionnel' },
-  { value: 'secular', label: 'Laique' },
-  { value: 'other', label: 'Autre' },
-]
-
-const hashkafaOptions = [
-  { value: '', label: 'Non renseigne' },
-  { value: 'haredi_ashkenaz', label: 'Haredi Ashkenaze' },
-  { value: 'haredi_sfarad', label: 'Haredi Sefarade' },
-  { value: 'dati_leumi', label: 'Dati Leoumi' },
-  { value: 'dati_liberal', label: 'Dati Liberal' },
-  { value: 'masorti', label: 'Massorti' },
-  { value: 'hiloni', label: 'Hiloni' },
-  { value: 'baal_teshuva', label: 'Baal Techouva' },
-  { value: 'other', label: 'Autre' },
-]
-
-const buildOptions = [
-  { value: '', label: 'Non renseigne' },
-  { value: 'slim', label: 'Mince' },
-  { value: 'average', label: 'Moyen' },
-  { value: 'athletic', label: 'Athletique' },
-  { value: 'stocky', label: 'Costaud' },
-  { value: 'heavy', label: 'Fort' },
-]
-
-const hairColorOptions = [
-  { value: '', label: 'Non renseigne' },
-  { value: 'black', label: 'Noir' },
-  { value: 'brown', label: 'Brun' },
-  { value: 'blond', label: 'Blond' },
-  { value: 'red', label: 'Roux' },
-  { value: 'gray', label: 'Gris' },
-  { value: 'white', label: 'Blanc' },
-  { value: 'bald', label: 'Chauve' },
-]
-
-const eyeColorOptions = [
-  { value: '', label: 'Non renseigne' },
-  { value: 'brown', label: 'Marron' },
-  { value: 'blue', label: 'Bleu' },
-  { value: 'green', label: 'Vert' },
-  { value: 'hazel', label: 'Noisette' },
-  { value: 'gray', label: 'Gris' },
-  { value: 'black', label: 'Noir' },
-]
-
-function getReligiousLevelLabel(value: string | null): string {
-  if (!value) return 'Non renseigne'
-  const found = religiousLevelOptions.find((o) => o.value === value)
-  return found ? found.label : value
+function getManStatusLabel(status: CandidateManStatus): string {
+  const labels: Record<CandidateManStatus, string> = {
+    actif: 'Actif',
+    en_pause: 'En pause',
+    archive: 'Archivé',
+  }
+  return labels[status] || status
 }
 
-function getHashkafaLabel(value: string | null): string {
-  if (!value) return 'Non renseigne'
-  const found = hashkafaOptions.find((o) => o.value === value)
-  return found ? found.label : value
-}
-
-function getBuildLabel(value: string | null): string {
-  if (!value) return 'Non renseigne'
-  const found = buildOptions.find((o) => o.value === value)
-  return found ? found.label : value
-}
-
-function getHairColorLabel(value: string | null): string {
-  if (!value) return 'Non renseigne'
-  const found = hairColorOptions.find((o) => o.value === value)
-  return found ? found.label : value
-}
-
-function getEyeColorLabel(value: string | null): string {
-  if (!value) return 'Non renseigne'
-  const found = eyeColorOptions.find((o) => o.value === value)
-  return found ? found.label : value
+function getManStatusColor(status: CandidateManStatus): string {
+  const colors: Record<CandidateManStatus, string> = {
+    actif: 'bg-emerald-50 text-emerald-700',
+    en_pause: 'bg-amber-50 text-amber-700',
+    archive: 'bg-gray-100 text-gray-500',
+  }
+  return colors[status] || 'bg-gray-100 text-gray-600'
 }
 
 // ─── Section card wrapper ─────────────────────────────────────
@@ -261,7 +203,6 @@ export default function ManDetailPage({
   const [error, setError] = useState<string | null>(null)
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false)
-  const [availabilityDropdownOpen, setAvailabilityDropdownOpen] = useState(false)
 
   // ── Fetch man ──────────────────────────────────────────────
   const fetchMan = useCallback(async () => {
@@ -316,13 +257,6 @@ export default function ManDetailPage({
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
-  function updateCustomField(field: string, value: unknown) {
-    setFormData((prev) => ({
-      ...prev,
-      custom_fields: { ...(prev.custom_fields || {}), [field]: value },
-    }))
-  }
-
   // ── Save ───────────────────────────────────────────────────
   async function handleSave() {
     if (!man) return
@@ -335,7 +269,6 @@ export default function ManDetailPage({
       created_by: _cb,
       created_at: _ca,
       updated_at: _ua,
-      gender: _g,
       ...updateData
     } = formData as CandidateMan
 
@@ -359,7 +292,7 @@ export default function ManDetailPage({
   }
 
   // ── Status change ──────────────────────────────────────────
-  async function handleStatusChange(newStatus: CandidateStatus) {
+  async function handleStatusChange(newStatus: CandidateManStatus) {
     if (!man) return
     setStatusDropdownOpen(false)
 
@@ -376,26 +309,6 @@ export default function ManDetailPage({
 
     setMan((prev) => (prev ? { ...prev, status: newStatus } : prev))
     setFormData((prev) => ({ ...prev, status: newStatus }))
-  }
-
-  // ── Availability change ────────────────────────────────────
-  async function handleAvailabilityChange(newAvailability: CandidateAvailability) {
-    if (!man) return
-    setAvailabilityDropdownOpen(false)
-
-    const { error: updateError } = await supabase
-      .from('candidates_men')
-      .update({ availability: newAvailability })
-      .eq('id', man.id)
-      .eq('organization_id', ORG_ID)
-
-    if (updateError) {
-      setError(`Erreur lors du changement de disponibilite : ${updateError.message}`)
-      return
-    }
-
-    setMan((prev) => (prev ? { ...prev, availability: newAvailability } : prev))
-    setFormData((prev) => ({ ...prev, availability: newAvailability }))
   }
 
   // ── Cancel edit ────────────────────────────────────────────
@@ -435,9 +348,6 @@ export default function ManDetailPage({
   }
 
   if (!man) return null
-
-  const customFields = (man.custom_fields || {}) as Record<string, string>
-  const formCustomFields = (formData.custom_fields || {}) as Record<string, string>
 
   return (
     <div className="min-h-screen bg-[#FFFBF0]">
@@ -484,16 +394,13 @@ export default function ManDetailPage({
                   {/* Status with dropdown */}
                   <div className="relative">
                     <button
-                      onClick={() => {
-                        setStatusDropdownOpen(!statusDropdownOpen)
-                        setAvailabilityDropdownOpen(false)
-                      }}
+                      onClick={() => setStatusDropdownOpen(!statusDropdownOpen)}
                       className={cn(
                         'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium cursor-pointer transition-opacity hover:opacity-80',
-                        getStatusColor(man.status)
+                        getManStatusColor(man.status)
                       )}
                     >
-                      {getStatusLabel(man.status)}
+                      {getManStatusLabel(man.status)}
                       <ChevronDown className="h-3 w-3" />
                     </button>
                     {statusDropdownOpen && (
@@ -516,40 +423,6 @@ export default function ManDetailPage({
                     )}
                   </div>
 
-                  {/* Availability with dropdown */}
-                  <div className="relative">
-                    <button
-                      onClick={() => {
-                        setAvailabilityDropdownOpen(!availabilityDropdownOpen)
-                        setStatusDropdownOpen(false)
-                      }}
-                      className={cn(
-                        'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium cursor-pointer transition-opacity hover:opacity-80',
-                        getAvailabilityColor(man.availability)
-                      )}
-                    >
-                      {getAvailabilityLabel(man.availability)}
-                      <ChevronDown className="h-3 w-3" />
-                    </button>
-                    {availabilityDropdownOpen && (
-                      <div className="absolute top-full left-0 mt-1 bg-white border border-[#E8E0D4] rounded-lg shadow-lg z-20 py-1 min-w-[180px]">
-                        {availabilityOptions.map((opt) => (
-                          <button
-                            key={opt.value}
-                            onClick={() => handleAvailabilityChange(opt.value)}
-                            className={cn(
-                              'w-full text-left px-3 py-1.5 text-sm hover:bg-[#FFFBF0] transition-colors',
-                              man.availability === opt.value
-                                ? 'font-semibold text-[#87A878]'
-                                : 'text-[#2D2D2D]'
-                            )}
-                          >
-                            {opt.label}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
                 </div>
               </div>
 
@@ -702,17 +575,6 @@ export default function ManDetailPage({
                   />
                 }
               />
-              <FieldRow
-                label="Nationalite"
-                value={man.nationality}
-                editing={editing}
-                inputElement={
-                  <Input
-                    value={formData.nationality || ''}
-                    onChange={(e) => updateField('nationality', e.target.value)}
-                  />
-                }
-              />
             </dl>
           </SectionCard>
 
@@ -738,24 +600,6 @@ export default function ManDetailPage({
                 }
               />
               <FieldRow
-                label="Telephone secondaire"
-                value={
-                  man.phone_secondary ? (
-                    <a href={`tel:${man.phone_secondary}`} className="text-[#87A878] hover:underline">
-                      {man.phone_secondary}
-                    </a>
-                  ) : null
-                }
-                editing={editing}
-                inputElement={
-                  <Input
-                    inputType="tel"
-                    value={formData.phone_secondary || ''}
-                    onChange={(e) => updateField('phone_secondary', e.target.value)}
-                  />
-                }
-              />
-              <FieldRow
                 label="Email"
                 value={
                   man.email ? (
@@ -774,25 +618,14 @@ export default function ManDetailPage({
                 }
               />
               <FieldRow
-                label="Adresse"
-                value={man.address}
-                editing={editing}
-                inputElement={
-                  <Input
-                    value={formData.address || ''}
-                    onChange={(e) => updateField('address', e.target.value)}
-                  />
-                }
-              />
-              <FieldRow
                 label="WhatsApp"
-                value={customFields.whatsapp || null}
+                value={man.whatsapp}
                 editing={editing}
                 inputElement={
                   <Input
                     inputType="tel"
-                    value={formCustomFields.whatsapp || ''}
-                    onChange={(e) => updateCustomField('whatsapp', e.target.value)}
+                    value={formData.whatsapp || ''}
+                    onChange={(e) => updateField('whatsapp', e.target.value)}
                   />
                 }
               />
@@ -803,37 +636,62 @@ export default function ManDetailPage({
           <SectionCard title="Vie religieuse" icon={<BookOpen className="h-4 w-4" />}>
             <dl>
               <FieldRow
-                label="Niveau religieux"
-                value={getReligiousLevelLabel(man.religious_level)}
+                label="Courant"
+                value={getCourantLabel(man.courant)}
                 editing={editing}
                 inputElement={
                   <Select
-                    options={religiousLevelOptions}
-                    value={formData.religious_level || ''}
-                    onChange={(e) => updateField('religious_level', e.target.value || null)}
+                    options={courantOptions}
+                    value={formData.courant || ''}
+                    onChange={(e) => updateField('courant', e.target.value || null)}
                   />
                 }
               />
               <FieldRow
-                label="Hashkafa"
-                value={getHashkafaLabel(man.hashkafa)}
+                label="Hassidout"
+                value={getHassidoutLabel(man.hassidout)}
                 editing={editing}
                 inputElement={
                   <Select
-                    options={hashkafaOptions}
-                    value={formData.hashkafa || ''}
-                    onChange={(e) => updateField('hashkafa', e.target.value || null)}
+                    options={hassidoutOptions}
+                    value={formData.hassidout || ''}
+                    onChange={(e) => updateField('hassidout', e.target.value || null)}
+                  />
+                }
+              />
+              <FieldRow
+                label="Nousah"
+                value={getNousahLabel(man.nousah)}
+                editing={editing}
+                inputElement={
+                  <Select
+                    options={nousahOptions}
+                    value={formData.nousah || ''}
+                    onChange={(e) => updateField('nousah', e.target.value || null)}
+                  />
+                }
+              />
+              <FieldRow
+                label="Type de kipa"
+                value={getKipaTypeLabel(man.kipa_type)}
+                editing={editing}
+                inputElement={
+                  <Select
+                    options={kipaTypeOptions}
+                    value={formData.kipa_type || ''}
+                    onChange={(e) => updateField('kipa_type', e.target.value || null)}
                   />
                 }
               />
               <FieldRow
                 label="Communaute"
-                value={man.community}
+                value={getCommunityEthnicLabel(man.community)}
                 editing={editing}
                 inputElement={
-                  <Input
+                  <Select
+                    options={communityEthnicOptions}
                     value={formData.community || ''}
-                    onChange={(e) => updateField('community', e.target.value)}
+                    onChange={(e) => updateField('community', e.target.value || null)}
                   />
                 }
               />
@@ -849,88 +707,119 @@ export default function ManDetailPage({
                 }
               />
               <FieldRow
-                label="Cohen / Levi / Israel"
-                value={man.cohen_levi_israel}
-                editing={editing}
-                inputElement={
-                  <Select
-                    options={[
-                      { value: '', label: 'Non renseigne' },
-                      { value: 'cohen', label: 'Cohen' },
-                      { value: 'levi', label: 'Levi' },
-                      { value: 'israel', label: 'Israel' },
-                    ]}
-                    value={formData.cohen_levi_israel || ''}
-                    onChange={(e) => updateField('cohen_levi_israel', e.target.value || null)}
-                  />
-                }
-              />
-              <FieldRow
-                label="Yechiva"
-                value={man.yeshiva}
+                label="Rav de reference"
+                value={man.rabbi_reference}
                 editing={editing}
                 inputElement={
                   <Input
-                    value={formData.yeshiva || ''}
-                    onChange={(e) => updateField('yeshiva', e.target.value)}
+                    value={formData.rabbi_reference || ''}
+                    onChange={(e) => updateField('rabbi_reference', e.target.value)}
                   />
                 }
               />
               <FieldRow
-                label="Rythme d'etude"
-                value={man.learning_schedule}
+                label="Yechiva / Seminaire"
+                value={man.school_seminary}
                 editing={editing}
                 inputElement={
                   <Input
-                    value={formData.learning_schedule || ''}
-                    onChange={(e) => updateField('learning_schedule', e.target.value)}
+                    value={formData.school_seminary || ''}
+                    onChange={(e) => updateField('school_seminary', e.target.value)}
                   />
                 }
               />
               <FieldRow
-                label="Chabbat"
-                value={man.keeps_shabbat === null ? null : man.keeps_shabbat ? 'Oui' : 'Non'}
+                label="Pratique du Chabbat"
+                value={getShabbatPracticeLabel(man.shabbat_practice)}
                 editing={editing}
                 inputElement={
                   <Select
-                    options={[
-                      { value: '', label: 'Non renseigne' },
-                      { value: 'true', label: 'Oui' },
-                      { value: 'false', label: 'Non' },
-                    ]}
-                    value={formData.keeps_shabbat === null ? '' : formData.keeps_shabbat ? 'true' : 'false'}
-                    onChange={(e) =>
-                      updateField('keeps_shabbat', e.target.value === '' ? null : e.target.value === 'true')
-                    }
+                    options={shabbatPracticeOptions}
+                    value={formData.shabbat_practice || ''}
+                    onChange={(e) => updateField('shabbat_practice', e.target.value || null)}
                   />
                 }
               />
               <FieldRow
-                label="Cacherout"
-                value={man.keeps_kashrut === null ? null : man.keeps_kashrut ? 'Oui' : 'Non'}
+                label="Niveau de cacheroute"
+                value={getKashrutLevelLabel(man.kashrut_level)}
                 editing={editing}
                 inputElement={
                   <Select
-                    options={[
-                      { value: '', label: 'Non renseigne' },
-                      { value: 'true', label: 'Oui' },
-                      { value: 'false', label: 'Non' },
-                    ]}
-                    value={formData.keeps_kashrut === null ? '' : formData.keeps_kashrut ? 'true' : 'false'}
-                    onChange={(e) =>
-                      updateField('keeps_kashrut', e.target.value === '' ? null : e.target.value === 'true')
-                    }
+                    options={kashrutLevelOptions}
+                    value={formData.kashrut_level || ''}
+                    onChange={(e) => updateField('kashrut_level', e.target.value || null)}
                   />
                 }
               />
               <FieldRow
-                label="Reference Rav"
-                value={customFields.rabbi_reference || null}
+                label="Tsniout"
+                value={getTsnioutLabel(man.tsniout)}
+                editing={editing}
+                inputElement={
+                  <Select
+                    options={tsnioutOptions}
+                    value={formData.tsniout || ''}
+                    onChange={(e) => updateField('tsniout', e.target.value || null)}
+                  />
+                }
+              />
+              <FieldRow
+                label="Etude de Torah"
+                value={getTorahStudyLabel(man.torah_study)}
+                editing={editing}
+                inputElement={
+                  <Select
+                    options={torahStudyOptions}
+                    value={formData.torah_study || ''}
+                    onChange={(e) => updateField('torah_study', e.target.value || null)}
+                  />
+                }
+              />
+              <FieldRow
+                label="Priere"
+                value={man.prayer_study}
                 editing={editing}
                 inputElement={
                   <Input
-                    value={formCustomFields.rabbi_reference || ''}
-                    onChange={(e) => updateCustomField('rabbi_reference', e.target.value)}
+                    value={formData.prayer_study || ''}
+                    onChange={(e) => updateField('prayer_study', e.target.value)}
+                  />
+                }
+              />
+              <FieldRow
+                label="Traditions / Minhaguim"
+                value={man.traditions_minhaguim}
+                editing={editing}
+                inputElement={
+                  <Input
+                    inputType="textarea"
+                    value={formData.traditions_minhaguim || ''}
+                    onChange={(e) => updateField('traditions_minhaguim', e.target.value)}
+                  />
+                }
+              />
+              <FieldRow
+                label="Projet de foyer religieux"
+                value={man.religious_home_project}
+                editing={editing}
+                inputElement={
+                  <Input
+                    inputType="textarea"
+                    value={formData.religious_home_project || ''}
+                    onChange={(e) => updateField('religious_home_project', e.target.value)}
+                  />
+                }
+              />
+              <FieldRow
+                label="Education des enfants"
+                value={getChildrenEducationLabel(man.children_education)}
+                editing={editing}
+                inputElement={
+                  <Select
+                    options={childrenEducationOptions}
+                    value={formData.children_education || ''}
+                    onChange={(e) => updateField('children_education', e.target.value || null)}
                   />
                 }
               />
@@ -941,13 +830,13 @@ export default function ManDetailPage({
           <SectionCard title="Famille" icon={<Users className="h-4 w-4" />}>
             <dl>
               <FieldRow
-                label="Historique matrimonial"
-                value={man.marital_history}
+                label="Statut matrimonial"
+                value={man.marital_status}
                 editing={editing}
                 inputElement={
                   <Input
-                    value={formData.marital_history || ''}
-                    onChange={(e) => updateField('marital_history', e.target.value)}
+                    value={formData.marital_status || ''}
+                    onChange={(e) => updateField('marital_status', e.target.value)}
                   />
                 }
               />
@@ -966,81 +855,15 @@ export default function ManDetailPage({
                   />
                 }
               />
-              {(man.has_children || formData.has_children) && (
-                <>
-                  <FieldRow
-                    label="Nombre d'enfants"
-                    value={man.children_count !== null ? String(man.children_count) : null}
-                    editing={editing}
-                    inputElement={
-                      <Input
-                        inputType="number"
-                        value={formData.children_count ?? ''}
-                        onChange={(e) =>
-                          updateField('children_count', e.target.value ? Number(e.target.value) : null)
-                        }
-                      />
-                    }
-                  />
-                  <FieldRow
-                    label="Details enfants"
-                    value={man.children_details}
-                    editing={editing}
-                    inputElement={
-                      <Input
-                        inputType="textarea"
-                        value={formData.children_details || ''}
-                        onChange={(e) => updateField('children_details', e.target.value)}
-                      />
-                    }
-                  />
-                </>
-              )}
               <FieldRow
-                label="Nom du pere"
-                value={man.father_name}
-                editing={editing}
-                inputElement={
-                  <Input
-                    value={formData.father_name || ''}
-                    onChange={(e) => updateField('father_name', e.target.value)}
-                  />
-                }
-              />
-              <FieldRow
-                label="Nom de la mere"
-                value={man.mother_name}
-                editing={editing}
-                inputElement={
-                  <Input
-                    value={formData.mother_name || ''}
-                    onChange={(e) => updateField('mother_name', e.target.value)}
-                  />
-                }
-              />
-              <FieldRow
-                label="Nombre de freres et soeurs"
-                value={man.siblings_count !== null ? String(man.siblings_count) : null}
-                editing={editing}
-                inputElement={
-                  <Input
-                    inputType="number"
-                    value={formData.siblings_count ?? ''}
-                    onChange={(e) =>
-                      updateField('siblings_count', e.target.value ? Number(e.target.value) : null)
-                    }
-                  />
-                }
-              />
-              <FieldRow
-                label="Situation familiale"
-                value={man.family_situation}
+                label="Contexte familial"
+                value={man.family_context}
                 editing={editing}
                 inputElement={
                   <Input
                     inputType="textarea"
-                    value={formData.family_situation || ''}
-                    onChange={(e) => updateField('family_situation', e.target.value)}
+                    value={formData.family_context || ''}
+                    onChange={(e) => updateField('family_context', e.target.value)}
                   />
                 }
               />
@@ -1062,127 +885,37 @@ export default function ManDetailPage({
                 }
               />
               <FieldRow
-                label="Niveau d'etudes"
-                value={man.education_level}
+                label="Etudes"
+                value={man.studies}
                 editing={editing}
                 inputElement={
                   <Input
-                    value={formData.education_level || ''}
-                    onChange={(e) => updateField('education_level', e.target.value)}
-                  />
-                }
-              />
-              <FieldRow
-                label="Diplome"
-                value={man.diploma}
-                editing={editing}
-                inputElement={
-                  <Input
-                    value={formData.diploma || ''}
-                    onChange={(e) => updateField('diploma', e.target.value)}
-                  />
-                }
-              />
-              <FieldRow
-                label="Ecole / Universite"
-                value={man.school}
-                editing={editing}
-                inputElement={
-                  <Input
-                    value={formData.school || ''}
-                    onChange={(e) => updateField('school', e.target.value)}
+                    value={formData.studies || ''}
+                    onChange={(e) => updateField('studies', e.target.value)}
                   />
                 }
               />
               <FieldRow
                 label="Temperament"
-                value={customFields.temperament || null}
+                value={man.temperament}
                 editing={editing}
                 inputElement={
                   <Input
                     inputType="textarea"
-                    value={formCustomFields.temperament || ''}
-                    onChange={(e) => updateCustomField('temperament', e.target.value)}
+                    value={formData.temperament || ''}
+                    onChange={(e) => updateField('temperament', e.target.value)}
                   />
                 }
               />
               <FieldRow
                 label="Centres d'interet"
-                value={customFields.interests || null}
+                value={man.interests}
                 editing={editing}
                 inputElement={
                   <Input
                     inputType="textarea"
-                    value={formCustomFields.interests || ''}
-                    onChange={(e) => updateCustomField('interests', e.target.value)}
-                  />
-                }
-              />
-            </dl>
-          </SectionCard>
-
-          {/* ── Physique ─────────────────────────────────── */}
-          <SectionCard title="Physique" icon={<Ruler className="h-4 w-4" />}>
-            <dl>
-              <FieldRow
-                label="Taille (cm)"
-                value={man.height_cm !== null ? `${man.height_cm} cm` : null}
-                editing={editing}
-                inputElement={
-                  <Input
-                    inputType="number"
-                    value={formData.height_cm ?? ''}
-                    onChange={(e) =>
-                      updateField('height_cm', e.target.value ? Number(e.target.value) : null)
-                    }
-                  />
-                }
-              />
-              <FieldRow
-                label="Corpulence"
-                value={getBuildLabel(man.build)}
-                editing={editing}
-                inputElement={
-                  <Select
-                    options={buildOptions}
-                    value={formData.build || ''}
-                    onChange={(e) => updateField('build', e.target.value || null)}
-                  />
-                }
-              />
-              <FieldRow
-                label="Couleur de cheveux"
-                value={getHairColorLabel(man.hair_color)}
-                editing={editing}
-                inputElement={
-                  <Select
-                    options={hairColorOptions}
-                    value={formData.hair_color || ''}
-                    onChange={(e) => updateField('hair_color', e.target.value || null)}
-                  />
-                }
-              />
-              <FieldRow
-                label="Couleur des yeux"
-                value={getEyeColorLabel(man.eye_color)}
-                editing={editing}
-                inputElement={
-                  <Select
-                    options={eyeColorOptions}
-                    value={formData.eye_color || ''}
-                    onChange={(e) => updateField('eye_color', e.target.value || null)}
-                  />
-                }
-              />
-              <FieldRow
-                label="Description physique"
-                value={man.physical_description}
-                editing={editing}
-                inputElement={
-                  <Input
-                    inputType="textarea"
-                    value={formData.physical_description || ''}
-                    onChange={(e) => updateField('physical_description', e.target.value)}
+                    value={formData.interests || ''}
+                    onChange={(e) => updateField('interests', e.target.value)}
                   />
                 }
               />
@@ -1195,8 +928,8 @@ export default function ManDetailPage({
               <FieldRow
                 label="Age souhaite"
                 value={
-                  man.preferred_age_min !== null || man.preferred_age_max !== null
-                    ? `${man.preferred_age_min ?? '?'} - ${man.preferred_age_max ?? '?'} ans`
+                  man.age_min !== null || man.age_max !== null
+                    ? `${man.age_min ?? '?'} - ${man.age_max ?? '?'} ans`
                     : null
                 }
                 editing={editing}
@@ -1205,99 +938,67 @@ export default function ManDetailPage({
                     <Input
                       inputType="number"
                       placeholder="Min"
-                      value={formData.preferred_age_min ?? ''}
+                      value={formData.age_min ?? ''}
                       onChange={(e) =>
-                        updateField('preferred_age_min', e.target.value ? Number(e.target.value) : null)
+                        updateField('age_min', e.target.value ? Number(e.target.value) : null)
                       }
                     />
                     <span className="text-sm text-[#6B7280]">a</span>
                     <Input
                       inputType="number"
                       placeholder="Max"
-                      value={formData.preferred_age_max ?? ''}
+                      value={formData.age_max ?? ''}
                       onChange={(e) =>
-                        updateField('preferred_age_max', e.target.value ? Number(e.target.value) : null)
+                        updateField('age_max', e.target.value ? Number(e.target.value) : null)
                       }
                     />
                   </div>
                 }
               />
               <FieldRow
-                label="Localisation souhaitee"
-                value={man.preferred_location}
+                label="Villes souhaitees"
+                value={man.preferred_cities}
                 editing={editing}
                 inputElement={
                   <Input
-                    value={formData.preferred_location || ''}
-                    onChange={(e) => updateField('preferred_location', e.target.value)}
+                    value={formData.preferred_cities || ''}
+                    onChange={(e) => updateField('preferred_cities', e.target.value)}
                   />
                 }
               />
               <FieldRow
-                label="Niveau religieux souhaite"
-                value={man.preferred_religious_level}
-                editing={editing}
-                inputElement={
-                  <Input
-                    value={formData.preferred_religious_level || ''}
-                    onChange={(e) => updateField('preferred_religious_level', e.target.value)}
-                  />
-                }
-              />
-              <FieldRow
-                label="Hashkafa souhaitee"
-                value={man.preferred_hashkafa}
-                editing={editing}
-                inputElement={
-                  <Input
-                    value={formData.preferred_hashkafa || ''}
-                    onChange={(e) => updateField('preferred_hashkafa', e.target.value)}
-                  />
-                }
-              />
-              <FieldRow
-                label="Communaute souhaitee"
-                value={man.preferred_community}
-                editing={editing}
-                inputElement={
-                  <Input
-                    value={formData.preferred_community || ''}
-                    onChange={(e) => updateField('preferred_community', e.target.value)}
-                  />
-                }
-              />
-              <FieldRow
-                label="Profession souhaitee"
-                value={man.preferred_profession}
-                editing={editing}
-                inputElement={
-                  <Input
-                    value={formData.preferred_profession || ''}
-                    onChange={(e) => updateField('preferred_profession', e.target.value)}
-                  />
-                }
-              />
-              <FieldRow
-                label="Description du partenaire ideal"
-                value={man.partner_description}
+                label="Qualites recherchees"
+                value={man.expected_qualities}
                 editing={editing}
                 inputElement={
                   <Input
                     inputType="textarea"
-                    value={formData.partner_description || ''}
-                    onChange={(e) => updateField('partner_description', e.target.value)}
+                    value={formData.expected_qualities || ''}
+                    onChange={(e) => updateField('expected_qualities', e.target.value)}
                   />
                 }
               />
               <FieldRow
-                label="Points de blocage"
-                value={man.deal_breakers}
+                label="Valeurs attendues"
+                value={man.expected_values}
                 editing={editing}
                 inputElement={
                   <Input
                     inputType="textarea"
-                    value={formData.deal_breakers || ''}
-                    onChange={(e) => updateField('deal_breakers', e.target.value)}
+                    value={formData.expected_values || ''}
+                    onChange={(e) => updateField('expected_values', e.target.value)}
+                  />
+                }
+              />
+              <FieldRow
+                label="Incompatibilites"
+                value={man.incompatibilities}
+                editing={editing}
+                inputElement={
+                  <Input
+                    inputType="textarea"
+                    value={formData.incompatibilities || ''}
+                    onChange={(e) => updateField('incompatibilities', e.target.value)}
                   />
                 }
               />
@@ -1320,75 +1021,37 @@ export default function ManDetailPage({
                 }
               />
               <FieldRow
-                label="Notes privees"
-                value={man.private_notes ? <p className="whitespace-pre-wrap">{man.private_notes}</p> : null}
+                label="Canal d'origine"
+                value={man.origin_channel}
                 editing={editing}
                 inputElement={
                   <Input
-                    inputType="textarea"
-                    value={formData.private_notes || ''}
-                    onChange={(e) => updateField('private_notes', e.target.value)}
+                    value={formData.origin_channel || ''}
+                    onChange={(e) => updateField('origin_channel', e.target.value)}
                   />
                 }
               />
               <FieldRow
-                label="Impression du Chadkhan"
+                label="Chadkhanit externe"
                 value={
-                  man.matchmaker_impression ? (
-                    <p className="whitespace-pre-wrap">{man.matchmaker_impression}</p>
-                  ) : null
+                  man.external_chadkhanit_name
+                    ? `${man.external_chadkhanit_name}${man.external_chadkhanit_contact ? ` (${man.external_chadkhanit_contact})` : ''}`
+                    : null
                 }
                 editing={editing}
                 inputElement={
-                  <Input
-                    inputType="textarea"
-                    value={formData.matchmaker_impression || ''}
-                    onChange={(e) => updateField('matchmaker_impression', e.target.value)}
-                  />
-                }
-              />
-              <FieldRow
-                label="Source"
-                value={man.source}
-                editing={editing}
-                inputElement={
-                  <Input
-                    value={formData.source || ''}
-                    onChange={(e) => updateField('source', e.target.value)}
-                  />
-                }
-              />
-              <FieldRow
-                label="Tags"
-                value={
-                  man.tags && man.tags.length > 0 ? (
-                    <div className="flex flex-wrap gap-1">
-                      {man.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="inline-flex rounded-full bg-[#87A878]/10 px-2 py-0.5 text-xs font-medium text-[#5A7A4A]"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null
-                }
-                editing={editing}
-                inputElement={
-                  <Input
-                    value={(formData.tags || []).join(', ')}
-                    helperText="Separez les tags par des virgules"
-                    onChange={(e) =>
-                      updateField(
-                        'tags',
-                        e.target.value
-                          .split(',')
-                          .map((t: string) => t.trim())
-                          .filter(Boolean)
-                      )
-                    }
-                  />
+                  <div className="space-y-2">
+                    <Input
+                      placeholder="Nom de la chadkhanit"
+                      value={formData.external_chadkhanit_name || ''}
+                      onChange={(e) => updateField('external_chadkhanit_name', e.target.value)}
+                    />
+                    <Input
+                      placeholder="Contact"
+                      value={formData.external_chadkhanit_contact || ''}
+                      onChange={(e) => updateField('external_chadkhanit_contact', e.target.value)}
+                    />
+                  </div>
                 }
               />
             </dl>
@@ -1399,7 +1062,6 @@ export default function ManDetailPage({
             <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-[#6B7280]">
               <span>Cree le {formatDate(man.created_at)}</span>
               <span>Mis a jour le {formatDate(man.updated_at)}</span>
-              <span>Priorite : {man.priority}</span>
             </div>
           </div>
 
@@ -1493,13 +1155,10 @@ export default function ManDetailPage({
       </div>
 
       {/* Close dropdowns on click outside */}
-      {(statusDropdownOpen || availabilityDropdownOpen) && (
+      {statusDropdownOpen && (
         <div
           className="fixed inset-0 z-10"
-          onClick={() => {
-            setStatusDropdownOpen(false)
-            setAvailabilityDropdownOpen(false)
-          }}
+          onClick={() => setStatusDropdownOpen(false)}
         />
       )}
     </div>

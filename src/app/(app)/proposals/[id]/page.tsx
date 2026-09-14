@@ -52,6 +52,12 @@ import {
   CircleDot,
   Minus,
 } from 'lucide-react'
+import {
+  getCourantLabel,
+  getShabbatPracticeLabel,
+  getKashrutLevelLabel,
+  getCommunityEthnicLabel,
+} from '@/lib/constants/orthodox'
 
 const ORG_ID = '00000000-0000-0000-0000-000000000001'
 
@@ -97,25 +103,6 @@ const sentimentOptions: { value: FeedbackSentiment; label: string }[] = [
   { value: 'negatif', label: 'Negatif' },
   { value: 'mitige', label: 'Mitige' },
 ]
-
-const religiousLevelLabels: Record<string, string> = {
-  very_religious: 'Tres pratiquant',
-  religious: 'Pratiquant',
-  traditional: 'Traditionnel',
-  secular: 'Laique',
-  other: 'Autre',
-}
-
-const hashkafaLabels: Record<string, string> = {
-  haredi_ashkenaz: 'Haredi Ashkenaze',
-  haredi_sfarad: 'Haredi Sefarade',
-  dati_leumi: 'Dati Leoumi',
-  dati_liberal: 'Dati Liberal',
-  masorti: 'Massorti',
-  hiloni: 'Hiloni',
-  baal_teshuva: 'Baal Techouva',
-  other: 'Autre',
-}
 
 const locationTypeLabels: Record<string, string> = {
   restaurant: 'Restaurant',
@@ -176,12 +163,12 @@ function computeCompatibility(
 
   if (womanAge !== null && manAge !== null) {
     const womanInManRange =
-      man.preferred_age_min !== null && man.preferred_age_max !== null
-        ? womanAge >= man.preferred_age_min && womanAge <= man.preferred_age_max
+      man.age_min !== null && man.age_max !== null
+        ? womanAge >= man.age_min && womanAge <= man.age_max
         : null
     const manInWomanRange =
-      woman.preferred_age_min !== null && woman.preferred_age_max !== null
-        ? manAge >= woman.preferred_age_min && manAge <= woman.preferred_age_max
+      woman.age_min !== null && woman.age_max !== null
+        ? manAge >= woman.age_min && manAge <= woman.age_max
         : null
 
     if (womanInManRange === null && manInWomanRange === null) {
@@ -243,85 +230,65 @@ function computeCompatibility(
     })
   }
 
-  // 3. Religious level
-  if (woman.religious_level && man.religious_level) {
-    if (woman.religious_level === man.religious_level) {
+  // 3. Courant religieux
+  if (woman.courant && man.courant) {
+    if (woman.courant === man.courant) {
       items.push({
-        label: 'Niveau religieux',
+        label: 'Courant',
         level: 'green',
-        detail: religiousLevelLabels[woman.religious_level] || woman.religious_level,
+        detail: getCourantLabel(woman.courant),
         icon: <Book className="h-4 w-4" />,
       })
     } else {
       items.push({
-        label: 'Niveau religieux',
+        label: 'Courant',
         level: 'orange',
-        detail: `${religiousLevelLabels[woman.religious_level] || woman.religious_level} / ${religiousLevelLabels[man.religious_level] || man.religious_level}`,
+        detail: `${getCourantLabel(woman.courant)} / ${getCourantLabel(man.courant)}`,
         icon: <Book className="h-4 w-4" />,
       })
     }
   } else {
     items.push({
-      label: 'Niveau religieux',
+      label: 'Courant',
       level: 'gray',
-      detail: 'Non renseigne',
+      detail: 'Non renseigné',
       icon: <Book className="h-4 w-4" />,
     })
   }
 
-  // 4. Hashkafa
-  if (woman.hashkafa && man.hashkafa) {
-    if (woman.hashkafa === man.hashkafa) {
+  // 4. Communauté
+  if (woman.community && man.community) {
+    if (woman.community === man.community) {
       items.push({
-        label: 'Hashkafa',
+        label: 'Communauté',
         level: 'green',
-        detail: hashkafaLabels[woman.hashkafa] || woman.hashkafa,
+        detail: getCommunityEthnicLabel(woman.community),
         icon: <Star className="h-4 w-4" />,
       })
     } else {
       items.push({
-        label: 'Hashkafa',
+        label: 'Communauté',
         level: 'orange',
-        detail: `${hashkafaLabels[woman.hashkafa] || woman.hashkafa} / ${hashkafaLabels[man.hashkafa] || man.hashkafa}`,
+        detail: `${getCommunityEthnicLabel(woman.community)} / ${getCommunityEthnicLabel(man.community)}`,
         icon: <Star className="h-4 w-4" />,
       })
     }
   } else {
     items.push({
-      label: 'Hashkafa',
+      label: 'Communauté',
       level: 'gray',
-      detail: 'Non renseigne',
+      detail: 'Non renseigné',
       icon: <Star className="h-4 w-4" />,
     })
   }
 
-  // 5. Children
-  const wWants = woman.wants_children
-  const mWants = man.wants_children
-  if (wWants !== null && mWants !== null) {
-    if (wWants === mWants) {
-      items.push({
-        label: 'Enfants',
-        level: 'green',
-        detail: wWants ? 'Les deux souhaitent des enfants' : 'Aucun ne souhaite d\'enfants',
-        icon: <Baby className="h-4 w-4" />,
-      })
-    } else {
-      items.push({
-        label: 'Enfants',
-        level: 'orange',
-        detail: 'Divergence sur le souhait d\'enfants',
-        icon: <Baby className="h-4 w-4" />,
-      })
-    }
-  } else {
-    items.push({
-      label: 'Enfants',
-      level: 'gray',
-      detail: 'Non renseigne',
-      icon: <Baby className="h-4 w-4" />,
-    })
-  }
+  // 5. Enfants
+  items.push({
+    label: 'Enfants',
+    level: 'gray',
+    detail: 'Non renseigné',
+    icon: <Baby className="h-4 w-4" />,
+  })
 
   return items
 }
@@ -858,29 +825,25 @@ export default function ProposalDetailPage({
                   <>
                     {/* Key info */}
                     <div className="space-y-3 mb-6">
+                      {woman.courant && (
+                        <InfoRow icon={<Book className="h-4 w-4" />} label="Courant" value={getCourantLabel(woman.courant)} />
+                      )}
                       {woman.community && (
-                        <InfoRow icon={<Users className="h-4 w-4" />} label="Communaute" value={woman.community} />
+                        <InfoRow icon={<Users className="h-4 w-4" />} label="Communauté" value={getCommunityEthnicLabel(woman.community)} />
                       )}
-                      {woman.religious_level && (
-                        <InfoRow icon={<Book className="h-4 w-4" />} label="Niveau religieux" value={religiousLevelLabels[woman.religious_level] || woman.religious_level} />
-                      )}
-                      {woman.hashkafa && (
-                        <InfoRow icon={<Star className="h-4 w-4" />} label="Hashkafa" value={hashkafaLabels[woman.hashkafa] || woman.hashkafa} />
+                      {woman.shabbat_practice && (
+                        <InfoRow icon={<Star className="h-4 w-4" />} label="Chabbat" value={getShabbatPracticeLabel(woman.shabbat_practice)} />
                       )}
                       {woman.profession && (
                         <InfoRow icon={<Briefcase className="h-4 w-4" />} label="Profession" value={woman.profession} />
                       )}
-                      {woman.marital_history && (
-                        <InfoRow icon={<User className="h-4 w-4" />} label="Historique matrimonial" value={woman.marital_history} />
+                      {woman.marital_status && (
+                        <InfoRow icon={<User className="h-4 w-4" />} label="Situation" value={woman.marital_status} />
                       )}
                       <InfoRow
                         icon={<Baby className="h-4 w-4" />}
                         label="Enfants"
-                        value={
-                          woman.has_children
-                            ? `Oui${woman.children_count ? ` (${woman.children_count})` : ''}`
-                            : 'Non'
-                        }
+                        value={woman.has_children ? 'Oui' : 'Non'}
                       />
                     </div>
 
@@ -890,17 +853,17 @@ export default function ProposalDetailPage({
                         <Target className="h-4 w-4 text-[#6B3A5B]" />
                         Ce qu&apos;elle recherche
                       </h4>
-                      {woman.partner_description && (
-                        <p className="text-sm text-[#6B7280] mb-2">{woman.partner_description}</p>
+                      {woman.ideal_husband && (
+                        <p className="text-sm text-[#6B7280] mb-2">{woman.ideal_husband}</p>
                       )}
                       <div className="space-y-1.5 text-sm text-[#6B7280]">
-                        {(woman.preferred_age_min || woman.preferred_age_max) && (
+                        {(woman.age_min || woman.age_max) && (
                           <p>
-                            Age : {woman.preferred_age_min || '?'} - {woman.preferred_age_max || '?'} ans
+                            Âge : {woman.age_min || '?'} – {woman.age_max || '?'} ans
                           </p>
                         )}
-                        {woman.preferred_location && (
-                          <p>Lieu : {woman.preferred_location}</p>
+                        {woman.preferred_cities && (
+                          <p>Villes : {woman.preferred_cities}</p>
                         )}
                       </div>
                     </div>
@@ -991,29 +954,25 @@ export default function ProposalDetailPage({
                   <>
                     {/* Key info */}
                     <div className="space-y-3 mb-6">
+                      {man.courant && (
+                        <InfoRow icon={<Book className="h-4 w-4" />} label="Courant" value={getCourantLabel(man.courant)} />
+                      )}
                       {man.community && (
-                        <InfoRow icon={<Users className="h-4 w-4" />} label="Communaute" value={man.community} />
+                        <InfoRow icon={<Users className="h-4 w-4" />} label="Communauté" value={getCommunityEthnicLabel(man.community)} />
                       )}
-                      {man.religious_level && (
-                        <InfoRow icon={<Book className="h-4 w-4" />} label="Niveau religieux" value={religiousLevelLabels[man.religious_level] || man.religious_level} />
-                      )}
-                      {man.hashkafa && (
-                        <InfoRow icon={<Star className="h-4 w-4" />} label="Hashkafa" value={hashkafaLabels[man.hashkafa] || man.hashkafa} />
+                      {man.shabbat_practice && (
+                        <InfoRow icon={<Star className="h-4 w-4" />} label="Chabbat" value={getShabbatPracticeLabel(man.shabbat_practice)} />
                       )}
                       {man.profession && (
                         <InfoRow icon={<Briefcase className="h-4 w-4" />} label="Profession" value={man.profession} />
                       )}
-                      {man.marital_history && (
-                        <InfoRow icon={<User className="h-4 w-4" />} label="Historique matrimonial" value={man.marital_history} />
+                      {man.marital_status && (
+                        <InfoRow icon={<User className="h-4 w-4" />} label="Situation matrimoniale" value={man.marital_status} />
                       )}
                       <InfoRow
                         icon={<Baby className="h-4 w-4" />}
                         label="Enfants"
-                        value={
-                          man.has_children
-                            ? `Oui${man.children_count ? ` (${man.children_count})` : ''}`
-                            : 'Non'
-                        }
+                        value={man.has_children ? 'Oui' : 'Non'}
                       />
                     </div>
 
@@ -1023,17 +982,17 @@ export default function ProposalDetailPage({
                         <Target className="h-4 w-4 text-[#5A7A4A]" />
                         Ce qu&apos;il recherche
                       </h4>
-                      {man.partner_description && (
-                        <p className="text-sm text-[#6B7280] mb-2">{man.partner_description}</p>
+                      {man.expected_qualities && (
+                        <p className="text-sm text-[#6B7280] mb-2">{man.expected_qualities}</p>
                       )}
                       <div className="space-y-1.5 text-sm text-[#6B7280]">
-                        {(man.preferred_age_min || man.preferred_age_max) && (
+                        {(man.age_min || man.age_max) && (
                           <p>
-                            Age : {man.preferred_age_min || '?'} - {man.preferred_age_max || '?'} ans
+                            Âge : {man.age_min || '?'} - {man.age_max || '?'} ans
                           </p>
                         )}
-                        {man.preferred_location && (
-                          <p>Lieu : {man.preferred_location}</p>
+                        {man.preferred_cities && (
+                          <p>Villes : {man.preferred_cities}</p>
                         )}
                       </div>
                     </div>

@@ -18,6 +18,12 @@ import {
   getAvailabilityLabel,
   cn,
 } from '@/lib/utils'
+import {
+  getCourantLabel,
+  getCommunityEthnicLabel,
+  getShabbatPracticeLabel,
+  getKashrutLevelLabel,
+} from '@/lib/constants/orthodox'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Card from '@/components/ui/Card'
@@ -36,16 +42,14 @@ interface CandidateOption {
   city: string | null
   status: string
   availability: string
-  religious_level: string | null
-  hashkafa: string | null
+  courant: string | null
   community: string | null
   profession: string | null
-  height_cm: number | null
-  preferred_age_min: number | null
-  preferred_age_max: number | null
-  preferred_religious_level: string | null
-  preferred_hashkafa: string | null
-  preferred_location: string | null
+  shabbat_practice: string | null
+  kashrut_level: string | null
+  age_min: number | null
+  age_max: number | null
+  preferred_cities: string | null
 }
 
 interface ActiveProposal {
@@ -55,24 +59,6 @@ interface ActiveProposal {
   candidate_man_id: string
 }
 
-const religiousLevelLabels: Record<string, string> = {
-  tres_pratiquant: 'Tres pratiquant(e)',
-  pratiquant: 'Pratiquant(e)',
-  traditionnel: 'Traditionnel(le)',
-  liberal: 'Liberal(e)',
-  autre: 'Autre',
-}
-
-const hashkafaLabels: Record<string, string> = {
-  haredi_ashkenaz: 'Haredi Ashkenaze',
-  haredi_sfarad: 'Haredi Sefarade',
-  dati_leumi: 'Dati Leoumi',
-  dati_liberal: 'Dati Liberal',
-  masorti: 'Massorti',
-  hiloni: 'Hiloni',
-  baal_teshuva: 'Baal Techouva',
-  autre: 'Autre',
-}
 
 export default function NewProposalPage() {
   const router = useRouter()
@@ -96,9 +82,8 @@ export default function NewProposalPage() {
 
       const selectFields = `
         id, first_name, last_name, date_of_birth, age_estimate, is_age_estimate,
-        city, status, availability, religious_level, hashkafa, community,
-        profession, height_cm, preferred_age_min, preferred_age_max,
-        preferred_religious_level, preferred_hashkafa, preferred_location
+        city, status, availability, courant, community, profession,
+        shabbat_practice, kashrut_level, age_min, age_max, preferred_cities
       `
 
       const [womenRes, menRes] = await Promise.all([
@@ -299,39 +284,35 @@ export default function NewProposalPage() {
             </dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-[#6B7280]">Taille</dt>
-            <dd className="font-medium text-[#2D2D2D]">
-              {candidate.height_cm ? `${candidate.height_cm} cm` : 'Non renseigne'}
-            </dd>
-          </div>
-          <div className="flex justify-between">
             <dt className="text-[#6B7280]">Profession</dt>
             <dd className="font-medium text-[#2D2D2D]">
-              {candidate.profession || 'Non renseigne'}
+              {candidate.profession || 'Non renseigné'}
             </dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-[#6B7280]">Niveau religieux</dt>
+            <dt className="text-[#6B7280]">Courant</dt>
             <dd className="font-medium text-[#2D2D2D]">
-              {candidate.religious_level
-                ? religiousLevelLabels[candidate.religious_level] || candidate.religious_level
-                : 'Non renseigne'}
+              {candidate.courant
+                ? getCourantLabel(candidate.courant)
+                : 'Non renseigné'}
             </dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-[#6B7280]">Hashkafa</dt>
+            <dt className="text-[#6B7280]">Communauté</dt>
             <dd className="font-medium text-[#2D2D2D]">
-              {candidate.hashkafa
-                ? hashkafaLabels[candidate.hashkafa] || candidate.hashkafa
-                : 'Non renseigne'}
+              {candidate.community
+                ? getCommunityEthnicLabel(candidate.community)
+                : 'Non renseigné'}
             </dd>
           </div>
-          <div className="flex justify-between">
-            <dt className="text-[#6B7280]">Communaute</dt>
-            <dd className="font-medium text-[#2D2D2D]">
-              {candidate.community || 'Non renseigne'}
-            </dd>
-          </div>
+          {candidate.shabbat_practice && (
+            <div className="flex justify-between">
+              <dt className="text-[#6B7280]">Chabbat</dt>
+              <dd className="font-medium text-[#2D2D2D]">
+                {getShabbatPracticeLabel(candidate.shabbat_practice)}
+              </dd>
+            </div>
+          )}
           <div className="flex justify-between">
             <dt className="text-[#6B7280]">Disponibilite</dt>
             <dd>
@@ -348,35 +329,19 @@ export default function NewProposalPage() {
             Recherche
           </p>
           <dl className="space-y-1 text-xs">
-            {(candidate.preferred_age_min || candidate.preferred_age_max) && (
+            {(candidate.age_min || candidate.age_max) && (
               <div className="flex justify-between">
-                <dt className="text-[#6B7280]">Age souhaite</dt>
+                <dt className="text-[#6B7280]">Âge souhaité</dt>
                 <dd className="font-medium text-[#2D2D2D]">
-                  {candidate.preferred_age_min || '?'} - {candidate.preferred_age_max || '?'} ans
+                  {candidate.age_min || '?'} - {candidate.age_max || '?'} ans
                 </dd>
               </div>
             )}
-            {candidate.preferred_religious_level && (
+            {candidate.preferred_cities && (
               <div className="flex justify-between">
-                <dt className="text-[#6B7280]">Niveau religieux</dt>
+                <dt className="text-[#6B7280]">Villes</dt>
                 <dd className="font-medium text-[#2D2D2D]">
-                  {religiousLevelLabels[candidate.preferred_religious_level] || candidate.preferred_religious_level}
-                </dd>
-              </div>
-            )}
-            {candidate.preferred_hashkafa && (
-              <div className="flex justify-between">
-                <dt className="text-[#6B7280]">Hashkafa</dt>
-                <dd className="font-medium text-[#2D2D2D]">
-                  {hashkafaLabels[candidate.preferred_hashkafa] || candidate.preferred_hashkafa}
-                </dd>
-              </div>
-            )}
-            {candidate.preferred_location && (
-              <div className="flex justify-between">
-                <dt className="text-[#6B7280]">Lieu</dt>
-                <dd className="font-medium text-[#2D2D2D]">
-                  {candidate.preferred_location}
+                  {candidate.preferred_cities}
                 </dd>
               </div>
             )}
@@ -493,30 +458,30 @@ export default function NewProposalPage() {
                 Points de compatibilite
               </h3>
               <div className="space-y-2 text-xs">
-                {/* Religious level match */}
+                {/* Courant match */}
                 <CompatRow
-                  label="Niveau religieux"
-                  womanValue={selectedWoman.religious_level ? religiousLevelLabels[selectedWoman.religious_level] || selectedWoman.religious_level : null}
-                  manValue={selectedMan.religious_level ? religiousLevelLabels[selectedMan.religious_level] || selectedMan.religious_level : null}
-                  match={selectedWoman.religious_level === selectedMan.religious_level}
-                />
-                {/* Hashkafa match */}
-                <CompatRow
-                  label="Hashkafa"
-                  womanValue={selectedWoman.hashkafa ? hashkafaLabels[selectedWoman.hashkafa] || selectedWoman.hashkafa : null}
-                  manValue={selectedMan.hashkafa ? hashkafaLabels[selectedMan.hashkafa] || selectedMan.hashkafa : null}
-                  match={selectedWoman.hashkafa === selectedMan.hashkafa}
+                  label="Courant"
+                  womanValue={selectedWoman.courant ? getCourantLabel(selectedWoman.courant) : null}
+                  manValue={selectedMan.courant ? getCourantLabel(selectedMan.courant) : null}
+                  match={selectedWoman.courant === selectedMan.courant}
                 />
                 {/* Community match */}
                 <CompatRow
-                  label="Communaute"
-                  womanValue={selectedWoman.community}
-                  manValue={selectedMan.community}
+                  label="Communauté"
+                  womanValue={selectedWoman.community ? getCommunityEthnicLabel(selectedWoman.community) : null}
+                  manValue={selectedMan.community ? getCommunityEthnicLabel(selectedMan.community) : null}
                   match={
                     !!selectedWoman.community &&
                     !!selectedMan.community &&
-                    selectedWoman.community.toLowerCase() === selectedMan.community.toLowerCase()
+                    selectedWoman.community === selectedMan.community
                   }
+                />
+                {/* Shabbat match */}
+                <CompatRow
+                  label="Chabbat"
+                  womanValue={selectedWoman.shabbat_practice ? getShabbatPracticeLabel(selectedWoman.shabbat_practice) : null}
+                  manValue={selectedMan.shabbat_practice ? getShabbatPracticeLabel(selectedMan.shabbat_practice) : null}
+                  match={selectedWoman.shabbat_practice === selectedMan.shabbat_practice}
                 />
                 {/* Location match */}
                 <CompatRow

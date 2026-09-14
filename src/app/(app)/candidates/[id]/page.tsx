@@ -11,6 +11,17 @@ import {
   getAvailabilityColor,
   cn,
 } from '@/lib/utils'
+import {
+  getCourantLabel,
+  getCommunityEthnicLabel,
+  getShabbatPracticeLabel,
+  getKashrutLevelLabel,
+  getHassidoutLabel,
+  getNousahLabel,
+  getHeadCoveringLabel,
+  getTsnioutLabel,
+  getChildrenEducationLabel,
+} from '@/lib/constants/orthodox'
 import Card from '@/components/ui/Card'
 import Avatar from '@/components/ui/Avatar'
 import Button from '@/components/ui/Button'
@@ -98,76 +109,81 @@ function CandidateDetailTabs({
   const c = candidate
 
   const identityFields: DetailField[] = [
-    { label: 'Prenom', value: c.first_name as string },
+    { label: 'Prénom', value: c.first_name as string },
     { label: 'Nom', value: c.last_name as string },
-    { label: 'Nom hebraique', value: c.hebrew_name as string | null },
-    { label: 'Nom de jeune fille', value: c.maiden_name as string | null },
+    { label: 'Nom hébraïque', value: c.hebrew_name as string | null },
     { label: 'Date de naissance', value: c.date_of_birth ? formatDate(c.date_of_birth as string) : null },
-    { label: 'Nationalite', value: c.nationality as string | null },
-    { label: 'Pays d\'origine', value: c.country_of_origin as string | null },
-    { label: 'Telephone', value: c.phone as string | null },
-    { label: 'Telephone secondaire', value: c.phone_secondary as string | null },
+    { label: 'Âge estimé', value: c.age_estimate as number | null },
+    { label: 'Téléphone', value: c.phone as string | null },
+    { label: 'WhatsApp', value: c.whatsapp as string | null },
     { label: 'Email', value: c.email as string | null },
-    { label: 'Adresse', value: c.address as string | null },
     { label: 'Ville', value: c.city as string | null },
-    { label: 'Code postal', value: c.postal_code as string | null },
     { label: 'Pays', value: c.country as string | null },
-  ]
-
-  const physicalFields: DetailField[] = [
-    { label: 'Taille (cm)', value: c.height_cm as number | null },
-    { label: 'Corpulence', value: c.build as string | null },
-    { label: 'Couleur de cheveux', value: c.hair_color as string | null },
-    { label: 'Couleur des yeux', value: c.eye_color as string | null },
-    { label: 'Description physique', value: c.physical_description as string | null },
+    { label: 'Langues', value: Array.isArray(c.languages) ? (c.languages as string[]).join(', ') : c.languages as string | null },
+    { label: 'Contact préféré', value: c.preferred_contact as string | null },
   ]
 
   const familyFields: DetailField[] = [
-    { label: 'Nom du pere', value: c.father_name as string | null },
-    { label: 'Profession du pere', value: c.father_profession as string | null },
-    { label: 'Origine du pere', value: c.father_origin as string | null },
-    { label: 'Nom de la mere', value: c.mother_name as string | null },
-    { label: 'Nom de jeune fille de la mere', value: c.mother_maiden_name as string | null },
-    { label: 'Profession de la mere', value: c.mother_profession as string | null },
-    { label: 'Origine de la mere', value: c.mother_origin as string | null },
-    { label: 'Nombre de freres/soeurs', value: c.siblings_count as number | null },
-    { label: 'Detail fratrie', value: c.siblings_details as string | null },
-    { label: 'Situation familiale', value: c.family_situation as string | null },
+    { label: 'Situation matrimoniale', value: c.marital_status as string | null },
+    { label: 'Enfants', value: c.has_children ? 'Oui' : 'Non' },
+    { label: 'Détails enfants', value: c.children_details as string | null },
+    { label: 'Fratrie', value: c.siblings as string | null },
+    { label: 'Villes famille', value: c.family_cities as string | null },
+    { label: 'Traditions familiales', value: c.family_traditions as string | null },
+    { label: 'Rôle famille dans le projet', value: c.family_role_in_project as string | null },
+    { label: 'Contexte familial', value: c.family_context as string | null },
   ]
 
   const religiousFields: DetailField[] = [
-    { label: 'Niveau de pratique', value: c.religious_level as string | null },
-    { label: 'Hashkafa', value: c.hashkafa as string | null },
-    { label: 'Communaute', value: c.community as string | null },
+    { label: 'Courant', value: getCourantLabel(c.courant as string | null) },
+    { label: 'Hassidout', value: getHassidoutLabel(c.hassidout as string | null) },
+    { label: 'Nousah', value: getNousahLabel(c.nousah as string | null) },
+    { label: 'Couverture de tete', value: getHeadCoveringLabel(c.head_covering as string | null) },
+    { label: 'Communaute', value: getCommunityEthnicLabel(c.community as string | null) },
     { label: 'Synagogue', value: c.synagogue as string | null },
-    { label: 'Cohen / Levi / Israel', value: c.cohen_levi_israel as string | null },
-    { label: 'Chabbat', value: c.keeps_shabbat as boolean | null },
-    { label: 'Cacherout', value: c.keeps_kashrut as boolean | null },
+    { label: 'Rav de reference', value: c.rabbi_reference as string | null },
+    { label: 'Ecole / Seminaire', value: c.school_seminary as string | null },
+    { label: 'Traditions et minhaguim', value: c.traditions_minhaguim as string | null },
+    { label: 'Pratique du Chabbat', value: getShabbatPracticeLabel(c.shabbat_practice as string | null) },
+    { label: 'Niveau de Cacheroute', value: getKashrutLevelLabel(c.kashrut_level as string | null) },
+    { label: 'Priere et etude', value: c.prayer_study as string | null },
+    { label: 'Tsniout', value: getTsnioutLabel(c.tsniout as string | null) },
+    { label: 'Projet de foyer religieux', value: c.religious_home_project as string | null },
+    { label: 'Education des enfants', value: getChildrenEducationLabel(c.children_education as string | null) },
   ]
 
   const personalityFields: DetailField[] = [
-    { label: 'Niveau d\'etudes', value: c.education_level as string | null },
-    { label: 'Ecole / Universite', value: c.school as string | null },
-    { label: 'Diplome', value: c.diploma as string | null },
+    { label: 'Études', value: c.studies as string | null },
     { label: 'Profession', value: c.profession as string | null },
-    { label: 'Employeur', value: c.employer as string | null },
-    { label: 'Situation matrimoniale', value: c.marital_history as string | null },
-    { label: 'Enfants', value: c.has_children ? `Oui (${c.children_count ?? '?'})` : 'Non' },
-    { label: 'Souhaite des enfants', value: c.wants_children as boolean | null },
+    { label: 'Emploi du temps', value: c.work_schedule as string | null },
+    { label: 'Centres d\'intérêt', value: c.interests as string | null },
+    { label: 'Tempérament', value: c.temperament as string | null },
+    { label: 'Vie sociale', value: c.social_life as string | null },
+    { label: 'Hobbies / Voyages', value: c.hobbies_travel as string | null },
+    { label: 'Tabac', value: c.smoking as string | null },
+    { label: 'Équilibre travail-vie', value: c.work_life_balance as string | null },
+    { label: 'Implication communautaire', value: c.community_involvement as string | null },
+    { label: 'Valeurs de couple', value: c.couple_values as string | null },
+    { label: 'Vision du foyer', value: c.home_vision as string | null },
+    { label: 'Note personnelle', value: c.personal_note as string | null },
   ]
 
   const expectationFields: DetailField[] = [
-    { label: 'Age souhaite (min)', value: c.preferred_age_min as number | null },
-    { label: 'Age souhaite (max)', value: c.preferred_age_max as number | null },
-    { label: 'Taille souhaitee (min cm)', value: c.preferred_height_min as number | null },
-    { label: 'Taille souhaitee (max cm)', value: c.preferred_height_max as number | null },
-    { label: 'Niveau religieux souhaite', value: c.preferred_religious_level as string | null },
-    { label: 'Hashkafa souhaitee', value: c.preferred_hashkafa as string | null },
-    { label: 'Communaute souhaitee', value: c.preferred_community as string | null },
-    { label: 'Lieu souhaite', value: c.preferred_location as string | null },
-    { label: 'Profession souhaitee', value: c.preferred_profession as string | null },
-    { label: 'Points redhibitoires', value: c.deal_breakers as string | null },
-    { label: 'Description du partenaire ideal', value: c.partner_description as string | null },
+    { label: 'Âge souhaité (min)', value: c.age_min as number | null },
+    { label: 'Âge souhaité (max)', value: c.age_max as number | null },
+    { label: 'Villes souhaitées', value: c.preferred_cities as string | null },
+    { label: 'Mobilité', value: c.mobility as string | null },
+    { label: 'Statut matrimonial accepté', value: Array.isArray(c.accepted_marital_status) ? (c.accepted_marital_status as string[]).join(', ') : c.accepted_marital_status as string | null },
+    { label: 'Projet religieux', value: c.religious_project as string | null },
+    { label: 'Importance étude Torah', value: c.torah_study_importance as string | null },
+    { label: 'Importance travail', value: c.work_importance as string | null },
+    { label: 'Qualités attendues', value: c.expected_qualities as string | null },
+    { label: 'Valeurs attendues', value: c.expected_values as string | null },
+    { label: 'Style de vie attendu', value: c.expected_lifestyle as string | null },
+    { label: 'Projet familial', value: c.family_project as string | null },
+    { label: 'Mari idéal', value: c.ideal_husband as string | null },
+    { label: 'Incompatibilités', value: c.incompatibilities as string | null },
+    { label: 'Critères physiques', value: c.physical_criteria as string | null },
   ]
 
   return (
@@ -185,31 +201,19 @@ function CandidateDetailTabs({
                 { label: 'Age', value: calculateAge(c.date_of_birth as string | null, c.age_estimate as number | null, c.is_age_estimate as boolean) },
                 { label: 'Ville', value: c.city as string | null },
                 { label: 'Profession', value: c.profession as string | null },
-                { label: 'Communaute', value: c.community as string | null },
-                { label: 'Hashkafa', value: c.hashkafa as string | null },
-                { label: 'Niveau de pratique', value: c.religious_level as string | null },
+                { label: 'Communaute', value: getCommunityEthnicLabel(c.community as string | null) },
+                { label: 'Courant', value: getCourantLabel(c.courant as string | null) },
               ]}
             />
           </Card>
 
           <Card>
             <h3 className="text-sm font-semibold text-[#6B7280] uppercase tracking-wider mb-3">
-              Notes
+              Note personnelle
             </h3>
-            <div className="space-y-3">
-              <div>
-                <p className="text-xs font-medium text-[#6B7280]">Notes generales</p>
-                <p className="text-sm text-[#2D2D2D] mt-0.5 whitespace-pre-wrap">
-                  {(c.notes as string) || <span className="text-[#6B7280]/50 italic">Non renseigne</span>}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs font-medium text-[#6B7280]">Impression de la chadkhanit</p>
-                <p className="text-sm text-[#2D2D2D] mt-0.5 whitespace-pre-wrap">
-                  {(c.matchmaker_impression as string) || <span className="text-[#6B7280]/50 italic">Non renseigne</span>}
-                </p>
-              </div>
-            </div>
+            <p className="text-sm text-[#2D2D2D] whitespace-pre-wrap">
+              {(c.personal_note as string) || <span className="text-[#6B7280]/50 italic">Non renseigné</span>}
+            </p>
           </Card>
         </div>
       </section>
@@ -219,10 +223,6 @@ function CandidateDetailTabs({
         <h2 className="text-lg font-semibold text-[#2D2D2D]">Identite et contact</h2>
         <Card>
           <SectionGrid fields={identityFields} />
-          <div className="mt-4 pt-4 border-t border-[#E8E0D4]">
-            <h3 className="text-sm font-semibold text-[#6B7280] mb-2">Physique</h3>
-            <SectionGrid fields={physicalFields} />
-          </div>
         </Card>
       </section>
 

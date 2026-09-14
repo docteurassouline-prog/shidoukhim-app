@@ -21,164 +21,135 @@ import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import Card from '@/components/ui/Card'
+import {
+  courantOptions,
+  hassidoutOptions,
+  nousahOptions,
+  headCoveringOptions,
+  shabbatPracticeOptions,
+  kashrutLevelOptions,
+  tsnioutOptions,
+  cohenLeviIsraelOptions,
+  communityEthnicOptions,
+  childrenEducationOptions,
+} from '@/lib/constants/orthodox'
 
 const ORG_ID = '00000000-0000-0000-0000-000000000001'
 
 const STEPS = [
-  { key: 'identity', label: 'Identite & Contact', icon: User },
+  { key: 'identity', label: 'Identité & Contact', icon: User },
   { key: 'family', label: 'Famille', icon: Users },
   { key: 'religion', label: 'Vie religieuse', icon: BookOpen },
-  { key: 'personality', label: 'Personnalite & Valeurs', icon: Sparkles },
+  { key: 'personality', label: 'Personnalité & Parcours', icon: Sparkles },
   { key: 'expectations', label: 'Attentes', icon: Heart },
-  { key: 'review', label: 'Verification', icon: ClipboardCheck },
-]
-
-const religiousLevelOptions = [
-  { value: '', label: 'Choisir...' },
-  { value: 'tres_pratiquant', label: 'Tres pratiquant(e)' },
-  { value: 'pratiquant', label: 'Pratiquant(e)' },
-  { value: 'traditionnel', label: 'Traditionnel(le)' },
-  { value: 'liberal', label: 'Liberal(e)' },
-  { value: 'autre', label: 'Autre' },
-]
-
-const hashkafaOptions = [
-  { value: '', label: 'Choisir...' },
-  { value: 'haredi_ashkenaz', label: 'Haredi Ashkenaze' },
-  { value: 'haredi_sfarad', label: 'Haredi Sefarade' },
-  { value: 'dati_leumi', label: 'Dati Leoumi' },
-  { value: 'dati_liberal', label: 'Dati Liberal' },
-  { value: 'masorti', label: 'Massorti' },
-  { value: 'hiloni', label: 'Hiloni' },
-  { value: 'baal_teshuva', label: 'Baal Techouva' },
-  { value: 'autre', label: 'Autre' },
+  { key: 'review', label: 'Vérification', icon: ClipboardCheck },
 ]
 
 interface FormData {
-  // Identity
+  // Identité
   first_name: string
   last_name: string
   hebrew_name: string
-  maiden_name: string
   date_of_birth: string
-  nationality: string
-  country_of_origin: string
+  age_estimate: string
   phone: string
-  phone_secondary: string
+  whatsapp: string
   email: string
-  address: string
   city: string
-  postal_code: string
   country: string
-  height_cm: string
-  build: string
-  hair_color: string
-  eye_color: string
 
-  // Family
-  father_name: string
-  father_profession: string
-  father_origin: string
-  mother_name: string
-  mother_maiden_name: string
-  mother_profession: string
-  mother_origin: string
-  siblings_count: string
-  siblings_details: string
-  family_situation: string
+  // Famille
+  siblings: string
+  family_context: string
+  family_traditions: string
+  marital_status: string
+  has_children: string
+  children_details: string
 
-  // Religion
-  religious_level: string
-  hashkafa: string
+  // Vie religieuse
+  courant: string
+  hassidout: string
+  nousah: string
   community: string
   synagogue: string
-  cohen_levi_israel: string
-  keeps_shabbat: string
-  keeps_kashrut: string
+  rabbi_reference: string
+  school_seminary: string
+  shabbat_practice: string
+  kashrut_level: string
+  tsniout: string
+  head_covering: string
+  traditions_minhaguim: string
+  prayer_study: string
 
-  // Personality
-  education_level: string
-  school: string
-  diploma: string
+  // Parcours
+  studies: string
   profession: string
-  employer: string
-  marital_history: string
-  has_children: string
-  children_count: string
-  notes: string
-  matchmaker_impression: string
+  interests: string
+  temperament: string
+  personal_note: string
 
-  // Expectations
-  preferred_age_min: string
-  preferred_age_max: string
-  preferred_height_min: string
-  preferred_height_max: string
-  preferred_religious_level: string
-  preferred_hashkafa: string
-  preferred_community: string
-  preferred_location: string
-  preferred_profession: string
-  deal_breakers: string
-  partner_description: string
+  // Attentes
+  age_min: string
+  age_max: string
+  preferred_cities: string
+  religious_project: string
+  children_education: string
+  expected_values: string
+  expected_qualities: string
+  incompatibilities: string
+  ideal_husband: string
+
+  // Méta
+  origin_channel: string
+  notes: string
 }
 
 const initialFormData: FormData = {
   first_name: '',
   last_name: '',
   hebrew_name: '',
-  maiden_name: '',
   date_of_birth: '',
-  nationality: '',
-  country_of_origin: '',
+  age_estimate: '',
   phone: '',
-  phone_secondary: '',
+  whatsapp: '',
   email: '',
-  address: '',
   city: '',
-  postal_code: '',
   country: 'France',
-  height_cm: '',
-  build: '',
-  hair_color: '',
-  eye_color: '',
-  father_name: '',
-  father_profession: '',
-  father_origin: '',
-  mother_name: '',
-  mother_maiden_name: '',
-  mother_profession: '',
-  mother_origin: '',
-  siblings_count: '',
-  siblings_details: '',
-  family_situation: '',
-  religious_level: '',
-  hashkafa: '',
+  siblings: '',
+  family_context: '',
+  family_traditions: '',
+  marital_status: '',
+  has_children: 'false',
+  children_details: '',
+  courant: '',
+  hassidout: '',
+  nousah: '',
   community: '',
   synagogue: '',
-  cohen_levi_israel: '',
-  keeps_shabbat: '',
-  keeps_kashrut: '',
-  education_level: '',
-  school: '',
-  diploma: '',
+  rabbi_reference: '',
+  school_seminary: '',
+  shabbat_practice: '',
+  kashrut_level: '',
+  tsniout: '',
+  head_covering: '',
+  traditions_minhaguim: '',
+  prayer_study: '',
+  studies: '',
   profession: '',
-  employer: '',
-  marital_history: '',
-  has_children: 'false',
-  children_count: '',
+  interests: '',
+  temperament: '',
+  personal_note: '',
+  age_min: '',
+  age_max: '',
+  preferred_cities: '',
+  religious_project: '',
+  children_education: '',
+  expected_values: '',
+  expected_qualities: '',
+  incompatibilities: '',
+  ideal_husband: '',
+  origin_channel: '',
   notes: '',
-  matchmaker_impression: '',
-  preferred_age_min: '',
-  preferred_age_max: '',
-  preferred_height_min: '',
-  preferred_height_max: '',
-  preferred_religious_level: '',
-  preferred_hashkafa: '',
-  preferred_community: '',
-  preferred_location: '',
-  preferred_profession: '',
-  deal_breakers: '',
-  partner_description: '',
 }
 
 export default function NewCandidatePage() {
@@ -227,76 +198,57 @@ export default function NewCandidatePage() {
   }
 
   function buildCandidatePayload() {
+    const hasDateOfBirth = !!formData.date_of_birth
+    const ageEstimate = formData.age_estimate ? parseInt(formData.age_estimate, 10) : null
+
     return {
       organization_id: ORG_ID,
-      gender: 'female' as const,
       first_name: formData.first_name.trim(),
       last_name: formData.last_name.trim(),
       hebrew_name: formData.hebrew_name || null,
-      maiden_name: formData.maiden_name || null,
-      date_of_birth: formData.date_of_birth || null,
-      age_estimate: null,
-      is_age_estimate: false,
-      nationality: formData.nationality || null,
-      country_of_origin: formData.country_of_origin || null,
+      date_of_birth: hasDateOfBirth ? formData.date_of_birth : null,
+      age_estimate: !hasDateOfBirth && ageEstimate ? ageEstimate : null,
+      is_age_estimate: !hasDateOfBirth && !!ageEstimate,
       phone: formData.phone || null,
-      phone_secondary: formData.phone_secondary || null,
+      whatsapp: formData.whatsapp || null,
       email: formData.email || null,
-      address: formData.address || null,
       city: formData.city || null,
-      postal_code: formData.postal_code || null,
       country: formData.country || null,
-      height_cm: formData.height_cm ? parseInt(formData.height_cm) : null,
-      build: formData.build || null,
-      hair_color: formData.hair_color || null,
-      eye_color: formData.eye_color || null,
-      physical_description: null,
-      religious_level: formData.religious_level || null,
-      hashkafa: formData.hashkafa || null,
+      siblings: formData.siblings || null,
+      family_context: formData.family_context || null,
+      family_traditions: formData.family_traditions || null,
+      marital_status: formData.marital_status || null,
+      has_children: formData.has_children === 'true',
+      children_details: formData.children_details || null,
+      courant: formData.courant || null,
+      hassidout: formData.hassidout || null,
+      nousah: formData.nousah || null,
       community: formData.community || null,
       synagogue: formData.synagogue || null,
-      cohen_levi_israel: formData.cohen_levi_israel || null,
-      keeps_shabbat: formData.keeps_shabbat === 'true' ? true : formData.keeps_shabbat === 'false' ? false : null,
-      keeps_kashrut: formData.keeps_kashrut === 'true' ? true : formData.keeps_kashrut === 'false' ? false : null,
-      father_name: formData.father_name || null,
-      father_profession: formData.father_profession || null,
-      father_origin: formData.father_origin || null,
-      mother_name: formData.mother_name || null,
-      mother_maiden_name: formData.mother_maiden_name || null,
-      mother_profession: formData.mother_profession || null,
-      mother_origin: formData.mother_origin || null,
-      siblings_count: formData.siblings_count ? parseInt(formData.siblings_count) : null,
-      siblings_details: formData.siblings_details || null,
-      family_situation: formData.family_situation || null,
-      education_level: formData.education_level || null,
-      school: formData.school || null,
-      diploma: formData.diploma || null,
+      rabbi_reference: formData.rabbi_reference || null,
+      school_seminary: formData.school_seminary || null,
+      shabbat_practice: formData.shabbat_practice || null,
+      kashrut_level: formData.kashrut_level || null,
+      tsniout: formData.tsniout || null,
+      head_covering: formData.head_covering || null,
+      traditions_minhaguim: formData.traditions_minhaguim || null,
+      prayer_study: formData.prayer_study || null,
+      studies: formData.studies || null,
       profession: formData.profession || null,
-      employer: formData.employer || null,
-      income_range: null,
-      marital_history: formData.marital_history || null,
-      has_children: formData.has_children === 'true',
-      children_count: formData.children_count ? parseInt(formData.children_count) : null,
-      children_details: null,
-      wants_children: null,
-      preferred_age_min: formData.preferred_age_min ? parseInt(formData.preferred_age_min) : null,
-      preferred_age_max: formData.preferred_age_max ? parseInt(formData.preferred_age_max) : null,
-      preferred_height_min: formData.preferred_height_min ? parseInt(formData.preferred_height_min) : null,
-      preferred_height_max: formData.preferred_height_max ? parseInt(formData.preferred_height_max) : null,
-      preferred_religious_level: formData.preferred_religious_level || null,
-      preferred_hashkafa: formData.preferred_hashkafa || null,
-      preferred_community: formData.preferred_community || null,
-      preferred_location: formData.preferred_location || null,
-      preferred_profession: formData.preferred_profession || null,
-      deal_breakers: formData.deal_breakers || null,
-      partner_description: formData.partner_description || null,
+      interests: formData.interests || null,
+      temperament: formData.temperament || null,
+      personal_note: formData.personal_note || null,
+      age_min: formData.age_min ? parseInt(formData.age_min, 10) : null,
+      age_max: formData.age_max ? parseInt(formData.age_max, 10) : null,
+      preferred_cities: formData.preferred_cities || null,
+      religious_project: formData.religious_project || null,
+      children_education: formData.children_education || null,
+      expected_values: formData.expected_values || null,
+      expected_qualities: formData.expected_qualities || null,
+      incompatibilities: formData.incompatibilities || null,
+      ideal_husband: formData.ideal_husband || null,
+      origin_channel: formData.origin_channel || null,
       notes: formData.notes || null,
-      private_notes: null,
-      matchmaker_impression: formData.matchmaker_impression || null,
-      source: null,
-      tags: [],
-      custom_fields: {},
-      priority: 0,
     }
   }
 
@@ -394,11 +346,11 @@ export default function NewCandidatePage() {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Input
-          label="Prenom *"
+          label="Prénom *"
           value={formData.first_name}
           onChange={(e) => updateField('first_name', e.target.value)}
           error={errors.first_name}
-          placeholder="Prenom"
+          placeholder="Prénom"
         />
         <Input
           label="Nom *"
@@ -408,16 +360,10 @@ export default function NewCandidatePage() {
           placeholder="Nom de famille"
         />
         <Input
-          label="Nom hebraique"
+          label="Nom hébraïque"
           value={formData.hebrew_name}
           onChange={(e) => updateField('hebrew_name', e.target.value)}
-          placeholder="Nom hebraique"
-        />
-        <Input
-          label="Nom de jeune fille"
-          value={formData.maiden_name}
-          onChange={(e) => updateField('maiden_name', e.target.value)}
-          placeholder="Si applicable"
+          placeholder="Ex : Sarah bat Avraham"
         />
         <Input
           label="Date de naissance"
@@ -426,24 +372,24 @@ export default function NewCandidatePage() {
           onChange={(e) => updateField('date_of_birth', e.target.value)}
         />
         <Input
-          label="Nationalite"
-          value={formData.nationality}
-          onChange={(e) => updateField('nationality', e.target.value)}
-          placeholder="Francaise"
+          label="Âge estimé"
+          inputType="number"
+          value={formData.age_estimate}
+          onChange={(e) => updateField('age_estimate', e.target.value)}
+          placeholder="Si date de naissance inconnue"
         />
         <Input
-          label="Telephone"
+          label="Téléphone"
           inputType="tel"
           value={formData.phone}
           onChange={(e) => updateField('phone', e.target.value)}
           placeholder="+33 6 ..."
         />
         <Input
-          label="Telephone secondaire"
-          inputType="tel"
-          value={formData.phone_secondary}
-          onChange={(e) => updateField('phone_secondary', e.target.value)}
-          placeholder="Optionnel"
+          label="WhatsApp"
+          value={formData.whatsapp}
+          onChange={(e) => updateField('whatsapp', e.target.value)}
+          placeholder="Si différent du téléphone"
         />
         <Input
           label="Email"
@@ -453,55 +399,15 @@ export default function NewCandidatePage() {
           placeholder="email@exemple.com"
         />
         <Input
-          label="Pays d'origine"
-          value={formData.country_of_origin}
-          onChange={(e) => updateField('country_of_origin', e.target.value)}
-        />
-        <Input
-          label="Adresse"
-          value={formData.address}
-          onChange={(e) => updateField('address', e.target.value)}
-          className="sm:col-span-2"
-        />
-        <Input
           label="Ville"
           value={formData.city}
           onChange={(e) => updateField('city', e.target.value)}
           placeholder="Paris"
         />
         <Input
-          label="Code postal"
-          value={formData.postal_code}
-          onChange={(e) => updateField('postal_code', e.target.value)}
-          placeholder="75016"
-        />
-        <Input
           label="Pays"
           value={formData.country}
           onChange={(e) => updateField('country', e.target.value)}
-        />
-        <Input
-          label="Taille (cm)"
-          inputType="number"
-          value={formData.height_cm}
-          onChange={(e) => updateField('height_cm', e.target.value)}
-          placeholder="165"
-        />
-        <Input
-          label="Corpulence"
-          value={formData.build}
-          onChange={(e) => updateField('build', e.target.value)}
-          placeholder="Mince, moyenne, ..."
-        />
-        <Input
-          label="Couleur de cheveux"
-          value={formData.hair_color}
-          onChange={(e) => updateField('hair_color', e.target.value)}
-        />
-        <Input
-          label="Couleur des yeux"
-          value={formData.eye_color}
-          onChange={(e) => updateField('eye_color', e.target.value)}
         />
       </div>
     )
@@ -510,156 +416,16 @@ export default function NewCandidatePage() {
   function renderStep1() {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Input
-          label="Nom du pere"
-          value={formData.father_name}
-          onChange={(e) => updateField('father_name', e.target.value)}
-        />
-        <Input
-          label="Profession du pere"
-          value={formData.father_profession}
-          onChange={(e) => updateField('father_profession', e.target.value)}
-        />
-        <Input
-          label="Origine du pere"
-          value={formData.father_origin}
-          onChange={(e) => updateField('father_origin', e.target.value)}
-        />
-        <div /> {/* spacer */}
-        <Input
-          label="Nom de la mere"
-          value={formData.mother_name}
-          onChange={(e) => updateField('mother_name', e.target.value)}
-        />
-        <Input
-          label="Nom de jeune fille de la mere"
-          value={formData.mother_maiden_name}
-          onChange={(e) => updateField('mother_maiden_name', e.target.value)}
-        />
-        <Input
-          label="Profession de la mere"
-          value={formData.mother_profession}
-          onChange={(e) => updateField('mother_profession', e.target.value)}
-        />
-        <Input
-          label="Origine de la mere"
-          value={formData.mother_origin}
-          onChange={(e) => updateField('mother_origin', e.target.value)}
-        />
-        <Input
-          label="Nombre de freres et soeurs"
-          inputType="number"
-          value={formData.siblings_count}
-          onChange={(e) => updateField('siblings_count', e.target.value)}
-        />
-        <Input
-          label="Situation familiale"
-          value={formData.family_situation}
-          onChange={(e) => updateField('family_situation', e.target.value)}
-          placeholder="Parents maries, divorces..."
-        />
-        <div className="sm:col-span-2">
-          <Input
-            label="Detail de la fratrie"
-            inputType="textarea"
-            value={formData.siblings_details}
-            onChange={(e) => updateField('siblings_details', e.target.value)}
-            placeholder="Frere aine 30 ans marie, soeur 25 ans..."
-          />
-        </div>
-      </div>
-    )
-  }
-
-  function renderStep2() {
-    return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Select
-          label="Niveau de pratique"
-          options={religiousLevelOptions}
-          value={formData.religious_level}
-          onChange={(e) => updateField('religious_level', e.target.value)}
-        />
-        <Select
-          label="Hashkafa"
-          options={hashkafaOptions}
-          value={formData.hashkafa}
-          onChange={(e) => updateField('hashkafa', e.target.value)}
-        />
-        <Input
-          label="Communaute"
-          value={formData.community}
-          onChange={(e) => updateField('community', e.target.value)}
-          placeholder="Communaute d'appartenance"
-        />
-        <Input
-          label="Synagogue"
-          value={formData.synagogue}
-          onChange={(e) => updateField('synagogue', e.target.value)}
-        />
-        <Input
-          label="Cohen / Levi / Israel"
-          value={formData.cohen_levi_israel}
-          onChange={(e) => updateField('cohen_levi_israel', e.target.value)}
-        />
-        <Select
-          label="Chabbat"
-          options={[
-            { value: '', label: 'Non precise' },
-            { value: 'true', label: 'Oui' },
-            { value: 'false', label: 'Non' },
-          ]}
-          value={formData.keeps_shabbat}
-          onChange={(e) => updateField('keeps_shabbat', e.target.value)}
-        />
-        <Select
-          label="Cacherout"
-          options={[
-            { value: '', label: 'Non precise' },
-            { value: 'true', label: 'Oui' },
-            { value: 'false', label: 'Non' },
-          ]}
-          value={formData.keeps_kashrut}
-          onChange={(e) => updateField('keeps_kashrut', e.target.value)}
-        />
-      </div>
-    )
-  }
-
-  function renderStep3() {
-    return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Input
-          label="Niveau d'etudes"
-          value={formData.education_level}
-          onChange={(e) => updateField('education_level', e.target.value)}
-          placeholder="Bac+5, Licence..."
-        />
-        <Input
-          label="Ecole / Universite"
-          value={formData.school}
-          onChange={(e) => updateField('school', e.target.value)}
-        />
-        <Input
-          label="Diplome"
-          value={formData.diploma}
-          onChange={(e) => updateField('diploma', e.target.value)}
-        />
-        <Input
-          label="Profession"
-          value={formData.profession}
-          onChange={(e) => updateField('profession', e.target.value)}
-        />
-        <Input
-          label="Employeur"
-          value={formData.employer}
-          onChange={(e) => updateField('employer', e.target.value)}
-        />
-        <Input
           label="Situation matrimoniale"
-          value={formData.marital_history}
-          onChange={(e) => updateField('marital_history', e.target.value)}
-          placeholder="Celibataire, divorcee..."
+          options={[
+            { value: '', label: 'Choisir...' },
+            { value: 'celibataire', label: 'Célibataire' },
+            { value: 'divorcee', label: 'Divorcée' },
+            { value: 'veuve', label: 'Veuve' },
+          ]}
+          value={formData.marital_status}
+          onChange={(e) => updateField('marital_status', e.target.value)}
         />
         <Select
           label="A des enfants"
@@ -671,29 +437,180 @@ export default function NewCandidatePage() {
           onChange={(e) => updateField('has_children', e.target.value)}
         />
         {formData.has_children === 'true' && (
-          <Input
-            label="Nombre d'enfants"
-            inputType="number"
-            value={formData.children_count}
-            onChange={(e) => updateField('children_count', e.target.value)}
-          />
+          <div className="sm:col-span-2">
+            <Input
+              label="Détails enfants"
+              inputType="textarea"
+              value={formData.children_details}
+              onChange={(e) => updateField('children_details', e.target.value)}
+              placeholder="Nombre, âges, garde..."
+            />
+          </div>
         )}
         <div className="sm:col-span-2">
           <Input
-            label="Notes"
+            label="Fratrie"
             inputType="textarea"
-            value={formData.notes}
-            onChange={(e) => updateField('notes', e.target.value)}
-            placeholder="Notes generales sur la candidate..."
+            value={formData.siblings}
+            onChange={(e) => updateField('siblings', e.target.value)}
+            placeholder="Frère aîné 30 ans marié, sœur 25 ans..."
           />
         </div>
         <div className="sm:col-span-2">
           <Input
-            label="Impression de la chadkhanit"
+            label="Contexte familial"
             inputType="textarea"
-            value={formData.matchmaker_impression}
-            onChange={(e) => updateField('matchmaker_impression', e.target.value)}
-            placeholder="Vos impressions personnelles..."
+            value={formData.family_context}
+            onChange={(e) => updateField('family_context', e.target.value)}
+            placeholder="Parents mariés, divorcés, composition familiale..."
+          />
+        </div>
+        <div className="sm:col-span-2">
+          <Input
+            label="Traditions familiales"
+            inputType="textarea"
+            value={formData.family_traditions}
+            onChange={(e) => updateField('family_traditions', e.target.value)}
+            placeholder="Traditions, minhaguim familiaux..."
+          />
+        </div>
+      </div>
+    )
+  }
+
+  function renderStep2() {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Select
+          label="Courant religieux"
+          options={courantOptions}
+          value={formData.courant}
+          onChange={(e) => updateField('courant', e.target.value)}
+        />
+        {formData.courant === 'haredi_hassidique' && (
+          <Select
+            label="Hassidout"
+            options={hassidoutOptions}
+            value={formData.hassidout}
+            onChange={(e) => updateField('hassidout', e.target.value)}
+          />
+        )}
+        <Select
+          label="Nousah (rite de prière)"
+          options={nousahOptions}
+          value={formData.nousah}
+          onChange={(e) => updateField('nousah', e.target.value)}
+        />
+        <Select
+          label="Communauté d'origine"
+          options={communityEthnicOptions}
+          value={formData.community}
+          onChange={(e) => updateField('community', e.target.value)}
+        />
+        <Input
+          label="Synagogue"
+          value={formData.synagogue}
+          onChange={(e) => updateField('synagogue', e.target.value)}
+          placeholder="Nom de la synagogue"
+        />
+        <Input
+          label="Référence rabbinique"
+          value={formData.rabbi_reference}
+          onChange={(e) => updateField('rabbi_reference', e.target.value)}
+          placeholder="Nom du Rav de référence"
+        />
+        <Input
+          label="Séminaire / École juive"
+          value={formData.school_seminary}
+          onChange={(e) => updateField('school_seminary', e.target.value)}
+          placeholder="Beth Yaakov, Séminaire..."
+        />
+        <Select
+          label="Chabbat"
+          options={shabbatPracticeOptions}
+          value={formData.shabbat_practice}
+          onChange={(e) => updateField('shabbat_practice', e.target.value)}
+        />
+        <Select
+          label="Cacheroute"
+          options={kashrutLevelOptions}
+          value={formData.kashrut_level}
+          onChange={(e) => updateField('kashrut_level', e.target.value)}
+        />
+        <Select
+          label="Tsniout (pudeur vestimentaire)"
+          options={tsnioutOptions}
+          value={formData.tsniout}
+          onChange={(e) => updateField('tsniout', e.target.value)}
+        />
+        <Select
+          label="Couverture de cheveux"
+          options={headCoveringOptions}
+          value={formData.head_covering}
+          onChange={(e) => updateField('head_covering', e.target.value)}
+        />
+        <div className="sm:col-span-2">
+          <Input
+            label="Traditions et Minhaguim particuliers"
+            inputType="textarea"
+            value={formData.traditions_minhaguim}
+            onChange={(e) => updateField('traditions_minhaguim', e.target.value)}
+            placeholder="Kitniyot à Pessah, deuxième jour de fête, minhaguim spécifiques..."
+          />
+        </div>
+        <div className="sm:col-span-2">
+          <Input
+            label="Étude / Prière"
+            inputType="textarea"
+            value={formData.prayer_study}
+            onChange={(e) => updateField('prayer_study', e.target.value)}
+            placeholder="Cours de Torah, Tehilim, participation aux offices..."
+          />
+        </div>
+      </div>
+    )
+  }
+
+  function renderStep3() {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Input
+          label="Études"
+          value={formData.studies}
+          onChange={(e) => updateField('studies', e.target.value)}
+          placeholder="Bac+5, Licence, Séminaire..."
+        />
+        <Input
+          label="Profession"
+          value={formData.profession}
+          onChange={(e) => updateField('profession', e.target.value)}
+          placeholder="Avocate, enseignante..."
+        />
+        <div className="sm:col-span-2">
+          <Input
+            label="Centres d'intérêt"
+            inputType="textarea"
+            value={formData.interests}
+            onChange={(e) => updateField('interests', e.target.value)}
+            placeholder="Hobbies, passions, activités..."
+          />
+        </div>
+        <div className="sm:col-span-2">
+          <Input
+            label="Tempérament / Personnalité"
+            inputType="textarea"
+            value={formData.temperament}
+            onChange={(e) => updateField('temperament', e.target.value)}
+            placeholder="Traits de caractère, personnalité..."
+          />
+        </div>
+        <div className="sm:col-span-2">
+          <Input
+            label="Note personnelle"
+            inputType="textarea"
+            value={formData.personal_note}
+            onChange={(e) => updateField('personal_note', e.target.value)}
+            placeholder="Ce qu'elle souhaite ajouter, mot personnel..."
           />
         </div>
       </div>
@@ -704,78 +621,76 @@ export default function NewCandidatePage() {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Input
-          label="Age minimum souhaite"
+          label="Âge minimum souhaité"
           inputType="number"
-          value={formData.preferred_age_min}
-          onChange={(e) => updateField('preferred_age_min', e.target.value)}
+          value={formData.age_min}
+          onChange={(e) => updateField('age_min', e.target.value)}
           placeholder="22"
         />
         <Input
-          label="Age maximum souhaite"
+          label="Âge maximum souhaité"
           inputType="number"
-          value={formData.preferred_age_max}
-          onChange={(e) => updateField('preferred_age_max', e.target.value)}
+          value={formData.age_max}
+          onChange={(e) => updateField('age_max', e.target.value)}
           placeholder="35"
         />
         <Input
-          label="Taille minimum souhaitee (cm)"
-          inputType="number"
-          value={formData.preferred_height_min}
-          onChange={(e) => updateField('preferred_height_min', e.target.value)}
-          placeholder="170"
-        />
-        <Input
-          label="Taille maximum souhaitee (cm)"
-          inputType="number"
-          value={formData.preferred_height_max}
-          onChange={(e) => updateField('preferred_height_max', e.target.value)}
-          placeholder="190"
-        />
-        <Select
-          label="Niveau religieux souhaite"
-          options={religiousLevelOptions}
-          value={formData.preferred_religious_level}
-          onChange={(e) => updateField('preferred_religious_level', e.target.value)}
-        />
-        <Select
-          label="Hashkafa souhaitee"
-          options={hashkafaOptions}
-          value={formData.preferred_hashkafa}
-          onChange={(e) => updateField('preferred_hashkafa', e.target.value)}
-        />
-        <Input
-          label="Communaute souhaitee"
-          value={formData.preferred_community}
-          onChange={(e) => updateField('preferred_community', e.target.value)}
-        />
-        <Input
-          label="Lieu souhaite"
-          value={formData.preferred_location}
-          onChange={(e) => updateField('preferred_location', e.target.value)}
-          placeholder="Paris, Israel..."
-        />
-        <Input
-          label="Profession souhaitee"
-          value={formData.preferred_profession}
-          onChange={(e) => updateField('preferred_profession', e.target.value)}
+          label="Villes préférées"
+          value={formData.preferred_cities}
+          onChange={(e) => updateField('preferred_cities', e.target.value)}
+          placeholder="Paris, Jérusalem, Bnei Brak..."
         />
         <div /> {/* spacer */}
         <div className="sm:col-span-2">
           <Input
-            label="Points redhibitoires"
+            label="Projet religieux du foyer"
             inputType="textarea"
-            value={formData.deal_breakers}
-            onChange={(e) => updateField('deal_breakers', e.target.value)}
-            placeholder="Ce qu'elle ne souhaite absolument pas..."
+            value={formData.religious_project}
+            onChange={(e) => updateField('religious_project', e.target.value)}
+            placeholder="Foyer Torah, mixte étude-travail, ouvert..."
+          />
+        </div>
+        <Select
+          label="Éducation des enfants souhaitée"
+          options={childrenEducationOptions}
+          value={formData.children_education}
+          onChange={(e) => updateField('children_education', e.target.value)}
+        />
+        <div /> {/* spacer */}
+        <div className="sm:col-span-2">
+          <Input
+            label="Qualités recherchées"
+            inputType="textarea"
+            value={formData.expected_qualities}
+            onChange={(e) => updateField('expected_qualities', e.target.value)}
+            placeholder="Qualités souhaitées chez le partenaire..."
           />
         </div>
         <div className="sm:col-span-2">
           <Input
-            label="Description du partenaire ideal"
+            label="Valeurs attendues"
             inputType="textarea"
-            value={formData.partner_description}
-            onChange={(e) => updateField('partner_description', e.target.value)}
-            placeholder="Description libre du profil recherche..."
+            value={formData.expected_values}
+            onChange={(e) => updateField('expected_values', e.target.value)}
+            placeholder="Valeurs essentielles pour la vie de couple..."
+          />
+        </div>
+        <div className="sm:col-span-2">
+          <Input
+            label="Description du mari idéal"
+            inputType="textarea"
+            value={formData.ideal_husband}
+            onChange={(e) => updateField('ideal_husband', e.target.value)}
+            placeholder="Description libre du profil recherché..."
+          />
+        </div>
+        <div className="sm:col-span-2">
+          <Input
+            label="Points rédhibitoires"
+            inputType="textarea"
+            value={formData.incompatibilities}
+            onChange={(e) => updateField('incompatibilities', e.target.value)}
+            placeholder="Ce qu'elle ne souhaite absolument pas..."
           />
         </div>
       </div>
@@ -783,45 +698,46 @@ export default function NewCandidatePage() {
   }
 
   function renderStep5() {
+    const nr = 'Non renseigné'
     const summaryFields: Array<{ section: string; items: Array<{ label: string; value: string }> }> = [
       {
-        section: 'Identite',
+        section: 'Identité',
         items: [
           { label: 'Nom', value: `${formData.first_name} ${formData.last_name}` },
-          { label: 'Date de naissance', value: formData.date_of_birth || 'Non renseigne' },
-          { label: 'Telephone', value: formData.phone || 'Non renseigne' },
-          { label: 'Email', value: formData.email || 'Non renseigne' },
-          { label: 'Ville', value: formData.city || 'Non renseigne' },
+          { label: 'Date de naissance', value: formData.date_of_birth || nr },
+          { label: 'Téléphone', value: formData.phone || nr },
+          { label: 'Ville', value: formData.city || nr },
         ],
       },
       {
         section: 'Famille',
         items: [
-          { label: 'Pere', value: formData.father_name || 'Non renseigne' },
-          { label: 'Mere', value: formData.mother_name || 'Non renseigne' },
-          { label: 'Fratrie', value: formData.siblings_count ? `${formData.siblings_count} frere(s)/soeur(s)` : 'Non renseigne' },
+          { label: 'Situation', value: formData.marital_status || nr },
+          { label: 'Enfants', value: formData.has_children === 'true' ? 'Oui' : 'Non' },
+          { label: 'Fratrie', value: formData.siblings || nr },
         ],
       },
       {
         section: 'Vie religieuse',
         items: [
-          { label: 'Niveau', value: formData.religious_level ? religiousLevelOptions.find((o) => o.value === formData.religious_level)?.label ?? formData.religious_level : 'Non renseigne' },
-          { label: 'Hashkafa', value: formData.hashkafa ? hashkafaOptions.find((o) => o.value === formData.hashkafa)?.label ?? formData.hashkafa : 'Non renseigne' },
-          { label: 'Communaute', value: formData.community || 'Non renseigne' },
+          { label: 'Courant', value: formData.courant ? courantOptions.find(o => o.value === formData.courant)?.label ?? formData.courant : nr },
+          { label: 'Communauté', value: formData.community ? communityEthnicOptions.find(o => o.value === formData.community)?.label ?? formData.community : nr },
+          { label: 'Chabbat', value: formData.shabbat_practice ? shabbatPracticeOptions.find(o => o.value === formData.shabbat_practice)?.label ?? formData.shabbat_practice : nr },
+          { label: 'Cacheroute', value: formData.kashrut_level ? kashrutLevelOptions.find(o => o.value === formData.kashrut_level)?.label ?? formData.kashrut_level : nr },
         ],
       },
       {
         section: 'Parcours',
         items: [
-          { label: 'Profession', value: formData.profession || 'Non renseigne' },
-          { label: 'Etudes', value: formData.education_level || 'Non renseigne' },
+          { label: 'Profession', value: formData.profession || nr },
+          { label: 'Études', value: formData.studies || nr },
         ],
       },
       {
         section: 'Attentes',
         items: [
-          { label: 'Tranche d\'age', value: formData.preferred_age_min || formData.preferred_age_max ? `${formData.preferred_age_min || '?'} - ${formData.preferred_age_max || '?'} ans` : 'Non renseigne' },
-          { label: 'Lieu souhaite', value: formData.preferred_location || 'Non renseigne' },
+          { label: "Tranche d'âge", value: formData.age_min || formData.age_max ? `${formData.age_min || '?'} – ${formData.age_max || '?'} ans` : nr },
+          { label: 'Villes', value: formData.preferred_cities || nr },
         ],
       },
     ]
@@ -830,7 +746,7 @@ export default function NewCandidatePage() {
       <div className="space-y-6">
         <div className="bg-[#87A878]/5 rounded-lg p-4 border border-[#87A878]/20">
           <p className="text-sm text-[#5A7A4A] font-medium">
-            Verifiez les informations avant de soumettre la fiche.
+            Vérifiez les informations avant de soumettre la fiche.
           </p>
         </div>
 
@@ -843,7 +759,7 @@ export default function NewCandidatePage() {
               {section.items.map((item) => (
                 <div key={item.label} className="py-1.5">
                   <span className="text-xs text-[#6B7280]">{item.label}</span>
-                  <p className={`text-sm ${item.value === 'Non renseigne' ? 'text-[#6B7280]/50 italic' : 'text-[#2D2D2D]'}`}>
+                  <p className={`text-sm ${item.value === nr ? 'text-[#6B7280]/50 italic' : 'text-[#2D2D2D]'}`}>
                     {item.value}
                   </p>
                 </div>

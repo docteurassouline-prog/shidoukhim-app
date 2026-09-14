@@ -60,22 +60,7 @@ export type AuditAction =
 
 export type SharedProfileAccess = 'lecture' | 'edition'
 
-export type ReligiousLevel =
-  | 'tres_pratiquant'
-  | 'pratiquant'
-  | 'traditionnel'
-  | 'liberal'
-  | 'autre'
-
-export type Hashkafa =
-  | 'haredi_ashkenaz'
-  | 'haredi_sfarad'
-  | 'dati_leumi'
-  | 'dati_liberal'
-  | 'masorti'
-  | 'hiloni'
-  | 'baal_teshuva'
-  | 'autre'
+export type CandidateManStatus = 'actif' | 'en_pause' | 'archive'
 
 // ============================================================
 // Core database types
@@ -115,85 +100,87 @@ export interface Candidate {
   first_name: string
   last_name: string
   hebrew_name: string | null
-  maiden_name: string | null
   date_of_birth: string | null
   age_estimate: number | null
   is_age_estimate: boolean
-  gender: 'female'
-  nationality: string | null
-  country_of_origin: string | null
-
-  email: string | null
-  phone: string | null
-  phone_secondary: string | null
-  address: string | null
   city: string | null
-  postal_code: string | null
   country: string | null
+  languages: string[] | null
+  phone: string | null
+  phone_country_code: string | null
+  whatsapp: string | null
+  email: string | null
+  preferred_contact: string | null
+  contact_availability: string | null
 
-  height_cm: number | null
-  build: string | null
-  hair_color: string | null
-  eye_color: string | null
-  physical_description: string | null
+  marital_status: string | null
+  has_children: boolean
+  children_details: string | null
+  siblings: string | null
+  family_cities: string | null
+  family_languages: string[] | null
+  family_traditions: string | null
+  family_role_in_project: string | null
+  family_context: string | null
 
-  religious_level: ReligiousLevel | null
-  hashkafa: Hashkafa | null
+  courant: string | null
+  hassidout: string | null
+  nousah: string | null
+  head_covering: string | null
   community: string | null
   synagogue: string | null
-  cohen_levi_israel: string | null
-  keeps_shabbat: boolean | null
-  keeps_kashrut: boolean | null
+  rabbi_reference: string | null
+  school_seminary: string | null
+  traditions_minhaguim: string | null
+  shabbat_practice: string | null
+  kashrut_level: string | null
+  prayer_study: string | null
+  tsniout: string | null
+  religious_home_project: string | null
+  children_education: string | null
 
-  father_name: string | null
-  father_profession: string | null
-  father_origin: string | null
-  mother_name: string | null
-  mother_maiden_name: string | null
-  mother_profession: string | null
-  mother_origin: string | null
-  siblings_count: number | null
-  siblings_details: string | null
-  family_situation: string | null
-
-  education_level: string | null
-  school: string | null
-  diploma: string | null
+  studies: string | null
   profession: string | null
-  employer: string | null
-  income_range: string | null
+  work_schedule: string | null
+  interests: string | null
+  temperament: string | null
+  social_life: string | null
+  hobbies_travel: string | null
+  smoking: string | null
+  work_life_balance: string | null
+  community_involvement: string | null
+  couple_values: string | null
+  home_vision: string | null
+  personal_note: string | null
 
-  marital_history: string | null
-  has_children: boolean
-  children_count: number | null
-  children_details: string | null
-  wants_children: boolean | null
-
-  preferred_age_min: number | null
-  preferred_age_max: number | null
-  preferred_height_min: number | null
-  preferred_height_max: number | null
-  preferred_religious_level: string | null
-  preferred_hashkafa: string | null
-  preferred_community: string | null
-  preferred_location: string | null
-  preferred_profession: string | null
-  deal_breakers: string | null
-  partner_description: string | null
+  age_min: number | null
+  age_max: number | null
+  preferred_cities: string | null
+  mobility: string | null
+  expected_languages: string[] | null
+  accepted_marital_status: string[] | null
+  religious_project: string | null
+  torah_study_importance: string | null
+  work_importance: string | null
+  expected_values: string | null
+  expected_qualities: string | null
+  expected_lifestyle: string | null
+  family_project: string | null
+  ideal_husband: string | null
+  incompatibilities: string | null
+  physical_criteria: string | null
 
   status: CandidateStatus
   availability: CandidateAvailability
-  priority: number
-
-  notes: string | null
-  private_notes: string | null
-  matchmaker_impression: string | null
-
-  source: string | null
-  tags: string[]
-  custom_fields: Record<string, unknown>
+  exclusivity: string | null
+  current_chadkhanit: string | null
+  origin_chadkhanit_name: string | null
+  origin_chadkhanit_contact: string | null
+  origin_channel: string | null
+  origin_date: string | null
   created_at: string
   updated_at: string
+  last_activity_at: string | null
 }
 
 export interface CandidatePhoto {
@@ -217,81 +204,53 @@ export interface CandidateMan {
   date_of_birth: string | null
   age_estimate: number | null
   is_age_estimate: boolean
-  gender: 'male'
-  nationality: string | null
-  country_of_origin: string | null
-
-  email: string | null
-  phone: string | null
-  phone_secondary: string | null
-  address: string | null
   city: string | null
-  postal_code: string | null
   country: string | null
+  phone: string | null
+  phone_country_code: string | null
+  whatsapp: string | null
+  email: string | null
+  languages: string[] | null
 
-  height_cm: number | null
-  build: string | null
-  hair_color: string | null
-  eye_color: string | null
-  physical_description: string | null
-
-  religious_level: ReligiousLevel | null
-  hashkafa: Hashkafa | null
+  courant: string | null
+  hassidout: string | null
+  nousah: string | null
+  kipa_type: string | null
   community: string | null
   synagogue: string | null
-  cohen_levi_israel: string | null
-  keeps_shabbat: boolean | null
-  keeps_kashrut: boolean | null
-  yeshiva: string | null
-  learning_schedule: string | null
+  rabbi_reference: string | null
+  school_seminary: string | null
+  shabbat_practice: string | null
+  kashrut_level: string | null
+  tsniout: string | null
+  traditions_minhaguim: string | null
+  torah_study: string | null
+  prayer_study: string | null
+  religious_home_project: string | null
+  children_education: string | null
 
-  father_name: string | null
-  father_profession: string | null
-  father_origin: string | null
-  mother_name: string | null
-  mother_maiden_name: string | null
-  mother_profession: string | null
-  mother_origin: string | null
-  siblings_count: number | null
-  siblings_details: string | null
-  family_situation: string | null
-
-  education_level: string | null
-  school: string | null
-  diploma: string | null
-  profession: string | null
-  employer: string | null
-  income_range: string | null
-
-  marital_history: string | null
+  marital_status: string | null
   has_children: boolean
-  children_count: number | null
-  children_details: string | null
-  wants_children: boolean | null
+  family_context: string | null
 
-  preferred_age_min: number | null
-  preferred_age_max: number | null
-  preferred_height_min: number | null
-  preferred_height_max: number | null
-  preferred_religious_level: string | null
-  preferred_hashkafa: string | null
-  preferred_community: string | null
-  preferred_location: string | null
-  preferred_profession: string | null
-  deal_breakers: string | null
-  partner_description: string | null
+  profession: string | null
+  studies: string | null
+  interests: string | null
+  temperament: string | null
 
-  status: CandidateStatus
-  availability: CandidateAvailability
-  priority: number
+  age_min: number | null
+  age_max: number | null
+  preferred_cities: string | null
+  expected_qualities: string | null
+  expected_values: string | null
+  incompatibilities: string | null
 
+  external_chadkhanit_name: string | null
+  external_chadkhanit_contact: string | null
+  origin_channel: string | null
   notes: string | null
-  private_notes: string | null
-  matchmaker_impression: string | null
 
-  source: string | null
-  tags: string[]
-  custom_fields: Record<string, unknown>
+  status: CandidateManStatus
   created_at: string
   updated_at: string
 }
@@ -581,11 +540,10 @@ export interface FilterOptions {
   status?: string
   availability?: string
   community?: string
+  courant?: string
   city?: string
   age_min?: number
   age_max?: number
-  religious_level?: string
-  hashkafa?: string
   has_children?: boolean
   sort_by?: string
   sort_order?: 'asc' | 'desc'

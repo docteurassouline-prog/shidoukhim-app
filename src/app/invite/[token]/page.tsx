@@ -14,6 +14,26 @@ import {
   Loader2,
   AlertCircle,
 } from 'lucide-react'
+import {
+  courantOptions,
+  hassidoutOptions,
+  nousahOptions,
+  headCoveringOptions,
+  shabbatPracticeOptions,
+  kashrutLevelOptions,
+  tsnioutOptions,
+  communityEthnicOptions,
+  childrenEducationOptions,
+  getCourantLabel,
+  getHassidoutLabel,
+  getNousahLabel,
+  getHeadCoveringLabel,
+  getShabbatPracticeLabel,
+  getKashrutLevelLabel,
+  getTsnioutLabel,
+  getCommunityEthnicLabel,
+  getChildrenEducationLabel,
+} from '@/lib/constants/orthodox'
 
 // ============================================================
 // Constants
@@ -33,31 +53,10 @@ const STEP_LABELS = [
   'Verification',
 ]
 
-const RELIGIOUS_LEVEL_OPTIONS = [
-  { value: '', label: 'Selectionnez...' },
-  { value: 'tres_pratiquant', label: 'Tres pratiquante' },
-  { value: 'pratiquant', label: 'Pratiquante' },
-  { value: 'traditionnel', label: 'Traditionnelle' },
-  { value: 'liberal', label: 'Non pratiquante' },
-  { value: 'autre', label: 'Autre' },
-]
-
-const HASHKAFA_OPTIONS = [
-  { value: '', label: 'Selectionnez...' },
-  { value: 'haredi_ashkenaz', label: 'Haredi Ashkenaze' },
-  { value: 'haredi_sfarad', label: 'Haredi Sefarade' },
-  { value: 'dati_leumi', label: 'Dati Leoumi (Sioniste religieux)' },
-  { value: 'dati_liberal', label: 'Dati Liberal' },
-  { value: 'masorti', label: 'Massorti (Conservateur)' },
-  { value: 'hiloni', label: 'Hiloni (Laique)' },
-  { value: 'baal_teshuva', label: 'Baal Teshouva' },
-  { value: 'other', label: 'Autre' },
-]
-
-const MARITAL_HISTORY_OPTIONS = [
-  { value: '', label: 'Selectionnez...' },
-  { value: 'celibataire', label: 'Celibataire' },
-  { value: 'divorcee', label: 'Divorcee' },
+const MARITAL_STATUS_OPTIONS = [
+  { value: '', label: 'Sélectionnez...' },
+  { value: 'celibataire', label: 'Célibataire' },
+  { value: 'divorcee', label: 'Divorcée' },
   { value: 'veuve', label: 'Veuve' },
 ]
 
@@ -66,7 +65,7 @@ const MARITAL_HISTORY_OPTIONS = [
 // ============================================================
 
 interface FormData {
-  // Step 1 - Identite
+  // Step 1 - Identité
   first_name: string
   last_name: string
   date_of_birth: string
@@ -76,33 +75,36 @@ interface FormData {
   email: string
 
   // Step 2 - Situation familiale
-  marital_history: string
+  marital_status: string
   has_children: boolean
-  children_count: number | ''
   children_details: string
-  family_situation: string
+  family_context: string
 
   // Step 3 - Vie religieuse
+  courant: string
+  hassidout: string
+  nousah: string
   community: string
-  religious_level: string
-  hashkafa: string
-  keeps_shabbat: boolean
-  keeps_kashrut: boolean
+  head_covering: string
+  shabbat_practice: string
+  kashrut_level: string
+  tsniout: string
+  traditions_minhaguim: string
 
-  // Step 4 - Personnalite et parcours
+  // Step 4 - Personnalité et parcours
   profession: string
-  education_level: string
-  diploma: string
+  studies: string
   interests: string
   temperament: string
 
   // Step 5 - Ce que vous recherchez
-  preferred_age_min: number | ''
-  preferred_age_max: number | ''
-  preferred_location: string
-  preferred_religious_level: string
-  partner_description: string
-  deal_breakers: string
+  age_min: number | ''
+  age_max: number | ''
+  preferred_cities: string
+  children_education: string
+  religious_home_project: string
+  ideal_husband: string
+  incompatibilities: string
 }
 
 const INITIAL_FORM_DATA: FormData = {
@@ -113,27 +115,30 @@ const INITIAL_FORM_DATA: FormData = {
   country: '',
   phone: '',
   email: '',
-  marital_history: '',
+  marital_status: '',
   has_children: false,
-  children_count: '',
   children_details: '',
-  family_situation: '',
+  family_context: '',
+  courant: '',
+  hassidout: '',
+  nousah: '',
   community: '',
-  religious_level: '',
-  hashkafa: '',
-  keeps_shabbat: false,
-  keeps_kashrut: false,
+  head_covering: '',
+  shabbat_practice: '',
+  kashrut_level: '',
+  tsniout: '',
+  traditions_minhaguim: '',
   profession: '',
-  education_level: '',
-  diploma: '',
+  studies: '',
   interests: '',
   temperament: '',
-  preferred_age_min: '',
-  preferred_age_max: '',
-  preferred_location: '',
-  preferred_religious_level: '',
-  partner_description: '',
-  deal_breakers: '',
+  age_min: '',
+  age_max: '',
+  preferred_cities: '',
+  children_education: '',
+  religious_home_project: '',
+  ideal_husband: '',
+  incompatibilities: '',
 }
 
 // ============================================================
@@ -474,10 +479,10 @@ function Step2Family({
       <FormField label="Situation matrimoniale">
         <select
           className={selectClass}
-          value={data.marital_history}
-          onChange={(e) => onChange({ marital_history: e.target.value })}
+          value={data.marital_status}
+          onChange={(e) => onChange({ marital_status: e.target.value })}
         >
-          {MARITAL_HISTORY_OPTIONS.map((opt) => (
+          {MARITAL_STATUS_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
               {opt.label}
             </option>
@@ -491,7 +496,7 @@ function Step2Family({
           onChange={(v) =>
             onChange({
               has_children: v,
-              ...(!v ? { children_count: '', children_details: '' } : {}),
+              ...(!v ? { children_details: '' } : {}),
             })
           }
           label="Avez-vous des enfants ?"
@@ -499,26 +504,11 @@ function Step2Family({
 
         {data.has_children && (
           <div className="mt-4 space-y-4 pl-1">
-            <FormField label="Nombre d'enfants">
-              <input
-                type="number"
-                min={0}
-                max={20}
-                className={inputClass}
-                placeholder="0"
-                value={data.children_count}
-                onChange={(e) =>
-                  onChange({
-                    children_count: e.target.value === '' ? '' : Number(e.target.value),
-                  })
-                }
-              />
-            </FormField>
-            <FormField label="Details (ages, garde, etc.)" hint="Informations qui pourraient etre utiles">
+            <FormField label="Détails (nombre, âges, garde, etc.)" hint="Informations utiles pour le shidoukh">
               <textarea
                 className={textareaClass}
                 rows={3}
-                placeholder="Ex : 2 enfants (8 ans et 5 ans), garde alternee"
+                placeholder="Ex : 2 enfants (8 ans et 5 ans), garde alternée"
                 value={data.children_details}
                 onChange={(e) => onChange({ children_details: e.target.value })}
               />
@@ -532,8 +522,8 @@ function Step2Family({
           className={textareaClass}
           rows={4}
           placeholder="Parlez-nous de votre famille..."
-          value={data.family_situation}
-          onChange={(e) => onChange({ family_situation: e.target.value })}
+          value={data.family_context}
+          onChange={(e) => onChange({ family_context: e.target.value })}
         />
       </FormField>
     </div>
@@ -556,23 +546,43 @@ function Step3Religion({
         </p>
       </div>
 
-      <FormField label="Communaute">
-        <input
-          type="text"
-          className={inputClass}
-          placeholder="Ex : Communaute sefarade de Paris"
+      <FormField label="Courant religieux">
+        <select
+          className={selectClass}
+          value={data.courant}
+          onChange={(e) => onChange({ courant: e.target.value })}
+        >
+          {courantOptions.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      </FormField>
+
+      {data.courant === 'haredi_hassidique' && (
+        <FormField label="Hassidout">
+          <select
+            className={selectClass}
+            value={data.hassidout}
+            onChange={(e) => onChange({ hassidout: e.target.value })}
+          >
+            {hassidoutOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </FormField>
+      )}
+
+      <FormField label="Communauté ethnique">
+        <select
+          className={selectClass}
           value={data.community}
           onChange={(e) => onChange({ community: e.target.value })}
-        />
-      </FormField>
-
-      <FormField label="Niveau de pratique">
-        <select
-          className={selectClass}
-          value={data.religious_level}
-          onChange={(e) => onChange({ religious_level: e.target.value })}
         >
-          {RELIGIOUS_LEVEL_OPTIONS.map((opt) => (
+          {communityEthnicOptions.map((opt) => (
             <option key={opt.value} value={opt.value}>
               {opt.label}
             </option>
@@ -580,13 +590,13 @@ function Step3Religion({
         </select>
       </FormField>
 
-      <FormField label="Hashkafa (orientation religieuse)">
+      <FormField label="Nousah (rite de prière)">
         <select
           className={selectClass}
-          value={data.hashkafa}
-          onChange={(e) => onChange({ hashkafa: e.target.value })}
+          value={data.nousah}
+          onChange={(e) => onChange({ nousah: e.target.value })}
         >
-          {HASHKAFA_OPTIONS.map((opt) => (
+          {nousahOptions.map((opt) => (
             <option key={opt.value} value={opt.value}>
               {opt.label}
             </option>
@@ -594,18 +604,71 @@ function Step3Religion({
         </select>
       </FormField>
 
-      <div className="bg-[#FFFBF0] rounded-xl p-4 border border-[#E8E0D4]/50 space-y-1">
-        <Toggle
-          checked={data.keeps_shabbat}
-          onChange={(v) => onChange({ keeps_shabbat: v })}
-          label="Observance du Chabbat"
+      <FormField label="Pratique du Chabbat">
+        <select
+          className={selectClass}
+          value={data.shabbat_practice}
+          onChange={(e) => onChange({ shabbat_practice: e.target.value })}
+        >
+          {shabbatPracticeOptions.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      </FormField>
+
+      <FormField label="Niveau de cacheroute">
+        <select
+          className={selectClass}
+          value={data.kashrut_level}
+          onChange={(e) => onChange({ kashrut_level: e.target.value })}
+        >
+          {kashrutLevelOptions.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      </FormField>
+
+      <FormField label="Tsniout (pudeur vestimentaire)">
+        <select
+          className={selectClass}
+          value={data.tsniout}
+          onChange={(e) => onChange({ tsniout: e.target.value })}
+        >
+          {tsnioutOptions.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      </FormField>
+
+      <FormField label="Couverture de cheveux">
+        <select
+          className={selectClass}
+          value={data.head_covering}
+          onChange={(e) => onChange({ head_covering: e.target.value })}
+        >
+          {headCoveringOptions.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      </FormField>
+
+      <FormField label="Traditions et minhaguim" hint="Coutumes familiales particulières">
+        <textarea
+          className={textareaClass}
+          rows={3}
+          placeholder="Ex : minhag marocain, kiddouch le vendredi soir en famille..."
+          value={data.traditions_minhaguim}
+          onChange={(e) => onChange({ traditions_minhaguim: e.target.value })}
         />
-        <Toggle
-          checked={data.keeps_kashrut}
-          onChange={(v) => onChange({ keeps_kashrut: v })}
-          label="Observance de la Cacherout"
-        />
-      </div>
+      </FormField>
     </div>
   )
 }
@@ -636,23 +699,13 @@ function Step4Personality({
         />
       </FormField>
 
-      <FormField label="Niveau d'etudes">
+      <FormField label="Études / Diplômes">
         <input
           type="text"
           className={inputClass}
-          placeholder="Ex : Bac+5, Master, Doctorat..."
-          value={data.education_level}
-          onChange={(e) => onChange({ education_level: e.target.value })}
-        />
-      </FormField>
-
-      <FormField label="Diplome">
-        <input
-          type="text"
-          className={inputClass}
-          placeholder="Ex : Master en droit, Diplome d'ingenieur..."
-          value={data.diploma}
-          onChange={(e) => onChange({ diploma: e.target.value })}
+          placeholder="Ex : Master en droit, Séminaire Beth Yaakov..."
+          value={data.studies}
+          onChange={(e) => onChange({ studies: e.target.value })}
         />
       </FormField>
 
@@ -696,75 +749,89 @@ function Step5Preferences({
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <FormField label="Age minimum">
+        <FormField label="Âge minimum">
           <input
             type="number"
             min={18}
             max={99}
             className={inputClass}
             placeholder="25"
-            value={data.preferred_age_min}
+            value={data.age_min}
             onChange={(e) =>
               onChange({
-                preferred_age_min: e.target.value === '' ? '' : Number(e.target.value),
+                age_min: e.target.value === '' ? '' : Number(e.target.value),
               })
             }
           />
         </FormField>
-        <FormField label="Age maximum">
+        <FormField label="Âge maximum">
           <input
             type="number"
             min={18}
             max={99}
             className={inputClass}
             placeholder="40"
-            value={data.preferred_age_max}
+            value={data.age_max}
             onChange={(e) =>
               onChange({
-                preferred_age_max: e.target.value === '' ? '' : Number(e.target.value),
+                age_max: e.target.value === '' ? '' : Number(e.target.value),
               })
             }
           />
         </FormField>
       </div>
 
-      <FormField label="Villes souhaitees">
+      <FormField label="Villes souhaitées">
         <input
           type="text"
           className={inputClass}
           placeholder="Paris, Tel Aviv, Londres..."
-          value={data.preferred_location}
-          onChange={(e) => onChange({ preferred_location: e.target.value })}
+          value={data.preferred_cities}
+          onChange={(e) => onChange({ preferred_cities: e.target.value })}
         />
       </FormField>
 
-      <FormField label="Niveau de pratique souhaite">
-        <input
-          type="text"
-          className={inputClass}
-          placeholder="Ex : Pratiquant, ouvert..."
-          value={data.preferred_religious_level}
-          onChange={(e) => onChange({ preferred_religious_level: e.target.value })}
+      <FormField label="Éducation des enfants souhaitée">
+        <select
+          className={selectClass}
+          value={data.children_education}
+          onChange={(e) => onChange({ children_education: e.target.value })}
+        >
+          {childrenEducationOptions.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      </FormField>
+
+      <FormField label="Projet religieux du foyer" hint="Comment imaginez-vous la vie religieuse de votre couple ?">
+        <textarea
+          className={textareaClass}
+          rows={3}
+          placeholder="Ex : foyer chaleureux, table de Chabbat ouverte..."
+          value={data.religious_home_project}
+          onChange={(e) => onChange({ religious_home_project: e.target.value })}
         />
       </FormField>
 
-      <FormField label="Decrivez le partenaire ideal" hint="Personnalite, valeurs, mode de vie...">
+      <FormField label="Description du mari idéal" hint="Personnalité, valeurs, mode de vie...">
         <textarea
           className={textareaClass}
           rows={4}
           placeholder="Je recherche quelqu'un qui..."
-          value={data.partner_description}
-          onChange={(e) => onChange({ partner_description: e.target.value })}
+          value={data.ideal_husband}
+          onChange={(e) => onChange({ ideal_husband: e.target.value })}
         />
       </FormField>
 
-      <FormField label="Points redhibitoires" hint="Ce que vous ne pourriez pas accepter">
+      <FormField label="Points rédhibitoires" hint="Ce que vous ne pourriez pas accepter">
         <textarea
           className={textareaClass}
           rows={3}
           placeholder="Il est important pour moi que..."
-          value={data.deal_breakers}
-          onChange={(e) => onChange({ deal_breakers: e.target.value })}
+          value={data.incompatibilities}
+          onChange={(e) => onChange({ incompatibilities: e.target.value })}
         />
       </FormField>
     </div>
@@ -916,63 +983,54 @@ function Step7Review({
         {
           label: 'Situation',
           value:
-            MARITAL_HISTORY_OPTIONS.find((o) => o.value === data.marital_history)
-              ?.label || data.marital_history,
+            MARITAL_STATUS_OPTIONS.find((o) => o.value === data.marital_status)
+              ?.label || data.marital_status,
         },
         { label: 'Enfants', value: data.has_children ? 'Oui' : 'Non' },
         ...(data.has_children
-          ? [
-              { label: 'Nombre', value: String(data.children_count) },
-              { label: 'Details', value: data.children_details },
-            ]
+          ? [{ label: 'Détails', value: data.children_details }]
           : []),
-        { label: 'Contexte familial', value: data.family_situation },
+        { label: 'Contexte familial', value: data.family_context },
       ],
     },
     {
       title: 'Vie religieuse',
       fields: [
-        { label: 'Communaute', value: data.community },
-        {
-          label: 'Pratique',
-          value:
-            RELIGIOUS_LEVEL_OPTIONS.find((o) => o.value === data.religious_level)
-              ?.label || data.religious_level,
-        },
-        {
-          label: 'Hashkafa',
-          value:
-            HASHKAFA_OPTIONS.find((o) => o.value === data.hashkafa)?.label ||
-            data.hashkafa,
-        },
-        { label: 'Chabbat', value: data.keeps_shabbat ? 'Oui' : 'Non' },
-        { label: 'Cacherout', value: data.keeps_kashrut ? 'Oui' : 'Non' },
+        { label: 'Courant', value: getCourantLabel(data.courant) },
+        ...(data.hassidout ? [{ label: 'Hassidout', value: getHassidoutLabel(data.hassidout) }] : []),
+        { label: 'Communauté', value: getCommunityEthnicLabel(data.community) },
+        { label: 'Nousah', value: getNousahLabel(data.nousah) },
+        { label: 'Chabbat', value: getShabbatPracticeLabel(data.shabbat_practice) },
+        { label: 'Cacheroute', value: getKashrutLevelLabel(data.kashrut_level) },
+        { label: 'Tsniout', value: getTsnioutLabel(data.tsniout) },
+        { label: 'Couverture', value: getHeadCoveringLabel(data.head_covering) },
+        { label: 'Traditions', value: data.traditions_minhaguim },
       ],
     },
     {
-      title: 'Personnalite et parcours',
+      title: 'Personnalité et parcours',
       fields: [
         { label: 'Profession', value: data.profession },
-        { label: "Niveau d'etudes", value: data.education_level },
-        { label: 'Diplome', value: data.diploma },
-        { label: "Centres d'interet", value: data.interests },
-        { label: 'Temperament', value: data.temperament },
+        { label: 'Études', value: data.studies },
+        { label: "Centres d'intérêt", value: data.interests },
+        { label: 'Tempérament', value: data.temperament },
       ],
     },
     {
       title: 'Ce que vous recherchez',
       fields: [
         {
-          label: 'Tranche d\'age',
+          label: "Tranche d'âge",
           value:
-            data.preferred_age_min || data.preferred_age_max
-              ? `${data.preferred_age_min || '?'} - ${data.preferred_age_max || '?'} ans`
+            data.age_min || data.age_max
+              ? `${data.age_min || '?'} - ${data.age_max || '?'} ans`
               : '',
         },
-        { label: 'Villes souhaitees', value: data.preferred_location },
-        { label: 'Pratique souhaitee', value: data.preferred_religious_level },
-        { label: 'Partenaire ideal', value: data.partner_description },
-        { label: 'Points redhibitoires', value: data.deal_breakers },
+        { label: 'Villes souhaitées', value: data.preferred_cities },
+        { label: 'Éducation des enfants', value: getChildrenEducationLabel(data.children_education) },
+        { label: 'Projet religieux du foyer', value: data.religious_home_project },
+        { label: 'Mari idéal', value: data.ideal_husband },
+        { label: 'Points rédhibitoires', value: data.incompatibilities },
       ],
     },
   ]
@@ -1296,15 +1354,9 @@ export default function InvitePage({
       // 2. Insert candidate
       const candidatePayload = {
         organization_id: invitation.organization_id,
-        gender: 'female' as const,
-        status: 'active' as const,
-        availability: 'available' as const,
-        priority: 0,
-        source: 'invitation',
-        tags: [],
-        custom_fields: {},
+        status: 'brouillon' as const,
+        availability: 'a_confirmer' as const,
 
-        // Identity
         first_name: formData.first_name.trim(),
         last_name: formData.last_name.trim(),
         date_of_birth: formData.date_of_birth || null,
@@ -1315,55 +1367,43 @@ export default function InvitePage({
         phone: formData.phone.trim() || null,
         email: formData.email.trim() || null,
 
-        // Family
-        marital_history: formData.marital_history || null,
+        marital_status: formData.marital_status || null,
         has_children: formData.has_children,
-        children_count:
-          formData.has_children && formData.children_count !== ''
-            ? Number(formData.children_count)
-            : null,
         children_details:
           formData.has_children && formData.children_details.trim()
             ? formData.children_details.trim()
             : null,
-        family_situation: formData.family_situation.trim() || null,
+        family_context: formData.family_context.trim() || null,
 
-        // Religion
-        community: formData.community.trim() || null,
-        religious_level: formData.religious_level || null,
-        hashkafa: formData.hashkafa || null,
-        keeps_shabbat: formData.keeps_shabbat,
-        keeps_kashrut: formData.keeps_kashrut,
+        courant: formData.courant || null,
+        hassidout: formData.courant === 'haredi_hassidique' ? (formData.hassidout || null) : null,
+        nousah: formData.nousah || null,
+        community: formData.community || null,
+        head_covering: formData.head_covering || null,
+        shabbat_practice: formData.shabbat_practice || null,
+        kashrut_level: formData.kashrut_level || null,
+        tsniout: formData.tsniout || null,
+        traditions_minhaguim: formData.traditions_minhaguim.trim() || null,
 
-        // Career
         profession: formData.profession.trim() || null,
-        education_level: formData.education_level.trim() || null,
-        diploma: formData.diploma.trim() || null,
+        studies: formData.studies.trim() || null,
+        interests: formData.interests.trim() || null,
+        temperament: formData.temperament.trim() || null,
 
-        // Notes (from personality fields)
-        notes: [
-          formData.interests.trim() &&
-            `Centres d'interet : ${formData.interests.trim()}`,
-          formData.temperament.trim() &&
-            `Temperament : ${formData.temperament.trim()}`,
-        ]
-          .filter(Boolean)
-          .join('\n\n') || null,
-
-        // Preferences
-        preferred_age_min:
-          formData.preferred_age_min !== ''
-            ? Number(formData.preferred_age_min)
+        age_min:
+          formData.age_min !== ''
+            ? Number(formData.age_min)
             : null,
-        preferred_age_max:
-          formData.preferred_age_max !== ''
-            ? Number(formData.preferred_age_max)
+        age_max:
+          formData.age_max !== ''
+            ? Number(formData.age_max)
             : null,
-        preferred_location: formData.preferred_location.trim() || null,
-        preferred_religious_level:
-          formData.preferred_religious_level.trim() || null,
-        partner_description: formData.partner_description.trim() || null,
-        deal_breakers: formData.deal_breakers.trim() || null,
+        preferred_cities: formData.preferred_cities.trim() || null,
+        children_education: formData.children_education || null,
+        religious_home_project: formData.religious_home_project.trim() || null,
+        ideal_husband: formData.ideal_husband.trim() || null,
+        incompatibilities: formData.incompatibilities.trim() || null,
+        origin_channel: 'invitation',
       }
 
       const { data: candidateData, error: candidateError } = await supabase

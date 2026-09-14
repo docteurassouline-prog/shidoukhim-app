@@ -8,25 +8,39 @@ import Link from 'next/link'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
+import {
+  courantOptions,
+  hassidoutOptions,
+  nousahOptions,
+  kipaTypeOptions,
+  shabbatPracticeOptions,
+  kashrutLevelOptions,
+  tsnioutOptions,
+  torahStudyOptions,
+  cohenLeviIsraelOptions,
+  communityEthnicOptions,
+  childrenEducationOptions,
+} from '@/lib/constants/orthodox'
 
 const ORG_ID = '00000000-0000-0000-0000-000000000001'
 
 const MARITAL_STATUS_OPTIONS = [
-  { value: 'celibataire', label: 'Celibataire' },
-  { value: 'divorce', label: 'Divorce' },
+  { value: '', label: 'Choisir...' },
+  { value: 'celibataire', label: 'Célibataire' },
+  { value: 'divorce', label: 'Divorcé' },
   { value: 'veuf', label: 'Veuf' },
 ]
 
 const ORIGIN_CHANNEL_OPTIONS = [
-  { value: 'bouche_a_oreille', label: 'Bouche a oreille' },
-  { value: 'evenement', label: 'Evenement' },
+  { value: '', label: 'Choisir...' },
+  { value: 'bouche_a_oreille', label: 'Bouche à oreille' },
+  { value: 'evenement', label: 'Événement' },
   { value: 'internet', label: 'Internet' },
   { value: 'recommandation', label: 'Recommandation' },
   { value: 'autre', label: 'Autre' },
 ]
 
 interface FormData {
-  // Identite
   first_name: string
   last_name: string
   hebrew_name: string
@@ -34,38 +48,39 @@ interface FormData {
   age_estimate: string
   city: string
   country: string
-
-  // Contact
   phone: string
   whatsapp: string
   email: string
-
-  // Vie religieuse
   languages: string
+  courant: string
+  hassidout: string
+  nousah: string
+  kipa_type: string
   community: string
+  synagogue: string
   rabbi_reference: string
+  school_seminary: string
+  shabbat_practice: string
+  kashrut_level: string
+  tsniout: string
   torah_study: string
-
-  // Situation personnelle
+  traditions_minhaguim: string
+  prayer_study: string
+  religious_home_project: string
+  children_education: string
   marital_status: string
-  has_children: boolean
+  has_children: string
   family_context: string
-
-  // Profil
   profession: string
   studies: string
   interests: string
   temperament: string
-
-  // Attentes
-  preferred_age_min: string
-  preferred_age_max: string
+  age_min: string
+  age_max: string
   preferred_cities: string
   expected_qualities: string
   expected_values: string
   incompatibilities: string
-
-  // Informations complementaires
   external_chadkhanit_name: string
   external_chadkhanit_contact: string
   origin_channel: string
@@ -84,18 +99,31 @@ const initialFormData: FormData = {
   whatsapp: '',
   email: '',
   languages: '',
+  courant: '',
+  hassidout: '',
+  nousah: '',
+  kipa_type: '',
   community: '',
+  synagogue: '',
   rabbi_reference: '',
+  school_seminary: '',
+  shabbat_practice: '',
+  kashrut_level: '',
+  tsniout: '',
   torah_study: '',
+  traditions_minhaguim: '',
+  prayer_study: '',
+  religious_home_project: '',
+  children_education: '',
   marital_status: '',
-  has_children: false,
+  has_children: 'false',
   family_context: '',
   profession: '',
   studies: '',
   interests: '',
   temperament: '',
-  preferred_age_min: '',
-  preferred_age_max: '',
+  age_min: '',
+  age_max: '',
   preferred_cities: '',
   expected_qualities: '',
   expected_values: '',
@@ -135,14 +163,8 @@ export default function NewManPage() {
 
   function validate(): boolean {
     const newErrors: Partial<Record<keyof FormData, string>> = {}
-
-    if (!form.first_name.trim()) {
-      newErrors.first_name = 'Le prenom est requis'
-    }
-    if (!form.last_name.trim()) {
-      newErrors.last_name = 'Le nom est requis'
-    }
-
+    if (!form.first_name.trim()) newErrors.first_name = 'Le prénom est requis'
+    if (!form.last_name.trim()) newErrors.last_name = 'Le nom est requis'
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -150,54 +172,19 @@ export default function NewManPage() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setSubmitError(null)
-
     if (!validate()) return
-
     setLoading(true)
 
     try {
       const supabase = createClient()
 
-      // Build partner_description from expected_qualities + expected_values
-      const partnerParts: string[] = []
-      if (form.expected_qualities.trim()) {
-        partnerParts.push(`Qualites recherchees : ${form.expected_qualities.trim()}`)
-      }
-      if (form.expected_values.trim()) {
-        partnerParts.push(`Valeurs attendues : ${form.expected_values.trim()}`)
-      }
-      const partnerDescription = partnerParts.length > 0 ? partnerParts.join('\n\n') : null
-
-      // Build custom_fields
-      const customFields: Record<string, unknown> = {}
-      if (form.languages.trim()) customFields.languages = form.languages.trim()
-      if (form.rabbi_reference.trim()) customFields.rabbi_reference = form.rabbi_reference.trim()
-      if (form.interests.trim()) customFields.interests = form.interests.trim()
-      if (form.temperament.trim()) customFields.temperament = form.temperament.trim()
-      if (form.external_chadkhanit_name.trim()) {
-        customFields.external_chadkhanit_name = form.external_chadkhanit_name.trim()
-      }
-      if (form.external_chadkhanit_contact.trim()) {
-        customFields.external_chadkhanit_contact = form.external_chadkhanit_contact.trim()
-      }
-      if (form.whatsapp.trim()) customFields.whatsapp = form.whatsapp.trim()
-      if (form.studies.trim()) customFields.studies = form.studies.trim()
-
-      // Determine age fields
       const hasDateOfBirth = !!form.date_of_birth
       const ageEstimate = form.age_estimate ? parseInt(form.age_estimate, 10) : null
 
       const insertData = {
         organization_id: ORG_ID,
-        gender: 'male' as const,
-        status: 'active' as const,
-        availability: 'available' as const,
-        priority: 0,
-        has_children: form.has_children,
-        tags: [],
-        custom_fields: customFields,
+        status: 'actif' as const,
 
-        // Identite
         first_name: form.first_name.trim(),
         last_name: form.last_name.trim(),
         hebrew_name: form.hebrew_name.trim() || null,
@@ -207,30 +194,46 @@ export default function NewManPage() {
         city: form.city.trim() || null,
         country: form.country.trim() || null,
 
-        // Contact
         phone: form.phone.trim() || null,
+        whatsapp: form.whatsapp.trim() || null,
         email: form.email.trim() || null,
 
-        // Religion & communaute
-        community: form.community.trim() || null,
-        yeshiva: form.torah_study.trim() || null,
+        courant: form.courant || null,
+        hassidout: form.hassidout || null,
+        nousah: form.nousah || null,
+        kipa_type: form.kipa_type || null,
+        community: form.community || null,
+        synagogue: form.synagogue.trim() || null,
+        rabbi_reference: form.rabbi_reference.trim() || null,
+        school_seminary: form.school_seminary.trim() || null,
+        shabbat_practice: form.shabbat_practice || null,
+        kashrut_level: form.kashrut_level || null,
+        tsniout: form.tsniout || null,
+        torah_study: form.torah_study.trim() || null,
+        traditions_minhaguim: form.traditions_minhaguim.trim() || null,
+        prayer_study: form.prayer_study.trim() || null,
+        religious_home_project: form.religious_home_project.trim() || null,
+        children_education: form.children_education || null,
 
-        // Situation personnelle
-        marital_history: form.marital_status || null,
-        family_situation: form.family_context.trim() || null,
+        marital_status: form.marital_status || null,
+        has_children: form.has_children === 'true',
+        family_context: form.family_context.trim() || null,
 
-        // Profil
         profession: form.profession.trim() || null,
+        studies: form.studies.trim() || null,
+        interests: form.interests.trim() || null,
+        temperament: form.temperament.trim() || null,
 
-        // Attentes
-        preferred_age_min: form.preferred_age_min ? parseInt(form.preferred_age_min, 10) : null,
-        preferred_age_max: form.preferred_age_max ? parseInt(form.preferred_age_max, 10) : null,
-        preferred_location: form.preferred_cities.trim() || null,
-        partner_description: partnerDescription,
-        deal_breakers: form.incompatibilities.trim() || null,
+        age_min: form.age_min ? parseInt(form.age_min, 10) : null,
+        age_max: form.age_max ? parseInt(form.age_max, 10) : null,
+        preferred_cities: form.preferred_cities.trim() || null,
+        expected_qualities: form.expected_qualities.trim() || null,
+        expected_values: form.expected_values.trim() || null,
+        incompatibilities: form.incompatibilities.trim() || null,
 
-        // Metadata
-        source: form.origin_channel || null,
+        external_chadkhanit_name: form.external_chadkhanit_name.trim() || null,
+        external_chadkhanit_contact: form.external_chadkhanit_contact.trim() || null,
+        origin_channel: form.origin_channel || null,
         notes: form.notes.trim() || null,
       }
 
@@ -246,7 +249,7 @@ export default function NewManPage() {
       router.push('/men')
     } catch (err) {
       setSubmitError(
-        err instanceof Error ? err.message : 'Une erreur est survenue lors de la creation du profil.'
+        err instanceof Error ? err.message : 'Une erreur est survenue lors de la création du profil.'
       )
     } finally {
       setLoading(false)
@@ -274,30 +277,28 @@ export default function NewManPage() {
           <div>
             <h1 className="text-2xl font-bold text-[#2D2D2D]">Nouveau profil homme</h1>
             <p className="text-sm text-[#6B7280]">
-              Remplissez les informations du candidat. Les champs marques * sont obligatoires.
+              Remplissez les informations du candidat. Les champs marqués * sont obligatoires.
             </p>
           </div>
         </div>
 
-        {/* Error banner */}
         {submitError && (
           <div className="mb-6 rounded-lg border border-[#C45B5B]/30 bg-[#C45B5B]/5 p-4">
             <p className="text-sm text-[#C45B5B]">{submitError}</p>
           </div>
         )}
 
-        {/* Form */}
         <form onSubmit={handleSubmit}>
           <div className="rounded-xl border border-[#E8E0D4] bg-white p-6 shadow-sm sm:p-8">
-            {/* ── Identite ── */}
-            <SectionHeading title="Identite" />
+            {/* ── Identité ── */}
+            <SectionHeading title="Identité & Contact" />
             <div className="grid gap-4 sm:grid-cols-2">
               <Input
-                label="Prenom *"
+                label="Prénom *"
                 value={form.first_name}
                 onChange={(e) => updateField('first_name', e.currentTarget.value)}
                 error={errors.first_name}
-                placeholder="Prenom du candidat"
+                placeholder="Prénom du candidat"
               />
               <Input
                 label="Nom *"
@@ -307,57 +308,47 @@ export default function NewManPage() {
                 placeholder="Nom de famille"
               />
               <Input
-                label="Nom hebreu"
+                label="Nom hébraïque"
                 value={form.hebrew_name}
                 onChange={(e) => updateField('hebrew_name', e.currentTarget.value)}
-                placeholder="Ex : Moshe ben David"
+                placeholder="Ex : Moshé ben David"
               />
               <Input
                 label="Date de naissance"
                 inputType="date"
                 value={form.date_of_birth}
                 onChange={(e) => updateField('date_of_birth', e.currentTarget.value)}
-                helperText="Ou renseignez un age estime ci-dessous"
               />
               <Input
-                label="Age estime"
+                label="Âge estimé"
                 inputType="number"
                 value={form.age_estimate}
                 onChange={(e) => updateField('age_estimate', e.currentTarget.value)}
-                placeholder="Ex : 28"
-                min={18}
-                max={120}
-                helperText="Si la date de naissance n'est pas connue"
+                placeholder="Si date de naissance inconnue"
               />
               <Input
                 label="Ville"
                 value={form.city}
                 onChange={(e) => updateField('city', e.currentTarget.value)}
-                placeholder="Ex : Paris"
+                placeholder="Paris"
               />
               <Input
                 label="Pays"
                 value={form.country}
                 onChange={(e) => updateField('country', e.currentTarget.value)}
-                placeholder="Ex : France"
               />
-            </div>
-
-            {/* ── Contact ── */}
-            <SectionHeading title="Contact" />
-            <div className="grid gap-4 sm:grid-cols-2">
               <Input
-                label="Telephone"
+                label="Téléphone"
                 inputType="tel"
                 value={form.phone}
                 onChange={(e) => updateField('phone', e.currentTarget.value)}
-                placeholder="+33 6 00 00 00 00"
+                placeholder="+33 6 ..."
               />
               <Input
                 label="WhatsApp"
                 value={form.whatsapp}
                 onChange={(e) => updateField('whatsapp', e.currentTarget.value)}
-                placeholder="Numero WhatsApp si different"
+                placeholder="Si différent du téléphone"
               />
               <Input
                 label="Email"
@@ -365,37 +356,108 @@ export default function NewManPage() {
                 value={form.email}
                 onChange={(e) => updateField('email', e.currentTarget.value)}
                 placeholder="email@exemple.com"
-                className="sm:col-span-2"
               />
             </div>
 
             {/* ── Vie religieuse ── */}
             <SectionHeading title="Vie religieuse" />
             <div className="grid gap-4 sm:grid-cols-2">
-              <Input
-                label="Langues parlees"
-                value={form.languages}
-                onChange={(e) => updateField('languages', e.currentTarget.value)}
-                placeholder="Ex : Francais, Hebreu, Anglais"
+              <Select
+                label="Courant religieux"
+                options={courantOptions}
+                value={form.courant}
+                onChange={(e) => updateField('courant', e.currentTarget.value)}
               />
-              <Input
-                label="Communaute"
+              {form.courant === 'haredi_hassidique' && (
+                <Select
+                  label="Hassidout"
+                  options={hassidoutOptions}
+                  value={form.hassidout}
+                  onChange={(e) => updateField('hassidout', e.currentTarget.value)}
+                />
+              )}
+              <Select
+                label="Nousah (rite de prière)"
+                options={nousahOptions}
+                value={form.nousah}
+                onChange={(e) => updateField('nousah', e.currentTarget.value)}
+              />
+              <Select
+                label="Type de kipa"
+                options={kipaTypeOptions}
+                value={form.kipa_type}
+                onChange={(e) => updateField('kipa_type', e.currentTarget.value)}
+              />
+              <Select
+                label="Communauté d'origine"
+                options={communityEthnicOptions}
                 value={form.community}
                 onChange={(e) => updateField('community', e.currentTarget.value)}
-                placeholder="Ex : Sfarade, Ashkenaze, Mixte"
               />
               <Input
-                label="Reference rabbinique"
+                label="Synagogue"
+                value={form.synagogue}
+                onChange={(e) => updateField('synagogue', e.currentTarget.value)}
+                placeholder="Nom de la synagogue"
+              />
+              <Input
+                label="Référence rabbinique"
                 value={form.rabbi_reference}
                 onChange={(e) => updateField('rabbi_reference', e.currentTarget.value)}
-                placeholder="Nom du Rav de reference"
+                placeholder="Nom du Rav de référence"
               />
               <Input
-                label="Etude de Torah / Yeshiva"
-                value={form.torah_study}
-                onChange={(e) => updateField('torah_study', e.currentTarget.value)}
-                placeholder="Yeshiva frequentee, rythme d'etude"
+                label="Yeshiva / École juive"
+                value={form.school_seminary}
+                onChange={(e) => updateField('school_seminary', e.currentTarget.value)}
+                placeholder="Yeshiva, Kolel, école..."
               />
+              <Select
+                label="Chabbat"
+                options={shabbatPracticeOptions}
+                value={form.shabbat_practice}
+                onChange={(e) => updateField('shabbat_practice', e.currentTarget.value)}
+              />
+              <Select
+                label="Cacheroute"
+                options={kashrutLevelOptions}
+                value={form.kashrut_level}
+                onChange={(e) => updateField('kashrut_level', e.currentTarget.value)}
+              />
+              <Select
+                label="Tsniout"
+                options={tsnioutOptions}
+                value={form.tsniout}
+                onChange={(e) => updateField('tsniout', e.currentTarget.value)}
+              />
+              <div /> {/* spacer */}
+              <div className="sm:col-span-2">
+                <Input
+                  label="Étude de Torah"
+                  inputType="textarea"
+                  value={form.torah_study}
+                  onChange={(e) => updateField('torah_study', e.currentTarget.value)}
+                  placeholder="Rythme d'étude, seder, Daf Yomi..."
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <Input
+                  label="Traditions et Minhaguim"
+                  inputType="textarea"
+                  value={form.traditions_minhaguim}
+                  onChange={(e) => updateField('traditions_minhaguim', e.currentTarget.value)}
+                  placeholder="Kitniyot à Pessah, deuxième jour de fête, minhaguim spécifiques..."
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <Input
+                  label="Prière / Pratique"
+                  inputType="textarea"
+                  value={form.prayer_study}
+                  onChange={(e) => updateField('prayer_study', e.currentTarget.value)}
+                  placeholder="Offices quotidiens, minyan, pratiques..."
+                />
+              </div>
             </div>
 
             {/* ── Situation personnelle ── */}
@@ -406,61 +468,58 @@ export default function NewManPage() {
                 value={form.marital_status}
                 onChange={(e) => updateField('marital_status', e.currentTarget.value)}
                 options={MARITAL_STATUS_OPTIONS}
-                placeholder="Selectionnez..."
               />
-              <div className="flex items-end pb-1">
-                <label className="flex items-center gap-2.5 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={form.has_children}
-                    onChange={(e) => updateField('has_children', e.target.checked)}
-                    className="h-4 w-4 rounded border-[#E8E0D4] text-[#87A878] focus:ring-[#87A878]"
-                  />
-                  <span className="text-sm font-medium text-[#2D2D2D]">A des enfants</span>
-                </label>
-              </div>
+              <Select
+                label="A des enfants"
+                options={[
+                  { value: 'false', label: 'Non' },
+                  { value: 'true', label: 'Oui' },
+                ]}
+                value={form.has_children}
+                onChange={(e) => updateField('has_children', e.currentTarget.value)}
+              />
               <div className="sm:col-span-2">
                 <Input
                   label="Contexte familial"
                   inputType="textarea"
                   value={form.family_context}
                   onChange={(e) => updateField('family_context', e.currentTarget.value)}
-                  placeholder="Informations sur la situation familiale, contexte particulier..."
+                  placeholder="Situation familiale, fratrie, contexte particulier..."
                 />
               </div>
             </div>
 
-            {/* ── Profil ── */}
-            <SectionHeading title="Profil" />
+            {/* ── Parcours ── */}
+            <SectionHeading title="Parcours & Personnalité" />
             <div className="grid gap-4 sm:grid-cols-2">
               <Input
                 label="Profession"
                 value={form.profession}
                 onChange={(e) => updateField('profession', e.currentTarget.value)}
-                placeholder="Ex : Ingenieur, Enseignant, Commercial"
+                placeholder="Ingénieur, enseignant..."
               />
               <Input
-                label="Etudes"
+                label="Études"
                 value={form.studies}
                 onChange={(e) => updateField('studies', e.currentTarget.value)}
-                placeholder="Ex : Master Informatique, Semicha"
+                placeholder="Master, Semicha, Kolel..."
               />
               <div className="sm:col-span-2">
                 <Input
-                  label="Centres d'interet"
+                  label="Centres d'intérêt"
                   inputType="textarea"
                   value={form.interests}
                   onChange={(e) => updateField('interests', e.currentTarget.value)}
-                  placeholder="Hobbies, passions, activites..."
+                  placeholder="Hobbies, passions, activités..."
                 />
               </div>
               <div className="sm:col-span-2">
                 <Input
-                  label="Temperament / Personnalite"
+                  label="Tempérament / Personnalité"
                   inputType="textarea"
                   value={form.temperament}
                   onChange={(e) => updateField('temperament', e.currentTarget.value)}
-                  placeholder="Description du caractere, traits de personnalite..."
+                  placeholder="Traits de caractère, personnalité..."
                 />
               </div>
             </div>
@@ -469,38 +528,49 @@ export default function NewManPage() {
             <SectionHeading title="Attentes" />
             <div className="grid gap-4 sm:grid-cols-2">
               <Input
-                label="Age minimum recherche"
+                label="Âge minimum souhaité"
                 inputType="number"
-                value={form.preferred_age_min}
-                onChange={(e) => updateField('preferred_age_min', e.currentTarget.value)}
-                placeholder="Ex : 22"
-                min={18}
-                max={120}
+                value={form.age_min}
+                onChange={(e) => updateField('age_min', e.currentTarget.value)}
+                placeholder="22"
               />
               <Input
-                label="Age maximum recherche"
+                label="Âge maximum souhaité"
                 inputType="number"
-                value={form.preferred_age_max}
-                onChange={(e) => updateField('preferred_age_max', e.currentTarget.value)}
-                placeholder="Ex : 30"
-                min={18}
-                max={120}
+                value={form.age_max}
+                onChange={(e) => updateField('age_max', e.currentTarget.value)}
+                placeholder="30"
+              />
+              <Input
+                label="Villes préférées"
+                value={form.preferred_cities}
+                onChange={(e) => updateField('preferred_cities', e.currentTarget.value)}
+                placeholder="Paris, Jérusalem, Bnei Brak..."
+                className="sm:col-span-2"
               />
               <div className="sm:col-span-2">
                 <Input
-                  label="Villes preferees"
-                  value={form.preferred_cities}
-                  onChange={(e) => updateField('preferred_cities', e.currentTarget.value)}
-                  placeholder="Ex : Paris, Lyon, Jerusalem"
+                  label="Projet religieux du foyer"
+                  inputType="textarea"
+                  value={form.religious_home_project}
+                  onChange={(e) => updateField('religious_home_project', e.currentTarget.value)}
+                  placeholder="Foyer Torah, mixte étude-travail..."
                 />
               </div>
+              <Select
+                label="Éducation des enfants souhaitée"
+                options={childrenEducationOptions}
+                value={form.children_education}
+                onChange={(e) => updateField('children_education', e.currentTarget.value)}
+              />
+              <div /> {/* spacer */}
               <div className="sm:col-span-2">
                 <Input
-                  label="Qualites recherchees"
+                  label="Qualités recherchées"
                   inputType="textarea"
                   value={form.expected_qualities}
                   onChange={(e) => updateField('expected_qualities', e.currentTarget.value)}
-                  placeholder="Qualites souhaitees chez la partenaire..."
+                  placeholder="Qualités souhaitées chez la partenaire..."
                 />
               </div>
               <div className="sm:col-span-2">
@@ -509,22 +579,22 @@ export default function NewManPage() {
                   inputType="textarea"
                   value={form.expected_values}
                   onChange={(e) => updateField('expected_values', e.currentTarget.value)}
-                  placeholder="Valeurs importantes pour la vie de couple..."
+                  placeholder="Valeurs essentielles..."
                 />
               </div>
               <div className="sm:col-span-2">
                 <Input
-                  label="Incompatibilites / Points redhibitoires"
+                  label="Points rédhibitoires"
                   inputType="textarea"
                   value={form.incompatibilities}
                   onChange={(e) => updateField('incompatibilities', e.currentTarget.value)}
-                  placeholder="Ce que le candidat ne souhaite absolument pas..."
+                  placeholder="Ce qu'il ne souhaite absolument pas..."
                 />
               </div>
             </div>
 
-            {/* ── Informations complementaires ── */}
-            <SectionHeading title="Informations complementaires" />
+            {/* ── Informations complémentaires ── */}
+            <SectionHeading title="Informations complémentaires" />
             <div className="grid gap-4 sm:grid-cols-2">
               <Input
                 label="Nom de la chadkhanit externe"
@@ -536,14 +606,13 @@ export default function NewManPage() {
                 label="Contact de la chadkhanit externe"
                 value={form.external_chadkhanit_contact}
                 onChange={(e) => updateField('external_chadkhanit_contact', e.currentTarget.value)}
-                placeholder="Telephone ou email"
+                placeholder="Téléphone ou email"
               />
               <Select
                 label="Canal d'origine"
                 value={form.origin_channel}
                 onChange={(e) => updateField('origin_channel', e.currentTarget.value)}
                 options={ORIGIN_CHANNEL_OPTIONS}
-                placeholder="Comment a-t-il connu le service ?"
               />
               <div className="sm:col-span-2">
                 <Input
@@ -551,7 +620,7 @@ export default function NewManPage() {
                   inputType="textarea"
                   value={form.notes}
                   onChange={(e) => updateField('notes', e.currentTarget.value)}
-                  placeholder="Remarques supplementaires, contexte, informations utiles..."
+                  placeholder="Remarques supplémentaires..."
                 />
               </div>
             </div>
