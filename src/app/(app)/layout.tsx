@@ -15,19 +15,25 @@ export default async function AppLayout({
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) {
-    redirect('/login')
+  // AUTH BYPASS TEMPORAIRE — à réactiver plus tard
+  // if (!user) {
+  //   redirect('/login')
+  // }
+
+  let profile: { full_name: string; email: string; role: string } | null = null
+
+  if (user) {
+    const { data } = await supabase
+      .from('user_profiles')
+      .select('id, full_name, email, role, phone, avatar_url, organization_id')
+      .eq('auth_user_id', user.id)
+      .eq('organization_id', ORG_ID)
+      .single()
+    profile = data
   }
 
-  const { data: profile } = await supabase
-    .from('user_profiles')
-    .select('id, full_name, email, role, phone, avatar_url, organization_id')
-    .eq('auth_user_id', user.id)
-    .eq('organization_id', ORG_ID)
-    .single()
-
   if (!profile) {
-    redirect('/login')
+    profile = { full_name: 'Admin', email: 'admin@shidoukhim.app', role: 'admin' }
   }
 
   return (
