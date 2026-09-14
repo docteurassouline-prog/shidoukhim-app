@@ -13,11 +13,19 @@ const protectedPaths = [
   '/settings',
 ]
 
+const candidateProtectedPaths = ['/espace-candidate']
+
 // Routes that are always public
-const publicPaths = ['/login', '/auth/callback']
+const publicPaths = ['/login', '/auth/callback', '/candidate-login']
 
 function isProtectedRoute(pathname: string): boolean {
   return protectedPaths.some(
+    (path) => pathname === path || pathname.startsWith(path + '/')
+  )
+}
+
+function isCandidateRoute(pathname: string): boolean {
+  return candidateProtectedPaths.some(
     (path) => pathname === path || pathname.startsWith(path + '/')
   )
 }
@@ -45,6 +53,14 @@ export async function proxy(request: NextRequest) {
   if (isProtectedRoute(pathname) && !user) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
+    url.searchParams.set('redirectTo', pathname)
+    return NextResponse.redirect(url)
+  }
+
+  // Candidate portal routes — redirect to candidate login if not authenticated
+  if (isCandidateRoute(pathname) && !user) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/candidate-login'
     url.searchParams.set('redirectTo', pathname)
     return NextResponse.redirect(url)
   }
