@@ -49,13 +49,13 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // If the route is protected and the user is not authenticated, redirect to login
-  if (isProtectedRoute(pathname) && !user) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/login'
-    url.searchParams.set('redirectTo', pathname)
-    return NextResponse.redirect(url)
-  }
+  // AUTH BYPASS TEMPORAIRE — à réactiver plus tard
+  // if (isProtectedRoute(pathname) && !user) {
+  //   const url = request.nextUrl.clone()
+  //   url.pathname = '/login'
+  //   url.searchParams.set('redirectTo', pathname)
+  //   return NextResponse.redirect(url)
+  // }
 
   // Candidate portal routes — redirect to candidate login if not authenticated
   if (isCandidateRoute(pathname) && !user) {
