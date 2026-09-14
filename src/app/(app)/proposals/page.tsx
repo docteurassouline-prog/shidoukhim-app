@@ -118,7 +118,7 @@ export default function ProposalsPage() {
           created_at,
           updated_at,
           candidate_woman:candidates!proposals_candidate_woman_id_fkey(id, first_name, last_name, city, age_estimate),
-          candidate_man:candidates_man!proposals_candidate_man_id_fkey(id, first_name, last_name, city, age_estimate),
+          candidate_man:candidates_men!proposals_candidate_man_id_fkey(id, first_name, last_name, city, age_estimate),
           creator:user_profiles!proposals_created_by_fkey(full_name)
         `,
           { count: 'exact' }

@@ -109,10 +109,10 @@ export default function NewProposalPage() {
           .in('status', ['validee', 'a_valider'])
           .order('last_name', { ascending: true }),
         supabase
-          .from('candidates_man')
+          .from('candidates_men')
           .select(selectFields)
           .eq('organization_id', ORG_ID)
-          .in('status', ['validee', 'a_valider'])
+          .in('status', ['actif', 'en_rencontre'])
           .order('last_name', { ascending: true }),
       ])
 

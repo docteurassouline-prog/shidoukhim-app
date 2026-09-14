@@ -76,6 +76,7 @@ export default function FeedbackPage(props: {
   const [existing, setExisting] = useState<ExistingFeedback | null>(null)
   const [candidateId, setCandidateId] = useState<string | null>(null)
   const [candidateType, setCandidateType] = useState<string>('woman')
+  const [proposalId, setProposalId] = useState<string | null>(null)
 
   /* ---- Load meeting & existing feedback ---- */
   useEffect(() => {
@@ -136,6 +137,8 @@ export default function FeedbackPage(props: {
         setLoading(false)
         return
       }
+
+      setProposalId(meeting.proposal_id)
 
       // 4. Check for existing feedback (filtered by candidate_type so both can give feedback)
       const { data: existingFb } = await supabase
@@ -198,6 +201,7 @@ export default function FeedbackPage(props: {
         .from('candidate_portal_feedback')
         .insert({
           meeting_id: meetingId,
+          proposal_id: proposalId,
           candidate_id: candidateId,
           candidate_type: candidateType,
           liked_appearance: feedback.liked_appearance,
