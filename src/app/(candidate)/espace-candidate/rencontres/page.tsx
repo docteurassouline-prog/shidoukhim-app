@@ -11,7 +11,7 @@ import { Calendar, MapPin, MessageCircleHeart, ChevronRight, Heart } from 'lucid
 /*  Types specific to this page                                       */
 /* ------------------------------------------------------------------ */
 
-interface ManInfo {
+interface OtherCandidateInfo {
   first_name: string
   city: string | null
   date_of_birth: string | null
@@ -53,11 +53,13 @@ interface ProposalRow {
   id: string
   status: string
   candidate_man_id: string
+  candidate_woman_id: string
 }
 
 interface MeetingDisplay {
   meeting: MeetingRow
-  man: ManInfo | null
+  otherCandidate: OtherCandidateInfo | null
+  otherLabel: string // "Lui" (women viewing men) or "Elle" (men viewing women)
   proposalStatus: string
   feedback: FeedbackRow | null
 }
@@ -80,21 +82,24 @@ export default function RencontresPage() {
       } = await supabase.auth.getUser()
       if (!user) return
 
-      // 2. Get candidate_id from portal token
+      // 2. Get candidate_id + candidate_type from portal token
       const { data: token } = await supabase
         .from('candidate_portal_tokens')
-        .select('candidate_id')
+        .select('candidate_id, candidate_type')
         .eq('auth_user_id', user.id)
         .eq('is_active', true)
         .single()
 
       if (!token) return
 
-      // 3. Fetch all proposals where she is the woman
+      const candidateType: 'woman' | 'man' = token.candidate_type || 'woman'
+      const isWoman = candidateType === 'woman'
+
+      // 3. Fetch all proposals where this candidate appears
       const { data: proposals } = await supabase
         .from('proposals')
-        .select('id, status, candidate_man_id')
-        .eq('candidate_woman_id', token.candidate_id)
+        .select('id, status, candidate_man_id, candidate_woman_id')
+        .eq(isWoman ? 'candidate_woman_id' : 'candidate_man_id', token.candidate_id)
 
       if (!proposals || proposals.length === 0) {
         setLoading(false)
@@ -115,32 +120,36 @@ export default function RencontresPage() {
         return
       }
 
-      // 5. Fetch man info for each proposal's man
-      const manIds = [...new Set(proposals.map((p: ProposalRow) => p.candidate_man_id))]
-      const { data: menData } = await supabase
-        .from('candidate_men')
+      // 5. Fetch the OTHER candidate's info (man if we're a woman, woman if we're a man)
+      const otherIds = [...new Set(
+        proposals.map((p: ProposalRow) => isWoman ? p.candidate_man_id : p.candidate_woman_id)
+      )]
+      const otherTable = isWoman ? 'candidates_men' : 'candidates'
+      const { data: othersData } = await supabase
+        .from(otherTable)
         .select('id, first_name, city, date_of_birth, age_estimate, is_age_estimate')
-        .in('id', manIds)
+        .in('id', otherIds)
 
-      const menMap = new Map<string, ManInfo>()
-      if (menData) {
-        for (const m of menData) {
-          menMap.set(m.id, {
-            first_name: m.first_name,
-            city: m.city,
-            date_of_birth: m.date_of_birth,
-            age_estimate: m.age_estimate,
-            is_age_estimate: m.is_age_estimate,
+      const othersMap = new Map<string, OtherCandidateInfo>()
+      if (othersData) {
+        for (const c of othersData) {
+          othersMap.set(c.id, {
+            first_name: c.first_name,
+            city: c.city,
+            date_of_birth: c.date_of_birth,
+            age_estimate: c.age_estimate,
+            is_age_estimate: c.is_age_estimate,
           })
         }
       }
 
-      // 6. Fetch existing feedback for these meetings
+      // 6. Fetch existing feedback for these meetings (only this candidate's type)
       const meetingIds = meetingsData.map((m: MeetingRow) => m.id)
       const { data: feedbackData } = await supabase
         .from('candidate_portal_feedback')
         .select('*')
         .in('meeting_id', meetingIds)
+        .eq('candidate_type', candidateType)
 
       const feedbackMap = new Map<string, FeedbackRow>()
       if (feedbackData) {
@@ -155,11 +164,15 @@ export default function RencontresPage() {
         proposalMap.set(p.id, p as ProposalRow)
       }
 
+      const otherLabel = isWoman ? 'Lui' : 'Elle'
+
       const display: MeetingDisplay[] = meetingsData.map((mtg: MeetingRow) => {
         const proposal = proposalMap.get(mtg.proposal_id)!
+        const otherId = isWoman ? proposal.candidate_man_id : proposal.candidate_woman_id
         return {
           meeting: mtg,
-          man: menMap.get(proposal.candidate_man_id) || null,
+          otherCandidate: othersMap.get(otherId) || null,
+          otherLabel,
           proposalStatus: proposal.status,
           feedback: feedbackMap.get(mtg.id) || null,
         }
@@ -210,11 +223,12 @@ export default function RencontresPage() {
       </div>
 
       <div className="space-y-4">
-        {meetings.map(({ meeting, man, proposalStatus, feedback }) => (
+        {meetings.map(({ meeting, otherCandidate, otherLabel, proposalStatus, feedback }) => (
           <MeetingCard
             key={meeting.id}
             meeting={meeting}
-            man={man}
+            otherCandidate={otherCandidate}
+            otherLabel={otherLabel}
             proposalStatus={proposalStatus}
             feedback={feedback}
           />
@@ -230,12 +244,14 @@ export default function RencontresPage() {
 
 function MeetingCard({
   meeting,
-  man,
+  otherCandidate,
+  otherLabel,
   proposalStatus,
   feedback,
 }: {
   meeting: MeetingRow
-  man: ManInfo | null
+  otherCandidate: OtherCandidateInfo | null
+  otherLabel: string
   proposalStatus: string
   feedback: FeedbackRow | null
 }) {
@@ -265,22 +281,23 @@ function MeetingCard({
 
       {/* Body */}
       <div className="p-5 space-y-3">
-        {/* Man info */}
-        {man && (
+        {/* Other candidate info */}
+        {otherCandidate && (
           <div className="flex items-center gap-2 text-sm text-[#2D2D2D]">
             <div className="w-8 h-8 rounded-full bg-[#87A878]/15 flex items-center justify-center flex-shrink-0">
               <span className="text-xs font-bold text-[#87A878]">
-                {man.first_name.charAt(0).toUpperCase()}
+                {otherCandidate.first_name.charAt(0).toUpperCase()}
               </span>
             </div>
             <div>
-              <span className="font-medium">{man.first_name}</span>
-              {man.city && (
-                <span className="text-[#6B7280]"> &middot; {man.city}</span>
+              <span className="text-[#9CA3AF] text-xs mr-1">{otherLabel} :</span>
+              <span className="font-medium">{otherCandidate.first_name}</span>
+              {otherCandidate.city && (
+                <span className="text-[#6B7280]"> &middot; {otherCandidate.city}</span>
               )}
               <span className="text-[#6B7280]">
                 {' '}
-                &middot; {calculateAge(man.date_of_birth, man.age_estimate, man.is_age_estimate)}
+                &middot; {calculateAge(otherCandidate.date_of_birth, otherCandidate.age_estimate, otherCandidate.is_age_estimate)}
               </span>
             </div>
           </div>

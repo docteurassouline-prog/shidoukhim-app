@@ -4,10 +4,11 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { User, Mail, Phone, MapPin, Heart, BookOpen, Briefcase } from 'lucide-react'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
-import type { Candidate } from '@/lib/types'
+import type { Candidate, CandidateMan } from '@/lib/types'
 
 export default function CandidateProfilePage() {
-  const [candidate, setCandidate] = useState<Candidate | null>(null)
+  const [candidate, setCandidate] = useState<Candidate | CandidateMan | null>(null)
+  const [candidateType, setCandidateType] = useState<'woman' | 'man'>('woman')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -18,20 +19,24 @@ export default function CandidateProfilePage() {
 
       const { data: token } = await supabase
         .from('candidate_portal_tokens')
-        .select('candidate_id')
+        .select('candidate_id, candidate_type')
         .eq('auth_user_id', user.id)
         .eq('is_active', true)
         .single()
 
       if (!token) return
 
+      const type: 'woman' | 'man' = token.candidate_type === 'man' ? 'man' : 'woman'
+      setCandidateType(type)
+
+      const table = type === 'woman' ? 'candidates' : 'candidates_men'
       const { data } = await supabase
-        .from('candidates')
+        .from(table)
         .select('*')
         .eq('id', token.candidate_id)
         .single()
 
-      if (data) setCandidate(data as Candidate)
+      if (data) setCandidate(data as Candidate | CandidateMan)
       setLoading(false)
     }
     fetchProfile()
@@ -127,6 +132,20 @@ export default function CandidateProfilePage() {
           {candidate.synagogue && <InfoField label="Synagogue" value={candidate.synagogue} />}
         </div>
       </section>
+
+      {/* Yeshiva / Religious studies (men only) */}
+      {candidateType === 'man' && ('yeshiva' in candidate || 'learning_schedule' in candidate) && (
+        <section className="bg-white rounded-xl border border-[#E8E0D4] p-6 space-y-4">
+          <h2 className="text-lg font-semibold text-[#2D2D2D] flex items-center gap-2">
+            <BookOpen className="h-5 w-5 text-[#6B3A5B]" />
+            Yechiva / Études religieuses
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {(candidate as CandidateMan).yeshiva && <InfoField label="Yechiva" value={(candidate as CandidateMan).yeshiva!} />}
+            {(candidate as CandidateMan).learning_schedule && <InfoField label="Programme d'étude" value={(candidate as CandidateMan).learning_schedule!} />}
+          </div>
+        </section>
+      )}
 
       {/* Professional */}
       <section className="bg-white rounded-xl border border-[#E8E0D4] p-6 space-y-4">

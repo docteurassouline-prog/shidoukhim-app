@@ -20,7 +20,7 @@ export default async function CandidateLayout({
 
   const { data: row } = await supabase
     .from('candidate_portal_tokens')
-    .select('candidate_id, candidates(first_name, last_name)')
+    .select('candidate_id, candidate_type')
     .eq('auth_user_id', user.id)
     .eq('is_active', true)
     .single()
@@ -57,13 +57,17 @@ export default async function CandidateLayout({
     )
   }
 
-  const candidateData = Array.isArray(row.candidates)
-    ? row.candidates[0]
-    : row.candidates
+  // Fetch name from the right table based on candidate_type
+  const table = row.candidate_type === 'man' ? 'candidates_men' : 'candidates'
+  const { data: candidateRow } = await supabase
+    .from(table)
+    .select('first_name, last_name')
+    .eq('id', row.candidate_id)
+    .single()
 
-  const candidateName = candidateData
-    ? `${candidateData.first_name} ${candidateData.last_name}`
-    : 'Candidat'
+  const candidateName = candidateRow
+    ? `${candidateRow.first_name} ${candidateRow.last_name}`
+    : 'Candidat(e)'
 
   const navLinks = [
     { href: '/espace-candidate', label: 'Mon parcours' },

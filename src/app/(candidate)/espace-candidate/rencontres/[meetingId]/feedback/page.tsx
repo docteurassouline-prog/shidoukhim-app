@@ -75,6 +75,7 @@ export default function FeedbackPage(props: {
   const [feedback, setFeedback] = useState<FeedbackData>(INITIAL_FEEDBACK)
   const [existing, setExisting] = useState<ExistingFeedback | null>(null)
   const [candidateId, setCandidateId] = useState<string | null>(null)
+  const [candidateType, setCandidateType] = useState<string>('woman')
 
   /* ---- Load meeting & existing feedback ---- */
   useEffect(() => {
@@ -91,10 +92,10 @@ export default function FeedbackPage(props: {
         return
       }
 
-      // 2. Get candidate_id
+      // 2. Get candidate_id + candidate_type
       const { data: token } = await supabase
         .from('candidate_portal_tokens')
-        .select('candidate_id')
+        .select('candidate_id, candidate_type')
         .eq('auth_user_id', user.id)
         .eq('is_active', true)
         .single()
@@ -106,8 +107,10 @@ export default function FeedbackPage(props: {
       }
 
       setCandidateId(token.candidate_id)
+      const cType: 'woman' | 'man' = token.candidate_type || 'woman'
+      setCandidateType(cType)
 
-      // 3. Verify meeting belongs to one of her proposals
+      // 3. Verify meeting belongs to one of this candidate's proposals
       const { data: meeting } = await supabase
         .from('meetings')
         .select('id, proposal_id, status')
@@ -120,11 +123,12 @@ export default function FeedbackPage(props: {
         return
       }
 
+      const proposalColumn = cType === 'woman' ? 'candidate_woman_id' : 'candidate_man_id'
       const { data: proposal } = await supabase
         .from('proposals')
-        .select('id, candidate_woman_id')
+        .select('id')
         .eq('id', meeting.proposal_id)
-        .eq('candidate_woman_id', token.candidate_id)
+        .eq(proposalColumn, token.candidate_id)
         .single()
 
       if (!proposal) {
@@ -133,12 +137,13 @@ export default function FeedbackPage(props: {
         return
       }
 
-      // 4. Check for existing feedback
+      // 4. Check for existing feedback (filtered by candidate_type so both can give feedback)
       const { data: existingFb } = await supabase
         .from('candidate_portal_feedback')
         .select('*')
         .eq('meeting_id', meetingId)
         .eq('candidate_id', token.candidate_id)
+        .eq('candidate_type', cType)
         .single()
 
       if (existingFb) {
@@ -194,6 +199,7 @@ export default function FeedbackPage(props: {
         .insert({
           meeting_id: meetingId,
           candidate_id: candidateId,
+          candidate_type: candidateType,
           liked_appearance: feedback.liked_appearance,
           liked_personality: feedback.liked_personality,
           liked_conversation: feedback.liked_conversation,

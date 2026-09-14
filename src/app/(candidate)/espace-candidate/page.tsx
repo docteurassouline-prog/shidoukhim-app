@@ -12,17 +12,22 @@ import { Heart, Calendar, MessageCircle, Star } from 'lucide-react'
 // Types locaux (ce que Supabase renvoie via les jointures)
 // ---------------------------------------------------------------------------
 
-interface ManBasicInfo {
+interface OtherCandidateInfo {
   first_name: string
   city: string | null
   age_estimate: number | null
 }
 
+type CandidateType = 'woman' | 'man'
+
 interface ProposalRow {
   id: string
   status: string
   created_at: string
-  candidates_man: ManBasicInfo | ManBasicInfo[] | null
+  /** Join vers le candidat homme (quand la candidate connectee est une femme) */
+  candidates_man?: OtherCandidateInfo | OtherCandidateInfo[] | null
+  /** Join vers la candidate femme (quand le candidat connecte est un homme) */
+  candidates_woman?: OtherCandidateInfo | OtherCandidateInfo[] | null
 }
 
 interface MeetingRow {
@@ -71,6 +76,7 @@ export default function EspaceCandidatePage() {
   const [error, setError] = useState<string | null>(null)
 
   const [firstName, setFirstName] = useState<string>('')
+  const [candidateType, setCandidateType] = useState<CandidateType>('woman')
   const [proposals, setProposals] = useState<ProposalRow[]>([])
   const [meetings, setMeetings] = useState<MeetingRow[]>([])
   const [feedbackIds, setFeedbackIds] = useState<Set<string>>(new Set())
@@ -90,10 +96,10 @@ export default function EspaceCandidatePage() {
           return
         }
 
-        // 2. Token portail → candidate_id
+        // 2. Token portail → candidate_id + candidate_type
         const { data: tokenRow, error: tokenError } = await supabase
           .from('candidate_portal_tokens')
-          .select('candidate_id')
+          .select('candidate_id, candidate_type')
           .eq('auth_user_id', user.id)
           .eq('is_active', true)
           .single()
@@ -104,23 +110,31 @@ export default function EspaceCandidatePage() {
         }
 
         const candidateId: string = tokenRow.candidate_id
+        const type: CandidateType = tokenRow.candidate_type === 'man' ? 'man' : 'woman'
+        setCandidateType(type)
 
-        // 3. Prenom de la candidate
+        // 3. Prenom du candidat connecte (table differente selon le type)
+        const candidateTable = type === 'woman' ? 'candidates' : 'candidates_men'
         const { data: candidateRow } = await supabase
-          .from('candidates')
+          .from(candidateTable)
           .select('first_name')
           .eq('id', candidateId)
           .single()
 
         setFirstName(candidateRow?.first_name ?? '')
 
-        // 4. Propositions (avec infos basiques du candidat homme)
+        // 4. Propositions (jointure vers l'autre candidat selon le type)
+        const proposalSelect =
+          type === 'woman'
+            ? 'id, status, created_at, candidates_man:candidates_men!proposals_candidate_man_id_fkey(first_name, city, age_estimate)'
+            : 'id, status, created_at, candidates_woman:candidates!proposals_candidate_woman_id_fkey(first_name, city, age_estimate)'
+        const proposalFilter =
+          type === 'woman' ? 'candidate_woman_id' : 'candidate_man_id'
+
         const { data: proposalRows } = await supabase
           .from('proposals')
-          .select(
-            'id, status, created_at, candidates_man!proposals_candidate_man_id_fkey(first_name, city, age_estimate)'
-          )
-          .eq('candidate_woman_id', candidateId)
+          .select(proposalSelect)
+          .eq(proposalFilter, candidateId)
           .order('created_at', { ascending: false })
 
         const safeProposals: ProposalRow[] = (proposalRows ?? []) as ProposalRow[]
@@ -148,6 +162,7 @@ export default function EspaceCandidatePage() {
             .from('candidate_portal_feedback')
             .select('id, meeting_id, created_at')
             .in('meeting_id', meetingIds)
+            .eq('candidate_type', type)
 
           const ids = new Set((feedbackRows ?? []).map((f: PortalFeedbackRow) => f.meeting_id))
           setFeedbackIds(ids)
@@ -261,7 +276,12 @@ export default function EspaceCandidatePage() {
           ) : (
             <div className="space-y-3">
               {activeProposals.map((proposal) => {
-                const man = unwrapJoin(proposal.candidates_man)
+                const other = unwrapJoin(
+                  candidateType === 'woman'
+                    ? proposal.candidates_man
+                    : proposal.candidates_woman
+                )
+                const pronoun = candidateType === 'woman' ? 'Lui' : 'Elle'
                 return (
                   <div
                     key={proposal.id}
@@ -269,12 +289,12 @@ export default function EspaceCandidatePage() {
                   >
                     <div className="min-w-0">
                       <p className="font-medium text-[#2D2D2D] truncate">
-                        {man?.first_name ?? 'Candidat'}
+                        {other?.first_name ?? pronoun}
                       </p>
                       <p className="text-xs text-[#6B7280] mt-0.5">
                         {[
-                          man?.city,
-                          man?.age_estimate ? `~${man.age_estimate} ans` : null,
+                          other?.city,
+                          other?.age_estimate ? `~${other.age_estimate} ans` : null,
                         ]
                           .filter(Boolean)
                           .join(' · ') || 'Informations non renseignees'}
