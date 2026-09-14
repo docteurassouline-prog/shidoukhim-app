@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import { Eye, EyeOff, Loader2, Heart, Sparkles } from 'lucide-react'
 
-type Mode = 'login' | 'signup'
+type Mode = 'login' | 'signup' | 'forgot'
 
 export default function LoginPage() {
   const supabase = createClient()
@@ -106,6 +106,35 @@ export default function LoginPage() {
     // If email confirmation is required
     setSuccess(
       'Compte cree ! Verifiez votre email pour confirmer votre inscription.'
+    )
+    setLoading(false)
+  }
+
+  async function handleForgotPassword(e: React.FormEvent) {
+    e.preventDefault()
+    setError(null)
+    setSuccess(null)
+    setLoading(true)
+
+    if (!email.trim()) {
+      setError('Veuillez saisir votre adresse email.')
+      setLoading(false)
+      return
+    }
+
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(
+      email,
+      { redirectTo: `${window.location.origin}/auth/callback?redirectTo=/reset-password` }
+    )
+
+    if (resetError) {
+      setError(resetError.message)
+      setLoading(false)
+      return
+    }
+
+    setSuccess(
+      'Un email de réinitialisation a été envoyé. Vérifiez votre boîte de réception.'
     )
     setLoading(false)
   }
@@ -341,6 +370,95 @@ export default function LoginPage() {
                 ) : (
                   'Se connecter'
                 )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setMode('forgot')
+                  setError(null)
+                  setSuccess(null)
+                }}
+                className="w-full text-center text-sm mt-3 transition-colors hover:underline"
+                style={{ color: '#6B3A5B' }}
+              >
+                Mot de passe oublié ?
+              </button>
+            </form>
+          )}
+
+          {/* Forgot password form */}
+          {mode === 'forgot' && (
+            <form onSubmit={handleForgotPassword} className="space-y-4">
+              <p className="text-sm mb-2" style={{ color: '#6B7280' }}>
+                Saisissez votre adresse email pour recevoir un lien de réinitialisation.
+              </p>
+              <div>
+                <label
+                  htmlFor="forgot-email"
+                  className="block text-sm font-medium mb-1.5"
+                  style={{ color: '#2D2D2D' }}
+                >
+                  Adresse email
+                </label>
+                <input
+                  id="forgot-email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="votre@email.com"
+                  autoComplete="email"
+                  className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all duration-200 focus:ring-2"
+                  style={{
+                    border: '1px solid #E8E0D4',
+                    color: '#2D2D2D',
+                    backgroundColor: '#FAFAF8',
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = '#87A878'
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(135,168,120,0.15)'
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = '#E8E0D4'
+                    e.currentTarget.style.boxShadow = 'none'
+                  }}
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-60"
+                style={{ backgroundColor: '#C5A55A' }}
+                onMouseEnter={(e) => {
+                  if (!loading) e.currentTarget.style.backgroundColor = '#B0903E'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#C5A55A'
+                }}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Envoi en cours...
+                  </>
+                ) : (
+                  'Envoyer le lien'
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setMode('login')
+                  setError(null)
+                  setSuccess(null)
+                }}
+                className="w-full text-center text-sm mt-1 transition-colors hover:underline"
+                style={{ color: '#6B7280' }}
+              >
+                Retour à la connexion
               </button>
             </form>
           )}
