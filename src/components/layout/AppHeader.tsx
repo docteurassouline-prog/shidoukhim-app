@@ -1,0 +1,43 @@
+'use client'
+
+import { Menu, Search } from 'lucide-react'
+
+interface AppHeaderProps {
+  title: string
+  onMenuToggle: () => void
+  onSearchToggle?: () => void
+}
+
+export default function AppHeader({
+  title,
+  onMenuToggle,
+  onSearchToggle,
+}: AppHeaderProps) {
+  return (
+    <header className="lg:hidden sticky top-0 z-30 flex items-center justify-between h-14 px-4 bg-white border-b border-[#E8E0D4]">
+      <button
+        onClick={onMenuToggle}
+        className="rounded-lg p-2 text-[#6B7280] hover:bg-gray-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#87A878]"
+        aria-label="Ouvrir le menu"
+      >
+        <Menu className="h-5 w-5" />
+      </button>
+
+      <h1 className="text-base font-semibold text-[#2D2D2D] truncate px-2">
+        {title}
+      </h1>
+
+      {onSearchToggle ? (
+        <button
+          onClick={onSearchToggle}
+          className="rounded-lg p-2 text-[#6B7280] hover:bg-gray-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#87A878]"
+          aria-label="Rechercher"
+        >
+          <Search className="h-5 w-5" />
+        </button>
+      ) : (
+        <div className="w-9" aria-hidden="true" />
+      )}
+    </header>
+  )
+}
