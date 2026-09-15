@@ -16,21 +16,21 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    'bg-[#87A878] text-white hover:bg-[#6B8C5E] focus-visible:ring-[#87A878]',
+    'bg-plum text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_1px_2px_rgba(31,27,30,0.18)] hover:bg-plum-hover focus-visible:ring-plum',
   secondary:
-    'bg-white text-[#2D2D2D] border border-[#E8E0D4] hover:bg-gray-50 focus-visible:ring-[#E8E0D4]',
+    'bg-surface text-ink border border-line shadow-card hover:bg-surface-muted hover:border-line-strong focus-visible:ring-line-strong',
   accent:
-    'bg-[#6B3A5B] text-white hover:bg-[#5A2E4D] focus-visible:ring-[#6B3A5B]',
+    'bg-sage text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_1px_2px_rgba(31,27,30,0.14)] hover:bg-sage-hover focus-visible:ring-sage',
   danger:
-    'bg-[#C45B5B] text-white hover:bg-[#B04A4A] focus-visible:ring-[#C45B5B]',
+    'bg-danger text-white hover:bg-danger-deep focus-visible:ring-danger',
   ghost:
-    'bg-transparent text-[#6B7280] hover:bg-gray-100 focus-visible:ring-[#E8E0D4]',
+    'bg-transparent text-ink-soft hover:bg-ink/[0.05] hover:text-ink focus-visible:ring-line-strong',
 }
 
 const sizeClasses: Record<ButtonSize, string> = {
-  sm: 'px-3 py-1.5 text-sm gap-1.5',
-  md: 'px-4 py-2 text-sm gap-2',
-  lg: 'px-6 py-3 text-base gap-2.5',
+  sm: 'h-8 px-3 text-[13px] gap-1.5',
+  md: 'h-10 px-4 text-sm gap-2',
+  lg: 'h-12 px-6 text-[15px] gap-2.5',
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -56,8 +56,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={isDisabled}
         className={[
-          'inline-flex items-center justify-center font-medium rounded-lg',
-          'transition-colors duration-150',
+          'inline-flex items-center justify-center font-medium rounded-[10px] whitespace-nowrap',
+          'transition-all duration-150 active:translate-y-px',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
           'disabled:opacity-50 disabled:cursor-not-allowed',
           variantClasses[variant],

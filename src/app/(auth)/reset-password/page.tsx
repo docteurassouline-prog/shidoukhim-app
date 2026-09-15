@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Eye, EyeOff, Loader2, Heart, Sparkles } from 'lucide-react'
+import { Eye, EyeOff, Loader2, CheckCircle2 } from 'lucide-react'
 
 export default function ResetPasswordPage() {
   const supabase = createClient()
@@ -47,185 +47,89 @@ export default function ResetPasswordPage() {
     }, 2000)
   }
 
+  const inputClass =
+    'w-full h-11 rounded-[10px] border border-line bg-surface px-3.5 pr-11 text-sm text-ink placeholder:text-ink-muted/80 transition-colors hover:border-line-strong focus:border-plum focus:outline-none'
+
   return (
-    <div
-      className="min-h-screen flex items-center justify-center px-4 py-12"
-      style={{ backgroundColor: '#FFFBF0' }}
-    >
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div
-          className="absolute -top-24 -right-24 w-96 h-96 rounded-full opacity-10"
-          style={{ backgroundColor: '#C5A55A' }}
-        />
-        <div
-          className="absolute -bottom-32 -left-32 w-[500px] h-[500px] rounded-full opacity-10"
-          style={{ backgroundColor: '#87A878' }}
-        />
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-canvas px-6 py-12">
+      <div className="w-full max-w-[400px]">
+        <p className="text-[11px] uppercase tracking-[0.28em] text-ink-muted">Shidoukhim</p>
+        <p className="font-display text-[34px] font-semibold leading-none text-plum">Hava Dahan</p>
 
-      <div className="w-full max-w-md relative z-10">
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <Heart
-              className="w-6 h-6"
-              style={{ color: '#6B3A5B' }}
-              fill="#6B3A5B"
-            />
-            <Sparkles className="w-5 h-5" style={{ color: '#C5A55A' }} />
-          </div>
-          <h1
-            className="text-3xl font-bold tracking-tight"
-            style={{ color: '#2D2D2D' }}
-          >
-            Nouveau mot de passe
-          </h1>
-          <div
-            className="mt-3 w-16 h-0.5 mx-auto rounded-full"
-            style={{ backgroundColor: '#C5A55A' }}
-          />
-        </div>
-
-        <div
-          className="bg-white rounded-2xl shadow-lg p-8"
-          style={{ borderTop: '3px solid #C5A55A' }}
-        >
+        <div className="mt-8 rounded-[14px] border border-line bg-surface p-7 shadow-card">
           {success ? (
-            <div
-              className="p-4 rounded-lg text-sm text-center"
-              style={{
-                backgroundColor: '#F0FDF4',
-                color: '#166534',
-                border: '1px solid #BBF7D0',
-              }}
-            >
-              Mot de passe modifié avec succès ! Redirection...
+            <div className="text-center py-4">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-sage-light text-sage-deep">
+                <CheckCircle2 className="h-7 w-7" />
+              </div>
+              <h1 className="text-[26px] text-ink">Mot de passe mis à jour</h1>
+              <p className="mt-2 text-sm text-ink-soft">Redirection vers votre tableau de bord…</p>
             </div>
           ) : (
-            <form onSubmit={handleReset} className="space-y-4">
+            <>
+              <h1 className="text-[28px] text-ink">Nouveau mot de passe</h1>
+              <p className="mt-2 text-sm text-ink-soft">Choisissez un mot de passe d&apos;au moins 6 caractères.</p>
+
               {error && (
-                <div
-                  className="p-3 rounded-lg text-sm"
-                  style={{
-                    backgroundColor: '#FEF2F2',
-                    color: '#C45B5B',
-                    border: '1px solid #FECACA',
-                  }}
-                >
+                <div className="mt-5 rounded-[10px] border border-danger/25 bg-danger-light px-4 py-3 text-sm text-danger-deep" role="alert">
                   {error}
                 </div>
               )}
 
-              <div>
-                <label
-                  htmlFor="new-password"
-                  className="block text-sm font-medium mb-1.5"
-                  style={{ color: '#2D2D2D' }}
-                >
-                  Nouveau mot de passe
-                </label>
-                <div className="relative">
-                  <input
-                    id="new-password"
-                    type={showPassword ? 'text' : 'password'}
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="6 caractères minimum"
-                    autoComplete="new-password"
-                    className="w-full px-4 py-3 pr-12 rounded-xl text-sm outline-none transition-all duration-200"
-                    style={{
-                      border: '1px solid #E8E0D4',
-                      color: '#2D2D2D',
-                      backgroundColor: '#FAFAF8',
-                    }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = '#87A878'
-                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(135,168,120,0.15)'
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.borderColor = '#E8E0D4'
-                      e.currentTarget.style.boxShadow = 'none'
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-lg hover:bg-gray-100 transition-colors"
-                    tabIndex={-1}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="w-4 h-4 text-gray-400" />
-                    ) : (
-                      <Eye className="w-4 h-4 text-gray-400" />
-                    )}
-                  </button>
+              <form onSubmit={handleReset} className="mt-6 space-y-5">
+                <div>
+                  <label htmlFor="password" className="block text-[13px] font-medium text-ink-soft mb-1.5">
+                    Mot de passe
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="password"
+                      type={showPassword ? 'text' : 'password'}
+                      autoComplete="new-password"
+                      required
+                      minLength={6}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="6 caractères minimum"
+                      className={inputClass}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-ink-muted hover:text-ink"
+                      aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
                 </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="confirm-password"
-                  className="block text-sm font-medium mb-1.5"
-                  style={{ color: '#2D2D2D' }}
+                <div>
+                  <label htmlFor="confirmPassword" className="block text-[13px] font-medium text-ink-soft mb-1.5">
+                    Confirmation
+                  </label>
+                  <input
+                    id="confirmPassword"
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete="new-password"
+                    required
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Retapez le mot de passe"
+                    className={inputClass}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[10px] bg-plum text-sm font-medium text-white transition-colors hover:bg-plum-hover disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Confirmer le mot de passe
-                </label>
-                <input
-                  id="confirm-password"
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Retapez le mot de passe"
-                  autoComplete="new-password"
-                  className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all duration-200"
-                  style={{
-                    border: '1px solid #E8E0D4',
-                    color: '#2D2D2D',
-                    backgroundColor: '#FAFAF8',
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = '#87A878'
-                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(135,168,120,0.15)'
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = '#E8E0D4'
-                    e.currentTarget.style.boxShadow = 'none'
-                  }}
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-60"
-                style={{ backgroundColor: '#6B3A5B' }}
-                onMouseEnter={(e) => {
-                  if (!loading) e.currentTarget.style.backgroundColor = '#5A2D4A'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#6B3A5B'
-                }}
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Modification en cours...
-                  </>
-                ) : (
-                  'Modifier le mot de passe'
-                )}
-              </button>
-            </form>
+                  {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+                  Enregistrer
+                </button>
+              </form>
+            </>
           )}
         </div>
-
-        <p
-          className="text-center text-xs mt-6"
-          style={{ color: '#6B7280' }}
-        >
-          Plateforme sécurisée de gestion des shidoukhim
-        </p>
       </div>
     </div>
   )

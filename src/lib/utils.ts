@@ -86,54 +86,63 @@ export function getAvailabilityLabel(availability: string): string {
   return labels[availability] || availability
 }
 
+const TONE = {
+  neutral: 'bg-stone-100 text-stone-600',
+  faded: 'bg-stone-100 text-stone-500',
+  gold: 'bg-gold-light text-gold-deep',
+  sage: 'bg-sage-light text-sage-deep',
+  plum: 'bg-plum-light text-plum',
+  danger: 'bg-danger-light text-danger-deep',
+}
+
 export function getStatusColor(status: string): string {
   const colors: Record<string, string> = {
-    invitation_envoyee: 'bg-blue-100 text-blue-800',
-    brouillon: 'bg-gray-100 text-gray-600',
-    a_valider: 'bg-yellow-100 text-yellow-800',
-    validee: 'bg-green-100 text-green-800',
-    archivee: 'bg-gray-100 text-gray-500',
+    invitation_envoyee: TONE.gold,
+    brouillon: TONE.neutral,
+    a_valider: TONE.gold,
+    validee: TONE.sage,
+    archivee: TONE.faded,
 
-    envisagee: 'bg-gray-100 text-gray-600',
-    accord_demande: 'bg-amber-100 text-amber-800',
-    attente_retour: 'bg-yellow-100 text-yellow-800',
-    acceptee: 'bg-emerald-100 text-emerald-800',
-    rencontre_a_organiser: 'bg-sky-100 text-sky-800',
-    rencontre_programmee: 'bg-indigo-100 text-indigo-800',
-    rencontres_en_cours: 'bg-pink-100 text-pink-800',
-    interrompue: 'bg-orange-100 text-orange-800',
-    refusee: 'bg-red-100 text-red-700',
-    aboutie: 'bg-violet-100 text-violet-800',
+    envisagee: TONE.neutral,
+    accord_demande: TONE.plum,
+    attente_retour: TONE.gold,
+    acceptee: TONE.sage,
+    rencontre_a_organiser: TONE.plum,
+    rencontre_programmee: TONE.plum,
+    rencontres_en_cours: TONE.plum,
+    interrompue: TONE.danger,
+    refusee: TONE.danger,
+    aboutie: TONE.gold,
 
-    a_planifier: 'bg-gray-100 text-gray-600',
-    planifiee: 'bg-blue-100 text-blue-800',
-    confirmee: 'bg-green-100 text-green-800',
-    effectuee: 'bg-emerald-100 text-emerald-800',
-    annulee: 'bg-gray-100 text-gray-500',
-    absent: 'bg-red-100 text-red-700',
+    a_planifier: TONE.neutral,
+    planifiee: TONE.plum,
+    confirmee: TONE.sage,
+    effectuee: TONE.sage,
+    annulee: TONE.faded,
+    absent: TONE.danger,
 
-    a_faire: 'bg-yellow-100 text-yellow-800',
-    en_cours: 'bg-blue-100 text-blue-800',
-    terminee: 'bg-green-100 text-green-800',
+    a_faire: TONE.gold,
+    en_cours: TONE.plum,
+    terminee: TONE.sage,
 
-    positif: 'bg-green-100 text-green-800',
-    neutre: 'bg-gray-100 text-gray-600',
-    negatif: 'bg-red-100 text-red-700',
-    mitige: 'bg-orange-100 text-orange-800',
+    positif: TONE.sage,
+    neutre: TONE.neutral,
+    negatif: TONE.danger,
+    mitige: TONE.gold,
   }
-  return colors[status] || 'bg-gray-100 text-gray-600'
+  return colors[status] || TONE.neutral
 }
 
 export function getAvailabilityColor(availability: string): string {
   const colors: Record<string, string> = {
-    a_confirmer: 'bg-yellow-100 text-yellow-800',
-    disponible: 'bg-green-100 text-green-800',
-    en_rencontre: 'bg-pink-100 text-pink-800',
-    en_pause: 'bg-orange-100 text-orange-800',
-    fiancee: 'bg-violet-100 text-violet-800',
-    mariee: 'bg-purple-100 text-purple-800',
+    a_confirmer: TONE.gold,
+    disponible: TONE.sage,
+    en_rencontre: TONE.plum,
+    en_pause: TONE.gold,
+    fiancee: TONE.gold,
+    mariee: TONE.gold,
   }
-  return colors[availability] || 'bg-gray-100 text-gray-600'
+  return colors[availability] || TONE.neutral
 }
 
 export function cn(...classes: (string | false | null | undefined)[]): string {

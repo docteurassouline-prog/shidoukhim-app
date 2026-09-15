@@ -28,14 +28,14 @@ function getInitials(name: string): string {
 // Deterministic color from name
 function getColorFromName(name: string): string {
   const colors = [
-    'bg-[#87A878]',
-    'bg-[#6B3A5B]',
-    'bg-[#C5A55A]',
-    'bg-[#7B8FA1]',
-    'bg-[#B07D62]',
-    'bg-[#8B6FA0]',
-    'bg-[#5B8F8F]',
-    'bg-[#C45B5B]',
+    'bg-sage',
+    'bg-plum',
+    'bg-gold',
+    'bg-[#6F8296]',
+    'bg-[#A5735A]',
+    'bg-[#7F6A93]',
+    'bg-[#5B8585]',
+    'bg-[#8E5E63]',
   ]
   let hash = 0
   for (let i = 0; i < name.length; i++) {
@@ -54,7 +54,7 @@ export default function Avatar({ src, name, size = 'md', className = '' }: Avata
   return (
     <div
       className={[
-        'relative rounded-full overflow-hidden shrink-0 flex items-center justify-center font-medium text-white',
+        'relative rounded-full overflow-hidden shrink-0 flex items-center justify-center font-medium text-white ring-2 ring-white shadow-card',
         sizeClasses[size],
         showImage ? '' : bgColor,
         className,

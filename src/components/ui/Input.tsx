@@ -16,24 +16,25 @@ type InputFieldProps = BaseInputProps &
   Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'type'>
 
 const baseClasses = [
-  'w-full rounded-lg border bg-white px-3 py-2 text-sm text-[#2D2D2D]',
-  'placeholder:text-[#6B7280]/60',
+  'w-full rounded-[10px] border bg-surface px-3.5 py-2 text-sm text-ink',
+  'placeholder:text-ink-muted/80',
   'transition-colors duration-150',
-  'focus:outline-none focus:ring-2 focus:ring-[#87A878] focus:border-[#87A878]',
-  'disabled:bg-gray-50 disabled:text-[#6B7280] disabled:cursor-not-allowed',
+  'hover:border-line-strong',
+  'focus:outline-none focus:border-plum',
+  'disabled:bg-surface-muted disabled:text-ink-muted disabled:cursor-not-allowed',
 ].join(' ')
 
 const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputFieldProps>(
   ({ label, error, helperText, inputType = 'text', id, className = '', ...props }, ref) => {
     const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined)
-    const borderClass = error ? 'border-[#C45B5B]' : 'border-[#E8E0D4]'
+    const borderClass = error ? 'border-danger' : 'border-line'
 
     return (
       <div className="w-full">
         {label && (
           <label
             htmlFor={inputId}
-            className="block text-sm font-medium text-[#2D2D2D] mb-1.5"
+            className="block text-[13px] font-medium text-ink-soft mb-1.5"
           >
             {label}
           </label>
@@ -43,7 +44,7 @@ const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputFieldProps
           <textarea
             ref={ref as React.Ref<HTMLTextAreaElement>}
             id={inputId}
-            className={`${baseClasses} ${borderClass} min-h-[80px] resize-y ${className}`}
+            className={`${baseClasses} ${borderClass} min-h-[96px] resize-y ${className}`}
             aria-invalid={error ? 'true' : undefined}
             aria-describedby={
               error
@@ -73,12 +74,12 @@ const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputFieldProps
         )}
 
         {error && (
-          <p id={`${inputId}-error`} className="mt-1 text-sm text-[#C45B5B]" role="alert">
+          <p id={`${inputId}-error`} className="mt-1.5 text-[12.5px] text-danger" role="alert">
             {error}
           </p>
         )}
         {helperText && !error && (
-          <p id={`${inputId}-helper`} className="mt-1 text-sm text-[#6B7280]">
+          <p id={`${inputId}-helper`} className="mt-1.5 text-[12.5px] text-ink-muted">
             {helperText}
           </p>
         )}

@@ -19,7 +19,7 @@ export default function ChadkhaniotLayout({
 
   return (
     <div>
-      <nav className="flex gap-1 border-b border-[#E8E0D4] mb-6">
+      <nav className="flex gap-1 border-b border-line mb-6">
         {tabs.map((tab) => {
           const isActive =
             tab.href === '/chadkhaniot'
@@ -32,8 +32,8 @@ export default function ChadkhaniotLayout({
               className={cn(
                 'flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors',
                 isActive
-                  ? 'border-[#6B3A5B] text-[#6B3A5B]'
-                  : 'border-transparent text-[#4B5563] hover:text-[#2D2D2D] hover:border-[#E8E0D4]'
+                  ? 'border-plum text-plum'
+                  : 'border-transparent text-ink-soft hover:text-ink hover:border-line'
               )}
             >
               <tab.icon className="h-4 w-4" />

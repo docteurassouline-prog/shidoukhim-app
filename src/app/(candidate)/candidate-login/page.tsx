@@ -67,21 +67,21 @@ export default function CandidateLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FFFBF0] flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-canvas flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         {/* Card */}
-        <div className="bg-white rounded-2xl shadow-lg border border-[#E8E0D4] p-8 sm:p-10">
+        <div className="bg-surface rounded-2xl shadow-lg border border-line p-8 sm:p-10">
           {/* Logo / Title */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#6B3A5B]/10 mb-4">
-              <Heart className="w-8 h-8 text-[#6B3A5B]" fill="#6B3A5B" />
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-plum/10 mb-4">
+              <Heart className="w-8 h-8 text-plum" fill="currentColor" />
             </div>
-            <h1 className="text-2xl font-bold text-[#2D2D2D] tracking-tight">
+            <h1 className="text-[30px] font-semibold text-ink tracking-tight">
               Hava Dahan{' '}
-              <span className="text-[#C5A55A]">&middot;</span>{' '}
+              <span className="text-gold">&middot;</span>{' '}
               Shidoukhim
             </h1>
-            <p className="mt-2 text-[#6B7280] text-sm">
+            <p className="mt-2 text-ink-soft text-sm">
               Espace personnel
             </p>
           </div>
@@ -89,9 +89,9 @@ export default function CandidateLoginPage() {
           {sent ? (
             /* Success state */
             <div className="text-center py-4">
-              <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#87A878]/15 mb-4">
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-sage/15 mb-4">
                 <svg
-                  className="w-7 h-7 text-[#87A878]"
+                  className="w-7 h-7 text-sage"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -104,10 +104,10 @@ export default function CandidateLoginPage() {
                   />
                 </svg>
               </div>
-              <h2 className="text-lg font-semibold text-[#2D2D2D] mb-2">
+              <h2 className="font-display text-[22px] font-semibold text-ink mb-2">
                 Lien envoyé !
               </h2>
-              <p className="text-[#6B7280] text-sm leading-relaxed">
+              <p className="text-ink-soft text-sm leading-relaxed">
                 Un lien de connexion a été envoyé à votre adresse email.
                 Vérifiez votre boîte de réception.
               </p>
@@ -118,7 +118,7 @@ export default function CandidateLoginPage() {
                   setEmail('')
                   setError(null)
                 }}
-                className="mt-6 text-sm text-[#6B3A5B] hover:text-[#5A2E4D] underline underline-offset-2 transition-colors"
+                className="mt-6 text-sm text-plum hover:text-plum-hover underline underline-offset-2 transition-colors"
               >
                 Renvoyer un lien
               </button>
@@ -129,7 +129,7 @@ export default function CandidateLoginPage() {
               <div>
                 <label
                   htmlFor="email"
-                  className="block text-sm font-medium text-[#2D2D2D] mb-1.5"
+                  className="block text-sm font-medium text-ink mb-1.5"
                 >
                   Adresse email
                 </label>
@@ -145,16 +145,16 @@ export default function CandidateLoginPage() {
                   }}
                   className={[
                     'w-full px-4 py-2.5 rounded-lg border text-sm',
-                    'bg-white text-[#2D2D2D] placeholder-[#9CA3AF]',
+                    'bg-surface text-ink placeholder-ink-muted',
                     'transition-colors duration-150',
                     'focus:outline-none focus:ring-2 focus:ring-offset-1',
                     error
-                      ? 'border-[#C45B5B] focus:ring-[#C45B5B]'
-                      : 'border-[#E8E0D4] focus:ring-[#87A878] focus:border-[#87A878]',
+                      ? 'border-danger focus:ring-danger'
+                      : 'border-line focus:ring-sage focus:border-sage',
                   ].join(' ')}
                 />
                 {error && (
-                  <p className="mt-1.5 text-xs text-[#C45B5B]">{error}</p>
+                  <p className="mt-1.5 text-xs text-danger">{error}</p>
                 )}
               </div>
 
@@ -172,7 +172,7 @@ export default function CandidateLoginPage() {
         </div>
 
         {/* Footer note */}
-        <p className="text-center text-xs text-[#9CA3AF] mt-6">
+        <p className="text-center text-xs text-ink-muted mt-6">
           En vous connectant, vous accédez à votre espace
           confidentiel et sécurisé.
         </p>

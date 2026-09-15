@@ -15,29 +15,25 @@ export default async function AppLayout({
     data: { user },
   } = await supabase.auth.getUser()
 
-  // AUTH BYPASS TEMPORAIRE — à réactiver plus tard
-  // if (!user) {
-  //   redirect('/login')
-  // }
-
-  let profile: { full_name: string; email: string; role: string } | null = null
-
-  if (user) {
-    const { data } = await supabase
-      .from('user_profiles')
-      .select('id, full_name, email, role, phone, avatar_url, organization_id')
-      .eq('auth_user_id', user.id)
-      .eq('organization_id', ORG_ID)
-      .single()
-    profile = data
+  if (!user) {
+    redirect('/login')
   }
 
-  if (!profile) {
-    profile = { full_name: 'Admin', email: 'admin@shidoukhim.app', role: 'admin' }
+  const { data: profileRow } = await supabase
+    .from('user_profiles')
+    .select('id, full_name, email, role')
+    .eq('auth_user_id', user.id)
+    .eq('organization_id', ORG_ID)
+    .maybeSingle()
+
+  const profile = profileRow ?? {
+    full_name: user.user_metadata?.full_name ?? user.email ?? 'Utilisateur',
+    email: user.email ?? '',
+    role: 'viewer',
   }
 
   return (
-    <div className="flex h-screen bg-[#FFFBF0]">
+    <div className="flex h-screen bg-canvas">
       <Sidebar
         user={{
           full_name: profile.full_name,
@@ -47,7 +43,7 @@ export default async function AppLayout({
       />
 
       <main className="flex-1 overflow-y-auto">
-        <div className="min-h-full px-4 py-6 sm:px-6 lg:px-8">
+        <div className="min-h-full px-4 pt-16 pb-10 sm:px-8 lg:px-10 lg:pt-8 max-w-[1440px]">
           {children}
         </div>
       </main>

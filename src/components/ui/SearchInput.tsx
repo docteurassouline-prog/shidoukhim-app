@@ -63,7 +63,7 @@ export default function SearchInput({
   return (
     <div className={`relative ${className}`}>
       <Search
-        className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6B7280]"
+        className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted"
         aria-hidden="true"
       />
       <input
@@ -74,10 +74,10 @@ export default function SearchInput({
         placeholder={placeholder}
         autoFocus={autoFocus}
         className={[
-          'w-full rounded-lg border border-[#E8E0D4] bg-white pl-10 pr-9 py-2 text-sm text-[#2D2D2D]',
-          'placeholder:text-[#6B7280]/60',
-          'transition-colors duration-150',
-          'focus:outline-none focus:ring-2 focus:ring-[#87A878] focus:border-[#87A878]',
+          'w-full rounded-[10px] border border-line bg-surface pl-10 pr-9 py-2 text-sm text-ink',
+          'placeholder:text-ink-muted/80',
+          'transition-colors duration-150 hover:border-line-strong',
+          'focus:outline-none focus:border-plum',
           'h-10',
         ].join(' ')}
         aria-label={placeholder}
@@ -85,7 +85,7 @@ export default function SearchInput({
       {localValue && (
         <button
           onClick={handleClear}
-          className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-[#6B7280] hover:text-[#2D2D2D] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#87A878]"
+          className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-ink-muted hover:text-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-plum/40"
           aria-label="Effacer la recherche"
         >
           <X className="h-4 w-4" />

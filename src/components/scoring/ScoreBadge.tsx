@@ -3,12 +3,12 @@
 import type { ScoreLevel } from '@/lib/scoring/types'
 
 const levelConfig: Record<ScoreLevel, { label: string; bg: string; text: string; border: string }> = {
-  excellent: { label: 'Excellent', bg: 'bg-[#87A878]/20', text: 'text-[#2E5A22]', border: 'border-[#87A878]/40' },
-  bon: { label: 'Bon', bg: 'bg-blue-50', text: 'text-blue-800', border: 'border-blue-300' },
-  moyen: { label: 'Moyen', bg: 'bg-[#C5A55A]/20', text: 'text-[#6B5020]', border: 'border-[#C5A55A]/40' },
-  faible: { label: 'Faible', bg: 'bg-[#C45B5B]/10', text: 'text-[#9B3030]', border: 'border-[#C45B5B]/25' },
-  incompatible: { label: 'Incompatible', bg: 'bg-red-50', text: 'text-red-800', border: 'border-red-300' },
-  inconnu: { label: 'Insuffisant', bg: 'bg-gray-100', text: 'text-gray-700', border: 'border-gray-300' },
+  excellent: { label: 'Excellent', bg: 'bg-sage/20', text: 'text-sage-deep', border: 'border-sage/40' },
+  bon: { label: 'Bon', bg: 'bg-plum-light', text: 'text-plum', border: 'border-plum/25' },
+  moyen: { label: 'Moyen', bg: 'bg-gold/20', text: 'text-gold-deep', border: 'border-gold/40' },
+  faible: { label: 'Faible', bg: 'bg-danger/10', text: 'text-danger-deep', border: 'border-danger/25' },
+  incompatible: { label: 'Incompatible', bg: 'bg-danger-light', text: 'text-danger-deep', border: 'border-danger/40' },
+  inconnu: { label: 'Insuffisant', bg: 'bg-stone-100', text: 'text-stone-700', border: 'border-stone-300' },
 }
 
 interface ScoreBadgeProps {

@@ -28,7 +28,7 @@ export default async function CandidateLayout({
   if (!row) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-ivory">
-        <div className="max-w-md rounded-xl border border-warm-border bg-card p-8 text-center shadow-sm">
+        <div className="max-w-md rounded-xl border border-warm-border bg-card p-8 text-center shadow-card">
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-danger-light">
             <svg
               className="h-7 w-7 text-danger"
@@ -78,7 +78,7 @@ export default async function CandidateLayout({
   return (
     <div className="flex min-h-screen flex-col bg-ivory">
       {/* Top nav bar */}
-      <header className="bg-plum text-white shadow-md">
+      <header className="bg-plum text-white shadow-card-hover">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
           <span className="text-base font-semibold tracking-wide sm:text-lg">
             Hava Dahan &middot; Shidoukhim

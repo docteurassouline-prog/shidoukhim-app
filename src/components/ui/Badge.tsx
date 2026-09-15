@@ -41,61 +41,67 @@ interface BadgeProps {
   dot?: boolean
 }
 
+// Cinq tonalités seulement : neutre, or (attente), sauge (positif), prune (en cours), danger.
+const tone = {
+  neutral: 'bg-stone-100 text-stone-600 border-stone-200',
+  gold: 'bg-gold-light text-gold-deep border-gold/30',
+  sage: 'bg-sage-light text-sage-deep border-sage/30',
+  plum: 'bg-plum-light text-plum border-plum/20',
+  danger: 'bg-danger-light text-danger-deep border-danger/25',
+  faded: 'bg-stone-50 text-stone-400 border-stone-200',
+}
+
 const variantStyles: Record<BadgeVariant, string> = {
-  // Fiche statuses
-  invitation_envoyee: 'bg-[#C5A55A]/15 text-[#8B7030] border-[#C5A55A]/30',
-  brouillon: 'bg-gray-100 text-gray-600 border-gray-200',
-  a_valider: 'bg-[#C5A55A]/15 text-[#8B7030] border-[#C5A55A]/30',
-  validee: 'bg-[#87A878]/15 text-[#5A7A4A] border-[#87A878]/30',
-  archivee: 'bg-gray-50 text-gray-400 border-gray-200',
+  invitation_envoyee: tone.gold,
+  brouillon: tone.neutral,
+  a_valider: tone.gold,
+  validee: tone.sage,
+  archivee: tone.faded,
 
-  // Disponibilites
-  a_confirmer: 'bg-gray-100 text-gray-600 border-gray-200',
-  disponible: 'bg-[#87A878]/15 text-[#5A7A4A] border-[#87A878]/30',
-  en_rencontre: 'bg-[#6B3A5B]/10 text-[#6B3A5B] border-[#6B3A5B]/20',
-  en_pause: 'bg-[#C5A55A]/15 text-[#8B7030] border-[#C5A55A]/30',
-  fiancee: 'bg-[#C5A55A]/15 text-[#8B7030] border-[#C5A55A]/30',
-  mariee: 'bg-[#C5A55A]/20 text-[#8B7030] border-[#C5A55A]/40',
+  a_confirmer: tone.neutral,
+  disponible: tone.sage,
+  en_rencontre: tone.plum,
+  en_pause: tone.gold,
+  fiancee: tone.gold,
+  mariee: tone.gold,
 
-  // Proposition statuses
-  envisagee: 'bg-gray-100 text-gray-600 border-gray-200',
-  accord_demande: 'bg-blue-50 text-blue-700 border-blue-200',
-  attente_retour: 'bg-[#C5A55A]/15 text-[#8B7030] border-[#C5A55A]/30',
-  acceptee: 'bg-[#87A878]/15 text-[#5A7A4A] border-[#87A878]/30',
-  rencontre_a_organiser: 'bg-blue-50 text-blue-700 border-blue-200',
-  rencontre_programmee: 'bg-[#6B3A5B]/10 text-[#6B3A5B] border-[#6B3A5B]/20',
-  rencontres_en_cours: 'bg-[#6B3A5B]/10 text-[#6B3A5B] border-[#6B3A5B]/20',
-  interrompue: 'bg-[#C45B5B]/10 text-[#C45B5B] border-[#C45B5B]/20',
-  refusee: 'bg-[#C45B5B]/10 text-[#C45B5B] border-[#C45B5B]/20',
-  aboutie: 'bg-[#C5A55A]/20 text-[#8B7030] border-[#C5A55A]/40',
+  envisagee: tone.neutral,
+  accord_demande: tone.plum,
+  attente_retour: tone.gold,
+  acceptee: tone.sage,
+  rencontre_a_organiser: tone.plum,
+  rencontre_programmee: tone.plum,
+  rencontres_en_cours: tone.plum,
+  interrompue: tone.danger,
+  refusee: tone.danger,
+  aboutie: tone.gold,
 
-  // Default
-  default: 'bg-gray-100 text-gray-600 border-gray-200',
+  default: tone.neutral,
 }
 
 const dotColors: Record<BadgeVariant, string> = {
-  invitation_envoyee: 'bg-[#C5A55A]',
-  brouillon: 'bg-gray-400',
-  a_valider: 'bg-[#C5A55A]',
-  validee: 'bg-[#87A878]',
-  archivee: 'bg-gray-300',
-  a_confirmer: 'bg-gray-400',
-  disponible: 'bg-[#87A878]',
-  en_rencontre: 'bg-[#6B3A5B]',
-  en_pause: 'bg-[#C5A55A]',
-  fiancee: 'bg-[#C5A55A]',
-  mariee: 'bg-[#C5A55A]',
-  envisagee: 'bg-gray-400',
-  accord_demande: 'bg-blue-500',
-  attente_retour: 'bg-[#C5A55A]',
-  acceptee: 'bg-[#87A878]',
-  rencontre_a_organiser: 'bg-blue-500',
-  rencontre_programmee: 'bg-[#6B3A5B]',
-  rencontres_en_cours: 'bg-[#6B3A5B]',
-  interrompue: 'bg-[#C45B5B]',
-  refusee: 'bg-[#C45B5B]',
-  aboutie: 'bg-[#C5A55A]',
-  default: 'bg-gray-400',
+  invitation_envoyee: 'bg-gold',
+  brouillon: 'bg-stone-400',
+  a_valider: 'bg-gold',
+  validee: 'bg-sage',
+  archivee: 'bg-stone-300',
+  a_confirmer: 'bg-stone-400',
+  disponible: 'bg-sage',
+  en_rencontre: 'bg-plum',
+  en_pause: 'bg-gold',
+  fiancee: 'bg-gold',
+  mariee: 'bg-gold',
+  envisagee: 'bg-stone-400',
+  accord_demande: 'bg-plum',
+  attente_retour: 'bg-gold',
+  acceptee: 'bg-sage',
+  rencontre_a_organiser: 'bg-plum',
+  rencontre_programmee: 'bg-plum',
+  rencontres_en_cours: 'bg-plum',
+  interrompue: 'bg-danger',
+  refusee: 'bg-danger',
+  aboutie: 'bg-gold',
+  default: 'bg-stone-400',
 }
 
 export default function Badge({
@@ -107,7 +113,7 @@ export default function Badge({
   return (
     <span
       className={[
-        'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium',
+        'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-[3px] text-[11.5px] font-medium leading-4 whitespace-nowrap',
         variantStyles[variant],
         className,
       ].join(' ')}
