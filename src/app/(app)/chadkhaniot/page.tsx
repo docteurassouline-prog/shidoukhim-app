@@ -283,7 +283,7 @@ export default function ChadkhaniotPage() {
   // ----- Loading state -----
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FFFBF0] flex items-center justify-center">
+      <div className="flex justify-center py-16">
         <LoadingSpinner text="Chargement de l'equipe..." size="lg" />
       </div>
     )
@@ -292,7 +292,7 @@ export default function ChadkhaniotPage() {
   // ----- Error state -----
   if (error && users.length === 0) {
     return (
-      <div className="min-h-screen bg-[#FFFBF0] p-6">
+      <div className="py-6">
         <div className="max-w-4xl mx-auto">
           <div className="bg-white rounded-xl border border-[#E8E0D4] p-8 text-center">
             <AlertCircle className="h-12 w-12 text-[#C45B5B] mx-auto mb-4" />
@@ -308,8 +308,8 @@ export default function ChadkhaniotPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FFFBF0]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div>
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
