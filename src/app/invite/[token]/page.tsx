@@ -157,11 +157,11 @@ interface PhotoPreview {
 function Logo() {
   return (
     <div className="flex items-center justify-center gap-2">
-      <Heart className="h-7 w-7 text-[#6B3A5B] fill-[#6B3A5B]/20" />
-      <span className="text-2xl font-bold tracking-tight text-[#2D2D2D]">
+      <Heart className="h-7 w-7 text-plum fill-plum/20" />
+      <span className="text-2xl font-bold tracking-tight text-ink">
         Hava Dahan
       </span>
-      <Sparkles className="h-5 w-5 text-[#C5A55A]" />
+      <Sparkles className="h-5 w-5 text-gold" />
     </div>
   )
 }
@@ -189,10 +189,10 @@ function ProgressBar({
                   transition-all duration-300
                   ${
                     isCompleted
-                      ? 'bg-[#87A878] text-white'
+                      ? 'bg-sage text-white'
                       : isCurrent
-                        ? 'bg-[#6B3A5B] text-white ring-4 ring-[#6B3A5B]/20'
-                        : 'bg-[#E8E0D4] text-[#2D2D2D]/50'
+                        ? 'bg-plum text-white ring-4 ring-plum/20'
+                        : 'bg-line text-ink/50'
                   }
                 `}
               >
@@ -201,7 +201,7 @@ function ProgressBar({
               <span
                 className={`
                   text-[10px] mt-1 text-center leading-tight hidden sm:block
-                  ${isCurrent ? 'text-[#6B3A5B] font-semibold' : 'text-[#2D2D2D]/50'}
+                  ${isCurrent ? 'text-plum font-semibold' : 'text-ink/50'}
                 `}
               >
                 {STEP_LABELS[i]}
@@ -211,16 +211,16 @@ function ProgressBar({
         })}
       </div>
       {/* Progress bar */}
-      <div className="h-2 bg-[#E8E0D4] rounded-full overflow-hidden mt-2">
+      <div className="h-2 bg-line rounded-full overflow-hidden mt-2">
         <div
-          className="h-full bg-gradient-to-r from-[#87A878] to-[#6B3A5B] rounded-full transition-all duration-500 ease-out"
+          className="h-full bg-gradient-to-r from-sage to-plum rounded-full transition-all duration-500 ease-out"
           style={{
             width: `${((currentStep - 1) / (totalSteps - 1)) * 100}%`,
           }}
         />
       </div>
       {/* Mobile step label */}
-      <p className="text-center text-sm text-[#6B3A5B] font-medium mt-2 sm:hidden">
+      <p className="text-center text-sm text-plum font-medium mt-2 sm:hidden">
         Etape {currentStep} / {totalSteps} &mdash; {STEP_LABELS[currentStep - 1]}
       </p>
     </div>
@@ -240,30 +240,30 @@ function FormField({
 }) {
   return (
     <div className="space-y-1.5">
-      <label className="block text-sm font-medium text-[#2D2D2D]">
+      <label className="block text-sm font-medium text-ink">
         {label}
-        {required && <span className="text-red-500 ml-0.5">*</span>}
+        {required && <span className="text-danger-deep ml-0.5">*</span>}
       </label>
       {children}
-      {hint && <p className="text-xs text-[#2D2D2D]/50">{hint}</p>}
+      {hint && <p className="text-xs text-ink/50">{hint}</p>}
     </div>
   )
 }
 
 const inputClass =
-  'w-full px-4 py-3 rounded-xl border border-[#E8E0D4] bg-white text-[#2D2D2D] text-base ' +
-  'placeholder:text-[#2D2D2D]/30 focus:outline-none focus:ring-2 focus:ring-[#87A878]/40 ' +
-  'focus:border-[#87A878] transition-all'
+  'w-full px-4 py-3 rounded-[14px] border border-line bg-surface text-ink text-base ' +
+  'placeholder:text-ink/30 focus:outline-none focus:ring-2 focus:ring-sage/40 ' +
+  'focus:border-sage transition-all'
 
 const selectClass =
-  'w-full px-4 py-3 rounded-xl border border-[#E8E0D4] bg-white text-[#2D2D2D] text-base ' +
-  'focus:outline-none focus:ring-2 focus:ring-[#87A878]/40 focus:border-[#87A878] transition-all ' +
+  'w-full px-4 py-3 rounded-[14px] border border-line bg-surface text-ink text-base ' +
+  'focus:outline-none focus:ring-2 focus:ring-sage/40 focus:border-sage transition-all ' +
   'appearance-none cursor-pointer'
 
 const textareaClass =
-  'w-full px-4 py-3 rounded-xl border border-[#E8E0D4] bg-white text-[#2D2D2D] text-base ' +
-  'placeholder:text-[#2D2D2D]/30 focus:outline-none focus:ring-2 focus:ring-[#87A878]/40 ' +
-  'focus:border-[#87A878] transition-all resize-none'
+  'w-full px-4 py-3 rounded-[14px] border border-line bg-surface text-ink text-base ' +
+  'placeholder:text-ink/30 focus:outline-none focus:ring-2 focus:ring-sage/40 ' +
+  'focus:border-sage transition-all resize-none'
 
 function Toggle({
   checked,
@@ -283,17 +283,17 @@ function Toggle({
       <div
         className={`
           relative w-12 h-7 rounded-full transition-colors duration-200
-          ${checked ? 'bg-[#87A878]' : 'bg-[#E8E0D4]'}
+          ${checked ? 'bg-sage' : 'bg-line'}
         `}
       >
         <div
           className={`
-            absolute top-0.5 w-6 h-6 rounded-full bg-white shadow-md transition-transform duration-200
+            absolute top-0.5 w-6 h-6 rounded-full bg-surface shadow-card-hover transition-transform duration-200
             ${checked ? 'translate-x-[22px]' : 'translate-x-0.5'}
           `}
         />
       </div>
-      <span className="text-sm font-medium text-[#2D2D2D] group-hover:text-[#6B3A5B] transition-colors">
+      <span className="text-sm font-medium text-ink group-hover:text-plum transition-colors">
         {label}
       </span>
     </button>
@@ -312,15 +312,15 @@ function ErrorPage({
   message: string
 }) {
   return (
-    <div className="min-h-screen bg-[#FFFBF0] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-canvas flex items-center justify-center px-4">
       <div className="max-w-md w-full text-center">
-        <div className="bg-white rounded-3xl shadow-lg p-8 border border-[#E8E0D4]">
-          <div className="w-20 h-20 rounded-full bg-[#6B3A5B]/10 flex items-center justify-center mx-auto mb-6">
-            <Heart className="h-10 w-10 text-[#6B3A5B]" />
+        <div className="bg-surface rounded-3xl shadow-lg p-8 border border-line">
+          <div className="w-20 h-20 rounded-full bg-plum/10 flex items-center justify-center mx-auto mb-6">
+            <Heart className="h-10 w-10 text-plum" />
           </div>
-          <h1 className="text-xl font-bold text-[#2D2D2D] mb-3">{title}</h1>
-          <p className="text-[#2D2D2D]/60 leading-relaxed">{message}</p>
-          <div className="mt-8 flex items-center justify-center gap-1 text-sm text-[#2D2D2D]/30">
+          <h1 className="text-[26px] font-semibold text-ink mb-3">{title}</h1>
+          <p className="text-ink/60 leading-relaxed">{message}</p>
+          <div className="mt-8 flex items-center justify-center gap-1 text-sm text-ink/30">
             <Heart className="h-3 w-3" />
             <span>Hava Dahan Matchmaking</span>
           </div>
@@ -336,27 +336,27 @@ function ErrorPage({
 
 function ConfirmationPage() {
   return (
-    <div className="min-h-screen bg-[#FFFBF0] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-canvas flex items-center justify-center px-4">
       <div className="max-w-md w-full text-center">
-        <div className="bg-white rounded-3xl shadow-lg p-8 border border-[#E8E0D4]">
-          <div className="w-20 h-20 rounded-full bg-[#87A878]/10 flex items-center justify-center mx-auto mb-6">
-            <Check className="h-10 w-10 text-[#87A878]" />
+        <div className="bg-surface rounded-3xl shadow-lg p-8 border border-line">
+          <div className="w-20 h-20 rounded-full bg-sage/10 flex items-center justify-center mx-auto mb-6">
+            <Check className="h-10 w-10 text-sage" />
           </div>
           <div className="flex items-center justify-center gap-2 mb-4">
-            <Sparkles className="h-5 w-5 text-[#C5A55A]" />
-            <h1 className="text-2xl font-bold text-[#2D2D2D]">Merci !</h1>
-            <Sparkles className="h-5 w-5 text-[#C5A55A]" />
+            <Sparkles className="h-5 w-5 text-gold" />
+            <h1 className="text-[30px] font-semibold text-ink">Merci !</h1>
+            <Sparkles className="h-5 w-5 text-gold" />
           </div>
-          <p className="text-[#2D2D2D]/70 leading-relaxed text-lg mb-2">
+          <p className="text-ink/70 leading-relaxed text-lg mb-2">
             Votre dossier a ete transmis avec succes.
           </p>
-          <p className="text-[#2D2D2D]/50 text-sm leading-relaxed">
+          <p className="text-ink/50 text-sm leading-relaxed">
             Nous examinons votre profil avec soin et vous contacterons prochainement.
             Que ce soit le debut d&apos;une belle histoire...
           </p>
-          <div className="mt-8 pt-6 border-t border-[#E8E0D4]">
-            <div className="flex items-center justify-center gap-2 text-sm text-[#6B3A5B]">
-              <Heart className="h-4 w-4 fill-[#6B3A5B]/20" />
+          <div className="mt-8 pt-6 border-t border-line">
+            <div className="flex items-center justify-center gap-2 text-sm text-plum">
+              <Heart className="h-4 w-4 fill-plum/20" />
               <span className="font-medium">Hava Dahan Matchmaking</span>
             </div>
           </div>
@@ -380,8 +380,8 @@ function Step1Identity({
   return (
     <div className="space-y-5">
       <div className="text-center mb-6">
-        <h2 className="text-xl font-bold text-[#2D2D2D]">Votre identite</h2>
-        <p className="text-sm text-[#2D2D2D]/50 mt-1">
+        <h2 className="font-display text-[24px] font-semibold text-ink">Votre identite</h2>
+        <p className="text-sm text-ink/50 mt-1">
           Commençons par les informations de base
         </p>
       </div>
@@ -470,8 +470,8 @@ function Step2Family({
   return (
     <div className="space-y-5">
       <div className="text-center mb-6">
-        <h2 className="text-xl font-bold text-[#2D2D2D]">Situation familiale</h2>
-        <p className="text-sm text-[#2D2D2D]/50 mt-1">
+        <h2 className="font-display text-[24px] font-semibold text-ink">Situation familiale</h2>
+        <p className="text-sm text-ink/50 mt-1">
           Ces informations restent strictement confidentielles
         </p>
       </div>
@@ -490,7 +490,7 @@ function Step2Family({
         </select>
       </FormField>
 
-      <div className="bg-[#FFFBF0] rounded-xl p-4 border border-[#E8E0D4]/50">
+      <div className="bg-canvas rounded-xl p-4 border border-line/50">
         <Toggle
           checked={data.has_children}
           onChange={(v) =>
@@ -540,8 +540,8 @@ function Step3Religion({
   return (
     <div className="space-y-5">
       <div className="text-center mb-6">
-        <h2 className="text-xl font-bold text-[#2D2D2D]">Vie religieuse</h2>
-        <p className="text-sm text-[#2D2D2D]/50 mt-1">
+        <h2 className="font-display text-[24px] font-semibold text-ink">Vie religieuse</h2>
+        <p className="text-sm text-ink/50 mt-1">
           Pour mieux vous connaitre et trouver la compatibilite ideale
         </p>
       </div>
@@ -683,8 +683,8 @@ function Step4Personality({
   return (
     <div className="space-y-5">
       <div className="text-center mb-6">
-        <h2 className="text-xl font-bold text-[#2D2D2D]">Personnalite et parcours</h2>
-        <p className="text-sm text-[#2D2D2D]/50 mt-1">
+        <h2 className="font-display text-[24px] font-semibold text-ink">Personnalite et parcours</h2>
+        <p className="text-sm text-ink/50 mt-1">
           Aidez-nous a mieux vous connaitre
         </p>
       </div>
@@ -742,8 +742,8 @@ function Step5Preferences({
   return (
     <div className="space-y-5">
       <div className="text-center mb-6">
-        <h2 className="text-xl font-bold text-[#2D2D2D]">Ce que vous recherchez</h2>
-        <p className="text-sm text-[#2D2D2D]/50 mt-1">
+        <h2 className="font-display text-[24px] font-semibold text-ink">Ce que vous recherchez</h2>
+        <p className="text-sm text-ink/50 mt-1">
           Decrivez le partenaire avec qui vous vous verriez partager votre vie
         </p>
       </div>
@@ -864,8 +864,8 @@ function Step6Photos({
   return (
     <div className="space-y-5">
       <div className="text-center mb-6">
-        <h2 className="text-xl font-bold text-[#2D2D2D]">Photos</h2>
-        <p className="text-sm text-[#2D2D2D]/50 mt-1">
+        <h2 className="font-display text-[24px] font-semibold text-ink">Photos</h2>
+        <p className="text-sm text-ink/50 mt-1">
           Ajoutez jusqu&apos;a {MAX_PHOTOS} photos (facultatif mais recommande)
         </p>
       </div>
@@ -878,8 +878,8 @@ function Step6Photos({
             transition-all duration-200
             ${
               dragOver
-                ? 'border-[#87A878] bg-[#87A878]/5'
-                : 'border-[#E8E0D4] hover:border-[#87A878]/50 hover:bg-[#87A878]/5'
+                ? 'border-sage bg-sage/5'
+                : 'border-line hover:border-sage/50 hover:bg-sage/5'
             }
           `}
           onDragOver={(e) => {
@@ -903,11 +903,11 @@ function Step6Photos({
               }
             }}
           />
-          <Upload className="h-10 w-10 text-[#87A878] mx-auto mb-3" />
-          <p className="text-sm text-[#2D2D2D]/70 font-medium">
+          <Upload className="h-10 w-10 text-sage mx-auto mb-3" />
+          <p className="text-sm text-ink/70 font-medium">
             Glissez vos photos ici ou cliquez pour selectionner
           </p>
-          <p className="text-xs text-[#2D2D2D]/40 mt-1">
+          <p className="text-xs text-ink/40 mt-1">
             JPG, PNG &mdash; 5 Mo max par photo &mdash;{' '}
             {MAX_PHOTOS - photos.length} restante(s)
           </p>
@@ -920,7 +920,7 @@ function Step6Photos({
           {photos.map((photo, index) => (
             <div
               key={index}
-              className="relative group aspect-square rounded-xl overflow-hidden border border-[#E8E0D4] bg-[#E8E0D4]/20"
+              className="relative group aspect-square rounded-xl overflow-hidden border border-line bg-line/20"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -931,7 +931,7 @@ function Step6Photos({
               <button
                 type="button"
                 onClick={() => onRemove(index)}
-                className="absolute top-2 right-2 w-7 h-7 rounded-full bg-red-500 text-white flex items-center justify-center
+                className="absolute top-2 right-2 w-7 h-7 rounded-full bg-danger text-white flex items-center justify-center
                   opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
               >
                 <X className="h-4 w-4" />
@@ -945,7 +945,7 @@ function Step6Photos({
       )}
 
       {photos.length === 0 && (
-        <p className="text-center text-sm text-[#2D2D2D]/40 italic">
+        <p className="text-center text-sm text-ink/40 italic">
           Aucune photo ajoutee pour le moment
         </p>
       )}
@@ -1038,8 +1038,8 @@ function Step7Review({
   return (
     <div className="space-y-5">
       <div className="text-center mb-6">
-        <h2 className="text-xl font-bold text-[#2D2D2D]">Verification</h2>
-        <p className="text-sm text-[#2D2D2D]/50 mt-1">
+        <h2 className="font-display text-[24px] font-semibold text-ink">Verification</h2>
+        <p className="text-sm text-ink/50 mt-1">
           Relisez vos informations avant envoi
         </p>
       </div>
@@ -1047,9 +1047,9 @@ function Step7Review({
       {sections.map((section) => (
         <div
           key={section.title}
-          className="bg-[#FFFBF0] rounded-xl border border-[#E8E0D4]/50 p-4"
+          className="bg-canvas rounded-[14px] border border-line/50 p-4"
         >
-          <h3 className="text-sm font-bold text-[#6B3A5B] mb-3 uppercase tracking-wider">
+          <h3 className="text-sm font-bold text-plum mb-3 uppercase tracking-wider">
             {section.title}
           </h3>
           <div className="space-y-2">
@@ -1058,12 +1058,12 @@ function Step7Review({
                 key={field.label}
                 className="flex flex-col sm:flex-row sm:items-baseline gap-0.5 sm:gap-2"
               >
-                <span className="text-xs font-medium text-[#2D2D2D]/50 sm:w-40 shrink-0">
+                <span className="text-xs font-medium text-ink/50 sm:w-40 shrink-0">
                   {field.label}
                 </span>
-                <span className="text-sm text-[#2D2D2D] break-words">
+                <span className="text-sm text-ink break-words">
                   {field.value || (
-                    <span className="text-[#2D2D2D]/30 italic">Non renseigne</span>
+                    <span className="text-ink/30 italic">Non renseigne</span>
                   )}
                 </span>
               </div>
@@ -1073,15 +1073,15 @@ function Step7Review({
       ))}
 
       {photos.length > 0 && (
-        <div className="bg-[#FFFBF0] rounded-xl border border-[#E8E0D4]/50 p-4">
-          <h3 className="text-sm font-bold text-[#6B3A5B] mb-3 uppercase tracking-wider">
+        <div className="bg-canvas rounded-[14px] border border-line/50 p-4">
+          <h3 className="text-sm font-bold text-plum mb-3 uppercase tracking-wider">
             Photos ({photos.length})
           </h3>
           <div className="flex gap-2 flex-wrap">
             {photos.map((photo, i) => (
               <div
                 key={i}
-                className="w-16 h-16 rounded-lg overflow-hidden border border-[#E8E0D4]"
+                className="w-16 h-16 rounded-lg overflow-hidden border border-line"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -1096,7 +1096,7 @@ function Step7Review({
       )}
 
       {/* Confirmation checkbox */}
-      <div className="bg-white rounded-xl border border-[#E8E0D4] p-4">
+      <div className="bg-surface rounded-[14px] border border-line p-4">
         <label className="flex items-start gap-3 cursor-pointer group">
           <div className="pt-0.5">
             <div
@@ -1104,8 +1104,8 @@ function Step7Review({
                 w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all
                 ${
                   confirmed
-                    ? 'bg-[#87A878] border-[#87A878]'
-                    : 'border-[#E8E0D4] group-hover:border-[#87A878]/50'
+                    ? 'bg-sage border-sage'
+                    : 'border-line group-hover:border-sage/50'
                 }
               `}
               onClick={() => onConfirm(!confirmed)}
@@ -1114,7 +1114,7 @@ function Step7Review({
             </div>
           </div>
           <span
-            className="text-sm text-[#2D2D2D] leading-relaxed select-none"
+            className="text-sm text-ink leading-relaxed select-none"
             onClick={() => onConfirm(!confirmed)}
           >
             Je confirme que les informations fournies sont exactes et j&apos;autorise
@@ -1492,10 +1492,10 @@ export default function InvitePage({
   // Loading
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FFFBF0] flex items-center justify-center">
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-10 w-10 text-[#6B3A5B] animate-spin mx-auto mb-4" />
-          <p className="text-sm text-[#2D2D2D]/50">Chargement...</p>
+          <Loader2 className="h-10 w-10 text-plum animate-spin mx-auto mb-4" />
+          <p className="text-sm text-ink/50">Chargement...</p>
         </div>
       </div>
     )
@@ -1536,12 +1536,12 @@ export default function InvitePage({
 
   // Main form
   return (
-    <div className="min-h-screen bg-[#FFFBF0]">
+    <div className="min-h-screen bg-canvas">
       {/* Header */}
-      <div className="bg-white border-b border-[#E8E0D4]">
+      <div className="bg-surface border-b border-line">
         <div className="max-w-xl mx-auto px-4 py-4">
           <Logo />
-          <p className="text-center text-xs text-[#2D2D2D]/40 mt-1">
+          <p className="text-center text-xs text-ink/40 mt-1">
             Formulaire d&apos;inscription confidentiel
           </p>
         </div>
@@ -1554,7 +1554,7 @@ export default function InvitePage({
 
       {/* Form content */}
       <div className="max-w-xl mx-auto px-4 pb-32">
-        <div className="bg-white rounded-2xl shadow-sm border border-[#E8E0D4] p-6 sm:p-8">
+        <div className="bg-surface rounded-2xl shadow-card border border-line p-6 sm:p-8">
           {currentStep === 1 && (
             <Step1Identity data={formData} onChange={updateFormData} />
           )}
@@ -1588,24 +1588,24 @@ export default function InvitePage({
 
           {/* Submit error */}
           {submitError && (
-            <div className="mt-4 p-4 rounded-xl bg-red-50 border border-red-200 flex items-start gap-3">
-              <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
-              <p className="text-sm text-red-700">{submitError}</p>
+            <div className="mt-4 p-4 rounded-xl bg-danger-light border border-danger/25 flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-danger-deep shrink-0 mt-0.5" />
+              <p className="text-sm text-danger-deep">{submitError}</p>
             </div>
           )}
         </div>
       </div>
 
       {/* Navigation buttons - fixed at bottom */}
-      <div className="fixed bottom-0 inset-x-0 bg-white border-t border-[#E8E0D4] shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+      <div className="fixed bottom-0 inset-x-0 bg-surface border-t border-line shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
         <div className="max-w-xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
           {currentStep > 1 ? (
             <button
               type="button"
               onClick={goPrev}
               disabled={submitting}
-              className="flex items-center gap-2 px-5 py-3 rounded-xl border border-[#E8E0D4] text-[#2D2D2D]
-                hover:bg-[#FFFBF0] transition-colors text-sm font-medium disabled:opacity-50"
+              className="flex items-center gap-2 px-5 py-3 rounded-[14px] border border-line text-ink
+                hover:bg-canvas transition-colors text-sm font-medium disabled:opacity-50"
             >
               <ChevronLeft className="h-4 w-4" />
               Precedent
@@ -1619,9 +1619,9 @@ export default function InvitePage({
               type="button"
               onClick={goNext}
               disabled={!canProceed()}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-[#6B3A5B] text-white
-                hover:bg-[#5a3050] transition-colors text-sm font-medium
-                disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
+              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-plum text-white
+                hover:bg-plum-hover transition-colors text-sm font-medium
+                disabled:opacity-40 disabled:cursor-not-allowed shadow-card"
             >
               Suivant
               <ChevronRight className="h-4 w-4" />
@@ -1631,9 +1631,9 @@ export default function InvitePage({
               type="button"
               onClick={handleSubmit}
               disabled={!confirmed || submitting}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-[#87A878] text-white
-                hover:bg-[#759a66] transition-colors text-sm font-medium
-                disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
+              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-sage text-white
+                hover:bg-sage-hover transition-colors text-sm font-medium
+                disabled:opacity-40 disabled:cursor-not-allowed shadow-card"
             >
               {submitting ? (
                 <>
