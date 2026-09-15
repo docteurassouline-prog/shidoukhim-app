@@ -82,11 +82,11 @@ function getManStatusLabel(status: CandidateManStatus): string {
 
 function getManStatusColor(status: CandidateManStatus): string {
   const colors: Record<CandidateManStatus, string> = {
-    actif: 'bg-emerald-50 text-emerald-700',
-    en_pause: 'bg-amber-50 text-amber-700',
-    archive: 'bg-gray-100 text-gray-500',
+    actif: 'bg-sage-light text-sage-deep',
+    en_pause: 'bg-gold-light text-gold-deep',
+    archive: 'bg-stone-100 text-stone-500',
   }
-  return colors[status] || 'bg-gray-100 text-gray-600'
+  return colors[status] || 'bg-stone-100 text-stone-600'
 }
 
 // ─── Section card wrapper ─────────────────────────────────────
@@ -101,10 +101,10 @@ function SectionCard({
   children: React.ReactNode
 }) {
   return (
-    <div className="bg-white rounded-xl border border-[#E8E0D4] shadow-sm overflow-hidden">
-      <div className="px-5 py-3.5 border-b border-[#E8E0D4] flex items-center gap-2">
-        <span className="text-[#87A878]">{icon}</span>
-        <h2 className="text-sm font-semibold text-[#2D2D2D]">{title}</h2>
+    <div className="bg-surface rounded-[14px] border border-line shadow-card overflow-hidden">
+      <div className="px-5 py-3.5 border-b border-line flex items-center gap-2">
+        <span className="text-sage">{icon}</span>
+        <h2 className="text-sm font-semibold text-ink">{title}</h2>
       </div>
       <div className="px-5 py-4">{children}</div>
     </div>
@@ -125,16 +125,16 @@ function FieldRow({
   inputElement?: React.ReactNode
 }) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 py-2 border-b border-[#E8E0D4]/50 last:border-0">
-      <dt className="text-sm font-medium text-[#6B7280]">{label}</dt>
-      <dd className="sm:col-span-2 text-sm text-[#2D2D2D]">
-        {editing && inputElement ? inputElement : (value || <span className="text-[#6B7280]/50 italic">Non renseigne</span>)}
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 py-2 border-b border-line/50 last:border-0">
+      <dt className="text-sm font-medium text-ink-soft">{label}</dt>
+      <dd className="sm:col-span-2 text-sm text-ink">
+        {editing && inputElement ? inputElement : (value || <span className="text-ink-soft/50 italic">Non renseigne</span>)}
       </dd>
     </div>
   )
 }
 
-// ─── Proposal status label in French ──────────────────────────
+// ─── Proposal status label in French ────────────────────────────
 
 function getProposalStatusLabel(status: string): string {
   const labels: Record<string, string> = {
@@ -160,24 +160,24 @@ function getProposalStatusLabel(status: string): string {
 
 function getProposalStatusColor(status: string): string {
   const colors: Record<string, string> = {
-    draft: 'bg-gray-100 text-gray-600',
-    proposed_woman: 'bg-amber-50 text-amber-700',
-    proposed_man: 'bg-amber-50 text-amber-700',
-    proposed_both: 'bg-amber-50 text-amber-700',
-    accepted_woman: 'bg-sky-50 text-sky-700',
-    accepted_man: 'bg-sky-50 text-sky-700',
-    accepted_both: 'bg-emerald-50 text-emerald-700',
-    meeting_scheduled: 'bg-indigo-50 text-indigo-700',
-    dating: 'bg-pink-50 text-pink-700',
-    engaged: 'bg-violet-50 text-violet-700',
-    married: 'bg-purple-50 text-purple-700',
-    declined_woman: 'bg-red-50 text-red-600',
-    declined_man: 'bg-red-50 text-red-600',
-    declined_both: 'bg-red-50 text-red-600',
-    cancelled: 'bg-gray-100 text-gray-500',
-    on_hold: 'bg-yellow-50 text-yellow-700',
+    draft: 'bg-stone-100 text-stone-600',
+    proposed_woman: 'bg-gold-light text-gold-deep',
+    proposed_man: 'bg-gold-light text-gold-deep',
+    proposed_both: 'bg-gold-light text-gold-deep',
+    accepted_woman: 'bg-plum-light text-plum',
+    accepted_man: 'bg-plum-light text-plum',
+    accepted_both: 'bg-sage-light text-sage-deep',
+    meeting_scheduled: 'bg-plum-light text-plum',
+    dating: 'bg-plum-light text-plum',
+    engaged: 'bg-plum-light text-plum',
+    married: 'bg-plum-light text-plum',
+    declined_woman: 'bg-danger-light text-danger-deep',
+    declined_man: 'bg-danger-light text-danger-deep',
+    declined_both: 'bg-danger-light text-danger-deep',
+    cancelled: 'bg-stone-100 text-stone-500',
+    on_hold: 'bg-gold-light text-gold-deep',
   }
-  return colors[status] || 'bg-gray-100 text-gray-600'
+  return colors[status] || 'bg-stone-100 text-stone-600'
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -193,7 +193,7 @@ export default function ManDetailPage({
   const router = useRouter()
   const supabase = createClient()
 
-  // ── State ──────────────────────────────────────────────────
+  // ── State ────────────────────────────────────────────────────
   const [man, setMan] = useState<CandidateMan | null>(null)
   const [formData, setFormData] = useState<Partial<CandidateMan>>({})
   const [proposals, setProposals] = useState<ProposalWithCandidates[]>([])
@@ -204,7 +204,7 @@ export default function ManDetailPage({
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false)
 
-  // ── Fetch man ──────────────────────────────────────────────
+  // ── Fetch man ────────────────────────────────────────────────
   const fetchMan = useCallback(async () => {
     setLoading(true)
     setError(null)
@@ -227,7 +227,7 @@ export default function ManDetailPage({
     setLoading(false)
   }, [id, supabase])
 
-  // ── Fetch proposals ────────────────────────────────────────
+  // ── Fetch proposals ────────────────────────────────────────────
   const fetchProposals = useCallback(async () => {
     const { data } = await supabase
       .from('proposals')
@@ -252,12 +252,12 @@ export default function ManDetailPage({
     fetchProposals()
   }, [fetchMan, fetchProposals])
 
-  // ── Form helpers ───────────────────────────────────────────
+  // ── Form helpers ───────────────────────────────────────────────
   function updateField(field: string, value: unknown) {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
-  // ── Save ───────────────────────────────────────────────────
+  // ── Save ─────────────────────────────────────────────────────
   async function handleSave() {
     if (!man) return
     setSaving(true)
@@ -291,7 +291,7 @@ export default function ManDetailPage({
     setTimeout(() => setSaveSuccess(false), 3000)
   }
 
-  // ── Status change ──────────────────────────────────────────
+  // ── Status change ──────────────────────────────────────────────
   async function handleStatusChange(newStatus: CandidateManStatus) {
     if (!man) return
     setStatusDropdownOpen(false)
@@ -311,32 +311,32 @@ export default function ManDetailPage({
     setFormData((prev) => ({ ...prev, status: newStatus }))
   }
 
-  // ── Cancel edit ────────────────────────────────────────────
+  // ── Cancel edit ────────────────────────────────────────────────
   function handleCancelEdit() {
     if (man) setFormData(man)
     setEditing(false)
   }
 
-  // ── Loading state ──────────────────────────────────────────
+  // ── Loading state ──────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FFFBF0] flex items-center justify-center">
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-[#87A878] mx-auto mb-3" />
-          <p className="text-sm text-[#6B7280]">Chargement du profil...</p>
+          <Loader2 className="h-8 w-8 animate-spin text-sage mx-auto mb-3" />
+          <p className="text-sm text-ink-soft">Chargement du profil...</p>
         </div>
       </div>
     )
   }
 
-  // ── Error / not found ──────────────────────────────────────
+  // ── Error / not found ──────────────────────────────────────────
   if (error && !man) {
     return (
-      <div className="min-h-screen bg-[#FFFBF0] flex items-center justify-center">
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
         <div className="text-center max-w-md">
-          <AlertCircle className="h-12 w-12 text-[#C45B5B] mx-auto mb-3" />
-          <h1 className="text-lg font-semibold text-[#2D2D2D] mb-2">Candidat introuvable</h1>
-          <p className="text-sm text-[#6B7280] mb-4">{error}</p>
+          <AlertCircle className="h-12 w-12 text-danger mx-auto mb-3" />
+          <h1 className="text-[24px] font-semibold text-ink mb-2">Candidat introuvable</h1>
+          <p className="text-sm text-ink-soft mb-4">{error}</p>
           <Link href="/men">
             <Button variant="secondary" icon={<ArrowLeft className="h-4 w-4" />}>
               Retour a la liste
@@ -350,28 +350,28 @@ export default function ManDetailPage({
   if (!man) return null
 
   return (
-    <div className="min-h-screen bg-[#FFFBF0]">
+    <div className="min-h-screen bg-canvas">
       <div className="max-w-5xl mx-auto px-4 py-6">
-        {/* ── Header ───────────────────────────────────────── */}
+        {/* ── Header ─────────────────────────────────────────────── */}
         <div className="mb-6">
           {/* Back link */}
           <Link
             href="/men"
-            className="inline-flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-[#2D2D2D] transition-colors mb-4"
+            className="inline-flex items-center gap-1.5 text-sm text-ink-soft hover:text-ink transition-colors mb-4"
           >
             <ArrowLeft className="h-4 w-4" />
             Retour a la liste des hommes
           </Link>
 
           {/* Name + badges + actions */}
-          <div className="bg-white rounded-xl border border-[#E8E0D4] shadow-sm p-5">
+          <div className="bg-surface rounded-[14px] border border-line shadow-card p-5">
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
               {/* Info */}
               <div className="flex-1 min-w-0">
-                <h1 className="text-xl font-bold text-[#2D2D2D] mb-1">
+                <h1 className="text-[26px] font-semibold text-ink mb-1">
                   {man.first_name} {man.last_name}
                 </h1>
-                <div className="flex flex-wrap items-center gap-3 text-sm text-[#6B7280] mb-3">
+                <div className="flex flex-wrap items-center gap-3 text-sm text-ink-soft mb-3">
                   <span className="inline-flex items-center gap-1">
                     <Calendar className="h-3.5 w-3.5" />
                     {calculateAge(man.date_of_birth, man.age_estimate, man.is_age_estimate)}
@@ -404,16 +404,16 @@ export default function ManDetailPage({
                       <ChevronDown className="h-3 w-3" />
                     </button>
                     {statusDropdownOpen && (
-                      <div className="absolute top-full left-0 mt-1 bg-white border border-[#E8E0D4] rounded-lg shadow-lg z-20 py-1 min-w-[160px]">
+                      <div className="absolute top-full left-0 mt-1 bg-surface border border-line rounded-lg shadow-lg z-20 py-1 min-w-[160px]">
                         {statusOptions.map((opt) => (
                           <button
                             key={opt.value}
                             onClick={() => handleStatusChange(opt.value)}
                             className={cn(
-                              'w-full text-left px-3 py-1.5 text-sm hover:bg-[#FFFBF0] transition-colors',
+                              'w-full text-left px-3 py-1.5 text-sm hover:bg-canvas transition-colors',
                               man.status === opt.value
-                                ? 'font-semibold text-[#87A878]'
-                                : 'text-[#2D2D2D]'
+                                ? 'font-semibold text-sage'
+                                : 'text-ink'
                             )}
                           >
                             {opt.label}
@@ -474,21 +474,21 @@ export default function ManDetailPage({
 
             {/* Error / success messages */}
             {error && (
-              <div className="mt-3 rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700">
+              <div className="mt-3 rounded-lg bg-danger-light border border-danger/25 px-3 py-2 text-sm text-danger-deep">
                 {error}
               </div>
             )}
             {saveSuccess && (
-              <div className="mt-3 rounded-lg bg-green-50 border border-green-200 px-3 py-2 text-sm text-green-700">
+              <div className="mt-3 rounded-lg bg-sage-light border border-sage/30 px-3 py-2 text-sm text-sage-deep">
                 Profil mis a jour avec succes
               </div>
             )}
           </div>
         </div>
 
-        {/* ── Sections ─────────────────────────────────────── */}
+        {/* ── Sections ─────────────────────────────────────────────── */}
         <div className="space-y-4">
-          {/* ── Identite ─────────────────────────────────── */}
+          {/* ── Identite ───────────────────────────────────────────── */}
           <SectionCard title="Identite" icon={<User className="h-4 w-4" />}>
             <dl className="divide-y-0">
               <FieldRow
@@ -541,7 +541,7 @@ export default function ManDetailPage({
                       value={formData.date_of_birth || ''}
                       onChange={(e) => updateField('date_of_birth', e.target.value || null)}
                     />
-                    <span className="text-xs text-[#6B7280] whitespace-nowrap pb-2">ou</span>
+                    <span className="text-xs text-ink-soft whitespace-nowrap pb-2">ou</span>
                     <Input
                       inputType="number"
                       placeholder="Age estime"
@@ -578,14 +578,14 @@ export default function ManDetailPage({
             </dl>
           </SectionCard>
 
-          {/* ── Contact ──────────────────────────────────── */}
+          {/* ── Contact ────────────────────────────────────────────── */}
           <SectionCard title="Contact" icon={<Phone className="h-4 w-4" />}>
             <dl>
               <FieldRow
                 label="Telephone"
                 value={
                   man.phone ? (
-                    <a href={`tel:${man.phone}`} className="text-[#87A878] hover:underline">
+                    <a href={`tel:${man.phone}`} className="text-sage hover:underline">
                       {man.phone}
                     </a>
                   ) : null
@@ -603,7 +603,7 @@ export default function ManDetailPage({
                 label="Email"
                 value={
                   man.email ? (
-                    <a href={`mailto:${man.email}`} className="text-[#87A878] hover:underline">
+                    <a href={`mailto:${man.email}`} className="text-sage hover:underline">
                       {man.email}
                     </a>
                   ) : null
@@ -632,7 +632,7 @@ export default function ManDetailPage({
             </dl>
           </SectionCard>
 
-          {/* ── Vie religieuse ───────────────────────────── */}
+          {/* ── Vie religieuse ───────────────────────────────────────── */}
           <SectionCard title="Vie religieuse" icon={<BookOpen className="h-4 w-4" />}>
             <dl>
               <FieldRow
@@ -826,7 +826,7 @@ export default function ManDetailPage({
             </dl>
           </SectionCard>
 
-          {/* ── Famille ──────────────────────────────────── */}
+          {/* ── Famille ────────────────────────────────────────────── */}
           <SectionCard title="Famille" icon={<Users className="h-4 w-4" />}>
             <dl>
               <FieldRow
@@ -870,7 +870,7 @@ export default function ManDetailPage({
             </dl>
           </SectionCard>
 
-          {/* ── Profil ───────────────────────────────────── */}
+          {/* ── Profil ─────────────────────────────────────────────── */}
           <SectionCard title="Profil" icon={<Briefcase className="h-4 w-4" />}>
             <dl>
               <FieldRow
@@ -922,7 +922,7 @@ export default function ManDetailPage({
             </dl>
           </SectionCard>
 
-          {/* ── Attentes ─────────────────────────────────── */}
+          {/* ── Attentes ───────────────────────────────────────────── */}
           <SectionCard title="Attentes" icon={<Heart className="h-4 w-4" />}>
             <dl>
               <FieldRow
@@ -943,7 +943,7 @@ export default function ManDetailPage({
                         updateField('age_min', e.target.value ? Number(e.target.value) : null)
                       }
                     />
-                    <span className="text-sm text-[#6B7280]">a</span>
+                    <span className="text-sm text-ink-soft">a</span>
                     <Input
                       inputType="number"
                       placeholder="Max"
@@ -1005,7 +1005,7 @@ export default function ManDetailPage({
             </dl>
           </SectionCard>
 
-          {/* ── Notes ────────────────────────────────────── */}
+          {/* ── Notes ──────────────────────────────────────────────── */}
           <SectionCard title="Notes" icon={<FileText className="h-4 w-4" />}>
             <dl>
               <FieldRow
@@ -1057,18 +1057,18 @@ export default function ManDetailPage({
             </dl>
           </SectionCard>
 
-          {/* ── Metadata ─────────────────────────────────── */}
-          <div className="bg-white rounded-xl border border-[#E8E0D4] shadow-sm px-5 py-3">
-            <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-[#6B7280]">
+          {/* ── Metadata ───────────────────────────────────────────── */}
+          <div className="bg-surface rounded-[14px] border border-line shadow-card px-5 py-3">
+            <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-ink-soft">
               <span>Cree le {formatDate(man.created_at)}</span>
               <span>Mis a jour le {formatDate(man.updated_at)}</span>
             </div>
           </div>
 
-          {/* ── Propositions liees ────────────────────────── */}
+          {/* ── Propositions liees ────────────────────────────────────── */}
           <SectionCard title="Propositions" icon={<MessageSquare className="h-4 w-4" />}>
             {proposals.length === 0 ? (
-              <p className="text-sm text-[#6B7280] italic py-2">
+              <p className="text-sm text-ink-soft italic py-2">
                 Aucune proposition pour ce candidat
               </p>
             ) : (
@@ -1079,14 +1079,14 @@ export default function ManDetailPage({
                     <Link
                       key={proposal.id}
                       href={`/proposals/${proposal.id}`}
-                      className="block rounded-lg border border-[#E8E0D4] p-3 hover:bg-[#FFFBF0] transition-colors group"
+                      className="block rounded-lg border border-line p-3 hover:bg-canvas transition-colors group"
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <p className="text-sm font-medium text-[#2D2D2D] group-hover:text-[#87A878] transition-colors">
+                          <p className="text-sm font-medium text-ink group-hover:text-sage transition-colors">
                             {woman?.first_name} {woman?.last_name}
                           </p>
-                          <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-[#6B7280]">
+                          <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-ink-soft">
                             {woman?.age_estimate && <span>~{woman.age_estimate} ans</span>}
                             {woman?.city && (
                               <span className="inline-flex items-center gap-0.5">
@@ -1096,7 +1096,7 @@ export default function ManDetailPage({
                             )}
                           </div>
                           {proposal.matchmaker_notes && (
-                            <p className="text-xs text-[#6B7280] mt-1 line-clamp-2">
+                            <p className="text-xs text-ink-soft mt-1 line-clamp-2">
                               {proposal.matchmaker_notes}
                             </p>
                           )}
@@ -1110,10 +1110,10 @@ export default function ManDetailPage({
                           >
                             {getProposalStatusLabel(proposal.status)}
                           </span>
-                          <span className="text-xs text-[#6B7280]">
+                          <span className="text-xs text-ink-soft">
                             {formatDate(proposal.updated_at)}
                           </span>
-                          <ExternalLink className="h-3.5 w-3.5 text-[#6B7280] opacity-0 group-hover:opacity-100 transition-opacity" />
+                          <ExternalLink className="h-3.5 w-3.5 text-ink-soft opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>
                       </div>
                     </Link>
@@ -1122,7 +1122,7 @@ export default function ManDetailPage({
               </div>
             )}
 
-            <div className="mt-4 pt-3 border-t border-[#E8E0D4]">
+            <div className="mt-4 pt-3 border-t border-line">
               <Link href={`/proposals/new?man=${man.id}`}>
                 <Button variant="secondary" size="sm" icon={<Heart className="h-4 w-4" />}>
                   Creer une proposition
@@ -1132,9 +1132,9 @@ export default function ManDetailPage({
           </SectionCard>
         </div>
 
-        {/* ── Bottom actions (edit mode) ──────────────────── */}
+        {/* ── Bottom actions (edit mode) ──────────────────────────────── */}
         {editing && (
-          <div className="sticky bottom-0 bg-[#FFFBF0]/95 backdrop-blur border-t border-[#E8E0D4] mt-6 -mx-4 px-4 py-3 flex justify-end gap-2">
+          <div className="sticky bottom-0 bg-canvas/95 backdrop-blur border-t border-line mt-6 -mx-4 px-4 py-3 flex justify-end gap-2">
             <Button
               variant="ghost"
               onClick={handleCancelEdit}
