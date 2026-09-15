@@ -1,8 +1,10 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { formatDate, formatDateTime, getStatusLabel, getAvailabilityLabel } from '@/lib/utils'
+import { getTopMatches } from '@/lib/scoring/actions'
 import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
+import TopMatchesSection from '@/components/scoring/TopMatchesSection'
 import {
   Users,
   Heart,
@@ -57,6 +59,7 @@ export default async function DashboardPage() {
     activeProposalsRes,
     upcomingTasksRes,
     recentActivityRes,
+    topMatches,
   ] = await Promise.all([
     // 1. Disponibles
     supabase
@@ -132,6 +135,9 @@ export default async function DashboardPage() {
       .eq('organization_id', ORG_ID)
       .order('created_at', { ascending: false })
       .limit(10),
+
+    // 8. Top matches (scoring)
+    getTopMatches(6),
   ])
 
   const stats: StatCard[] = [
@@ -284,6 +290,23 @@ export default async function DashboardPage() {
             </Card>
           </Link>
         ))}
+      </div>
+
+      {/* Suggestions de compatibilite */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-base font-semibold text-[#2D2D2D] flex items-center gap-2">
+            <Heart className="h-5 w-5 text-[#6B3A5B]" />
+            Meilleures compatibilites
+          </h2>
+          <Link
+            href="/proposals/new"
+            className="text-sm text-[#87A878] hover:underline"
+          >
+            Nouvelle proposition
+          </Link>
+        </div>
+        <TopMatchesSection matches={topMatches} />
       </div>
 
       {/* 2 colonnes : Taches + Activite */}

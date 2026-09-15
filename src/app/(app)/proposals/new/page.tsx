@@ -12,6 +12,9 @@ import {
   Search,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { computePairScore } from '@/lib/scoring/actions'
+import type { CompatibilityResult } from '@/lib/scoring/types'
+import ScoreDetails from '@/components/scoring/ScoreDetails'
 import {
   calculateAge,
   getStatusLabel,
@@ -22,7 +25,6 @@ import {
   getCourantLabel,
   getCommunityEthnicLabel,
   getShabbatPracticeLabel,
-  getKashrutLevelLabel,
 } from '@/lib/constants/orthodox'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
@@ -73,6 +75,8 @@ export default function NewProposalPage() {
   const [loadingCandidates, setLoadingCandidates] = useState(true)
   const [conflicts, setConflicts] = useState<ActiveProposal[]>([])
   const [checkingConflicts, setCheckingConflicts] = useState(false)
+  const [pairScore, setPairScore] = useState<CompatibilityResult | null>(null)
+  const [loadingScore, setLoadingScore] = useState(false)
 
   // Load candidates
   useEffect(() => {
@@ -135,6 +139,25 @@ export default function NewProposalPage() {
     }
 
     checkConflicts()
+  }, [selectedWoman, selectedMan])
+
+  useEffect(() => {
+    if (!selectedWoman || !selectedMan) {
+      setPairScore(null)
+      return
+    }
+
+    let cancelled = false
+    setLoadingScore(true)
+
+    computePairScore(selectedWoman.id, selectedMan.id).then((result) => {
+      if (!cancelled) {
+        setPairScore(result)
+        setLoadingScore(false)
+      }
+    })
+
+    return () => { cancelled = true }
   }, [selectedWoman, selectedMan])
 
   async function handleSubmit() {
@@ -451,50 +474,22 @@ export default function NewProposalPage() {
             {renderProfileSummary(selectedMan, 'un candidat', 'bg-blue-50/50')}
           </div>
 
-          {/* Compatibility summary */}
+          {/* Score de compatibilite */}
           {selectedWoman && selectedMan && (
             <Card>
               <h3 className="text-sm font-semibold text-[#6B7280] uppercase tracking-wider mb-3">
-                Points de compatibilite
+                Score de compatibilite
               </h3>
-              <div className="space-y-2 text-xs">
-                {/* Courant match */}
-                <CompatRow
-                  label="Courant"
-                  womanValue={selectedWoman.courant ? getCourantLabel(selectedWoman.courant) : null}
-                  manValue={selectedMan.courant ? getCourantLabel(selectedMan.courant) : null}
-                  match={selectedWoman.courant === selectedMan.courant}
-                />
-                {/* Community match */}
-                <CompatRow
-                  label="Communauté"
-                  womanValue={selectedWoman.community ? getCommunityEthnicLabel(selectedWoman.community) : null}
-                  manValue={selectedMan.community ? getCommunityEthnicLabel(selectedMan.community) : null}
-                  match={
-                    !!selectedWoman.community &&
-                    !!selectedMan.community &&
-                    selectedWoman.community === selectedMan.community
-                  }
-                />
-                {/* Shabbat match */}
-                <CompatRow
-                  label="Chabbat"
-                  womanValue={selectedWoman.shabbat_practice ? getShabbatPracticeLabel(selectedWoman.shabbat_practice) : null}
-                  manValue={selectedMan.shabbat_practice ? getShabbatPracticeLabel(selectedMan.shabbat_practice) : null}
-                  match={selectedWoman.shabbat_practice === selectedMan.shabbat_practice}
-                />
-                {/* Location match */}
-                <CompatRow
-                  label="Ville"
-                  womanValue={selectedWoman.city}
-                  manValue={selectedMan.city}
-                  match={
-                    !!selectedWoman.city &&
-                    !!selectedMan.city &&
-                    selectedWoman.city.toLowerCase() === selectedMan.city.toLowerCase()
-                  }
-                />
-              </div>
+              {loadingScore ? (
+                <div className="flex items-center gap-2 py-3">
+                  <LoadingSpinner size="sm" />
+                  <span className="text-xs text-[#6B7280]">Calcul en cours...</span>
+                </div>
+              ) : pairScore ? (
+                <ScoreDetails result={pairScore} />
+              ) : (
+                <p className="text-xs text-[#6B7280]">Impossible de calculer le score.</p>
+              )}
             </Card>
           )}
 
@@ -527,35 +522,3 @@ export default function NewProposalPage() {
   )
 }
 
-function CompatRow({
-  label,
-  womanValue,
-  manValue,
-  match,
-}: {
-  label: string
-  womanValue: string | null
-  manValue: string | null
-  match: boolean
-}) {
-  const bothFilled = !!womanValue && !!manValue
-
-  return (
-    <div className="flex items-center gap-2">
-      <span
-        className={cn(
-          'h-2 w-2 rounded-full shrink-0',
-          !bothFilled ? 'bg-gray-300' : match ? 'bg-green-500' : 'bg-orange-400'
-        )}
-      />
-      <span className="text-[#6B7280] w-28 shrink-0">{label}</span>
-      <span className="text-[#2D2D2D] flex-1 truncate">
-        {womanValue || '-'}
-      </span>
-      <span className="text-[#6B7280] mx-1">/</span>
-      <span className="text-[#2D2D2D] flex-1 truncate">
-        {manValue || '-'}
-      </span>
-    </div>
-  )
-}
