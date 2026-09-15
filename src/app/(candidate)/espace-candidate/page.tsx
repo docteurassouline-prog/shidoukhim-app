@@ -227,7 +227,7 @@ export default function EspaceCandidatePage() {
   return (
     <div className="min-h-screen bg-canvas">
       <div className="max-w-3xl mx-auto px-4 py-8 sm:py-12">
-        {/* ── Accueil ──────────────────────────────────────────────── */}
+        {/* ── Accueil ─────────────────────────────────────── */}
         <section className="mb-10">
           <div className="flex items-center gap-3 mb-2">
             <div className="inline-flex items-center justify-center w-11 h-11 rounded-full bg-plum/10">
@@ -242,7 +242,7 @@ export default function EspaceCandidatePage() {
           </p>
         </section>
 
-        {/* ── Statistiques ────────────────────────────────────────────── */}
+        {/* ── Statistiques ────────────────────────────────── */}
         <section className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
           <StatCard
             icon={<Heart className="w-5 h-5 text-plum" />}
@@ -264,7 +264,7 @@ export default function EspaceCandidatePage() {
           />
         </section>
 
-        {/* ── Propositions actives ─────────────────────────────────────── */}
+        {/* ── Propositions actives ─────────────────────────── */}
         <section className="mb-10">
           <h2 className="font-display text-[22px] font-semibold text-plum mb-4 flex items-center gap-2">
             <Star className="w-4 h-4 text-gold" />
@@ -310,7 +310,7 @@ export default function EspaceCandidatePage() {
           )}
         </section>
 
-        {/* ── Rencontres recentes ──────────────────────────────────────── */}
+        {/* ── Rencontres recentes ──────────────────────────── */}
         <section>
           <h2 className="font-display text-[22px] font-semibold text-plum mb-4 flex items-center gap-2">
             <Calendar className="w-4 h-4 text-sage" />

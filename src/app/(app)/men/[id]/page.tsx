@@ -134,7 +134,7 @@ function FieldRow({
   )
 }
 
-// ─── Proposal status label in French ────────────────────────────
+// ─── Proposal status label in French ──────────────────────────
 
 function getProposalStatusLabel(status: string): string {
   const labels: Record<string, string> = {
@@ -193,7 +193,7 @@ export default function ManDetailPage({
   const router = useRouter()
   const supabase = createClient()
 
-  // ── State ────────────────────────────────────────────────────
+  // ── State ──────────────────────────────────────────────────
   const [man, setMan] = useState<CandidateMan | null>(null)
   const [formData, setFormData] = useState<Partial<CandidateMan>>({})
   const [proposals, setProposals] = useState<ProposalWithCandidates[]>([])
@@ -204,7 +204,7 @@ export default function ManDetailPage({
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false)
 
-  // ── Fetch man ────────────────────────────────────────────────
+  // ── Fetch man ──────────────────────────────────────────────
   const fetchMan = useCallback(async () => {
     setLoading(true)
     setError(null)
@@ -227,7 +227,7 @@ export default function ManDetailPage({
     setLoading(false)
   }, [id, supabase])
 
-  // ── Fetch proposals ────────────────────────────────────────────
+  // ── Fetch proposals ────────────────────────────────────────
   const fetchProposals = useCallback(async () => {
     const { data } = await supabase
       .from('proposals')
@@ -252,12 +252,12 @@ export default function ManDetailPage({
     fetchProposals()
   }, [fetchMan, fetchProposals])
 
-  // ── Form helpers ───────────────────────────────────────────────
+  // ── Form helpers ───────────────────────────────────────────
   function updateField(field: string, value: unknown) {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
-  // ── Save ─────────────────────────────────────────────────────
+  // ── Save ───────────────────────────────────────────────────
   async function handleSave() {
     if (!man) return
     setSaving(true)
@@ -291,7 +291,7 @@ export default function ManDetailPage({
     setTimeout(() => setSaveSuccess(false), 3000)
   }
 
-  // ── Status change ──────────────────────────────────────────────
+  // ── Status change ──────────────────────────────────────────
   async function handleStatusChange(newStatus: CandidateManStatus) {
     if (!man) return
     setStatusDropdownOpen(false)
@@ -311,13 +311,13 @@ export default function ManDetailPage({
     setFormData((prev) => ({ ...prev, status: newStatus }))
   }
 
-  // ── Cancel edit ────────────────────────────────────────────────
+  // ── Cancel edit ────────────────────────────────────────────
   function handleCancelEdit() {
     if (man) setFormData(man)
     setEditing(false)
   }
 
-  // ── Loading state ──────────────────────────────────────────────
+  // ── Loading state ──────────────────────────────────────────
   if (loading) {
     return (
       <div className="min-h-screen bg-canvas flex items-center justify-center">
@@ -329,7 +329,7 @@ export default function ManDetailPage({
     )
   }
 
-  // ── Error / not found ──────────────────────────────────────────
+  // ── Error / not found ──────────────────────────────────────
   if (error && !man) {
     return (
       <div className="min-h-screen bg-canvas flex items-center justify-center">
@@ -352,7 +352,7 @@ export default function ManDetailPage({
   return (
     <div className="min-h-screen bg-canvas">
       <div className="max-w-5xl mx-auto px-4 py-6">
-        {/* ── Header ─────────────────────────────────────────────── */}
+        {/* ── Header ───────────────────────────────────────── */}
         <div className="mb-6">
           {/* Back link */}
           <Link
@@ -486,9 +486,9 @@ export default function ManDetailPage({
           </div>
         </div>
 
-        {/* ── Sections ─────────────────────────────────────────────── */}
+        {/* ── Sections ─────────────────────────────────────── */}
         <div className="space-y-4">
-          {/* ── Identite ───────────────────────────────────────────── */}
+          {/* ── Identite ─────────────────────────────────── */}
           <SectionCard title="Identite" icon={<User className="h-4 w-4" />}>
             <dl className="divide-y-0">
               <FieldRow
@@ -578,7 +578,7 @@ export default function ManDetailPage({
             </dl>
           </SectionCard>
 
-          {/* ── Contact ────────────────────────────────────────────── */}
+          {/* ── Contact ──────────────────────────────────── */}
           <SectionCard title="Contact" icon={<Phone className="h-4 w-4" />}>
             <dl>
               <FieldRow
@@ -632,7 +632,7 @@ export default function ManDetailPage({
             </dl>
           </SectionCard>
 
-          {/* ── Vie religieuse ───────────────────────────────────────── */}
+          {/* ── Vie religieuse ───────────────────────────── */}
           <SectionCard title="Vie religieuse" icon={<BookOpen className="h-4 w-4" />}>
             <dl>
               <FieldRow
@@ -826,7 +826,7 @@ export default function ManDetailPage({
             </dl>
           </SectionCard>
 
-          {/* ── Famille ────────────────────────────────────────────── */}
+          {/* ── Famille ──────────────────────────────────── */}
           <SectionCard title="Famille" icon={<Users className="h-4 w-4" />}>
             <dl>
               <FieldRow
@@ -870,7 +870,7 @@ export default function ManDetailPage({
             </dl>
           </SectionCard>
 
-          {/* ── Profil ─────────────────────────────────────────────── */}
+          {/* ── Profil ───────────────────────────────────── */}
           <SectionCard title="Profil" icon={<Briefcase className="h-4 w-4" />}>
             <dl>
               <FieldRow
@@ -922,7 +922,7 @@ export default function ManDetailPage({
             </dl>
           </SectionCard>
 
-          {/* ── Attentes ───────────────────────────────────────────── */}
+          {/* ── Attentes ─────────────────────────────────── */}
           <SectionCard title="Attentes" icon={<Heart className="h-4 w-4" />}>
             <dl>
               <FieldRow
@@ -1005,7 +1005,7 @@ export default function ManDetailPage({
             </dl>
           </SectionCard>
 
-          {/* ── Notes ──────────────────────────────────────────────── */}
+          {/* ── Notes ────────────────────────────────────── */}
           <SectionCard title="Notes" icon={<FileText className="h-4 w-4" />}>
             <dl>
               <FieldRow
@@ -1057,7 +1057,7 @@ export default function ManDetailPage({
             </dl>
           </SectionCard>
 
-          {/* ── Metadata ───────────────────────────────────────────── */}
+          {/* ── Metadata ─────────────────────────────────── */}
           <div className="bg-surface rounded-[14px] border border-line shadow-card px-5 py-3">
             <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-ink-soft">
               <span>Cree le {formatDate(man.created_at)}</span>
@@ -1065,7 +1065,7 @@ export default function ManDetailPage({
             </div>
           </div>
 
-          {/* ── Propositions liees ────────────────────────────────────── */}
+          {/* ── Propositions liees ────────────────────────── */}
           <SectionCard title="Propositions" icon={<MessageSquare className="h-4 w-4" />}>
             {proposals.length === 0 ? (
               <p className="text-sm text-ink-soft italic py-2">
@@ -1132,7 +1132,7 @@ export default function ManDetailPage({
           </SectionCard>
         </div>
 
-        {/* ── Bottom actions (edit mode) ──────────────────────────────── */}
+        {/* ── Bottom actions (edit mode) ──────────────────── */}
         {editing && (
           <div className="sticky bottom-0 bg-canvas/95 backdrop-blur border-t border-line mt-6 -mx-4 px-4 py-3 flex justify-end gap-2">
             <Button
