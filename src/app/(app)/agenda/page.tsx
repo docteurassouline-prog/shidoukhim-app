@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { formatDate } from '@/lib/utils'
+import { formatDate, getStatusLabel } from '@/lib/utils'
 import type {
   Task,
   TaskCreateInput,
@@ -34,7 +34,6 @@ import {
   ChevronDown,
   PhoneForwarded,
   Target,
-  ListTodo,
 } from 'lucide-react'
 
 const ORG_ID = '00000000-0000-0000-0000-000000000001'
@@ -42,6 +41,13 @@ const ORG_ID = '00000000-0000-0000-0000-000000000001'
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+
+function errorMessage(err: unknown): string {
+  if (err && typeof err === 'object' && 'message' in err && typeof (err as { message: unknown }).message === 'string') {
+    return (err as { message: string }).message
+  }
+  return 'Erreur de chargement'
+}
 
 function toISODate(date: Date): string {
   return date.toISOString().split('T')[0]
@@ -59,12 +65,12 @@ function priorityLabel(p: TaskPriority): string {
 
 function priorityColor(p: TaskPriority): string {
   const map: Record<TaskPriority, string> = {
-    urgente: 'bg-red-100 text-red-700 border-red-200',
-    haute: 'bg-orange-100 text-orange-700 border-orange-200',
-    normale: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-    basse: 'bg-gray-100 text-gray-500 border-gray-200',
+    urgente: 'bg-danger-light text-danger-deep border-danger/25',
+    haute: 'bg-gold-light text-gold-deep border-gold/30',
+    normale: 'bg-gold-light text-gold-deep border-gold/30',
+    basse: 'bg-stone-100 text-stone-500 border-stone-200',
   }
-  return map[p] ?? 'bg-gray-100 text-gray-500 border-gray-200'
+  return map[p] ?? 'bg-stone-100 text-stone-500 border-stone-200'
 }
 
 function priorityIcon(p: TaskPriority) {
@@ -81,20 +87,7 @@ function priorityIcon(p: TaskPriority) {
 }
 
 function proposalStatusLabel(s: string): string {
-  const map: Record<string, string> = {
-    draft: 'Brouillon',
-    proposed_woman: 'Propose (elle)',
-    proposed_man: 'Propose (lui)',
-    proposed_both: 'Propose (les deux)',
-    accepted_woman: 'Accepte (elle)',
-    accepted_man: 'Accepte (lui)',
-    accepted_both: 'Accepte (les deux)',
-    meeting_scheduled: 'Rencontre planifiee',
-    dating: 'En frequentation',
-    engaged: 'Fiances',
-    on_hold: 'En pause',
-  }
-  return map[s] ?? s
+  return getStatusLabel(s)
 }
 
 // ---------------------------------------------------------------------------
@@ -229,7 +222,7 @@ export default function AgendaPage() {
       const enriched = await enrichTasks(data ?? [])
       setTodayTasks(enriched)
     } catch (err: unknown) {
-      setTodayError(err instanceof Error ? err.message : 'Erreur de chargement')
+      setTodayError(errorMessage(err))
     } finally {
       setTodayLoading(false)
     }
@@ -253,7 +246,7 @@ export default function AgendaPage() {
       const enriched = await enrichTasks(data ?? [])
       setWeekTasks(enriched)
     } catch (err: unknown) {
-      setWeekError(err instanceof Error ? err.message : 'Erreur de chargement')
+      setWeekError(errorMessage(err))
     } finally {
       setWeekLoading(false)
     }
@@ -268,7 +261,7 @@ export default function AgendaPage() {
           .from('candidates')
           .select('id, first_name, last_name, status, updated_at')
           .eq('organization_id', ORG_ID)
-          .eq('status', 'active')
+          .eq('status', 'validee')
           .lt('updated_at', thirtyDaysAgo)
           .order('updated_at', { ascending: true })
           .limit(50),
@@ -276,7 +269,7 @@ export default function AgendaPage() {
           .from('candidates_men')
           .select('id, first_name, last_name, status, updated_at')
           .eq('organization_id', ORG_ID)
-          .eq('status', 'active')
+          .in('status', ['actif', 'en_rencontre'])
           .lt('updated_at', thirtyDaysAgo)
           .order('updated_at', { ascending: true })
           .limit(50),
@@ -293,7 +286,7 @@ export default function AgendaPage() {
       )
       setStaleCandidates(combined)
     } catch (err: unknown) {
-      setStaleError(err instanceof Error ? err.message : 'Erreur de chargement')
+      setStaleError(errorMessage(err))
     } finally {
       setStaleLoading(false)
     }
@@ -303,13 +296,7 @@ export default function AgendaPage() {
     setProposalsLoading(true)
     setProposalsError(null)
     try {
-      const excludedStatuses = [
-        'cancelled',
-        'declined_woman',
-        'declined_man',
-        'declined_both',
-        'married',
-      ]
+      const excludedStatuses = ['refusee', 'interrompue', 'aboutie']
       const { data, error } = await supabase
         .from('proposals')
         .select(
@@ -334,7 +321,7 @@ export default function AgendaPage() {
       })
       setDanglingProposals(rows)
     } catch (err: unknown) {
-      setProposalsError(err instanceof Error ? err.message : 'Erreur de chargement')
+      setProposalsError(errorMessage(err))
     } finally {
       setProposalsLoading(false)
     }
@@ -541,14 +528,14 @@ export default function AgendaPage() {
       <div
         key={task.id}
         className={[
-          'bg-white rounded-lg border p-4 transition-shadow hover:shadow-sm',
-          overdue ? 'border-red-300 ring-1 ring-red-200' : 'border-[#E8E0D4]',
+          'bg-surface rounded-lg border p-4 transition-shadow hover:shadow-card',
+          overdue ? 'border-danger/25 ring-1 ring-red-200' : 'border-line',
         ].join(' ')}
       >
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap mb-1">
-              <h4 className="text-sm font-semibold text-[#2D2D2D] truncate">
+              <h4 className="text-sm font-semibold text-ink truncate">
                 {task.title}
               </h4>
               <Badge variant="default" className={priorityColor(task.priority)}>
@@ -558,27 +545,27 @@ export default function AgendaPage() {
                 </span>
               </Badge>
               {overdue && (
-                <Badge variant="default" className="bg-red-100 text-red-700 border-red-200">
+                <Badge variant="default" className="bg-danger-light text-danger-deep border-danger/25">
                   En retard
                 </Badge>
               )}
             </div>
 
             {task.description && (
-              <p className="text-xs text-[#6B7280] mt-1 line-clamp-2">
+              <p className="text-xs text-ink-soft mt-1 line-clamp-2">
                 {task.description}
               </p>
             )}
 
             <div className="flex items-center gap-3 mt-2 flex-wrap">
               {task.due_date && (
-                <span className="inline-flex items-center gap-1 text-xs text-[#6B7280]">
+                <span className="inline-flex items-center gap-1 text-xs text-ink-soft">
                   <Clock className="h-3 w-3" />
                   {formatDate(task.due_date)}
                 </span>
               )}
               {task.candidateName && (
-                <span className="inline-flex items-center gap-1 text-xs text-[#6B3A5B]">
+                <span className="inline-flex items-center gap-1 text-xs text-plum">
                   <Target className="h-3 w-3" />
                   {task.candidateName}
                 </span>
@@ -588,7 +575,7 @@ export default function AgendaPage() {
                   <Badge
                     key={tag}
                     variant="default"
-                    className="bg-[#C5A55A]/10 text-[#8B7030] border-[#C5A55A]/20 text-[10px]"
+                    className="bg-gold/10 text-gold-deep border-gold/20 text-[10px]"
                   >
                     {tag}
                   </Badge>
@@ -615,15 +602,12 @@ export default function AgendaPage() {
   // Render
   // -----------------------------------------------------------------------
   return (
-    <div className="min-h-screen bg-[#FFFBF0]">
+    <div>
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-[#2D2D2D] flex items-center gap-2">
-            <ListTodo className="h-7 w-7 text-[#87A878]" />
-            Agenda
-          </h1>
-          <p className="text-sm text-[#6B7280] mt-1">
+          <h1 className="text-[30px] font-semibold text-ink">Agenda</h1>
+          <p className="text-sm text-ink-soft mt-1">
             Gerez vos taches et suivez vos dossiers en cours
           </p>
         </div>
@@ -636,18 +620,18 @@ export default function AgendaPage() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* ============================================================ */}
         {/* SECTION 1 – Mes actions du jour                              */}
         {/* ============================================================ */}
-        <section>
-          <div className="flex items-center gap-2 mb-4">
-            <CalendarCheck className="h-5 w-5 text-[#87A878]" />
-            <h2 className="text-lg font-semibold text-[#2D2D2D]">
+        <section className="rounded-[14px] border border-line bg-surface shadow-card p-5 sm:p-6">
+          <div className="flex items-center gap-2 mb-5">
+            <CalendarCheck className="h-5 w-5 text-sage" />
+            <h2 className="font-display text-[22px] font-semibold text-ink">
               Mes actions du jour
             </h2>
             {!todayLoading && (
-              <Badge variant="default" className="bg-[#87A878]/15 text-[#5A7A4A] border-[#87A878]/30">
+              <Badge variant="default" className="bg-sage/15 text-sage-deep border-sage/30">
                 {todayTasks.length}
               </Badge>
             )}
@@ -656,7 +640,7 @@ export default function AgendaPage() {
           {todayLoading ? (
             <LoadingSpinner text="Chargement des taches..." size="sm" />
           ) : todayError ? (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-sm text-red-700">
+            <div className="bg-danger-light border border-danger/25 rounded-lg p-4 text-sm text-danger-deep">
               {todayError}
             </div>
           ) : todayTasks.length === 0 ? (
@@ -675,14 +659,14 @@ export default function AgendaPage() {
         {/* ============================================================ */}
         {/* SECTION 2 – A venir cette semaine                            */}
         {/* ============================================================ */}
-        <section>
-          <div className="flex items-center gap-2 mb-4">
-            <CalendarClock className="h-5 w-5 text-[#C5A55A]" />
-            <h2 className="text-lg font-semibold text-[#2D2D2D]">
+        <section className="rounded-[14px] border border-line bg-surface shadow-card p-5 sm:p-6">
+          <div className="flex items-center gap-2 mb-5">
+            <CalendarClock className="h-5 w-5 text-gold" />
+            <h2 className="font-display text-[22px] font-semibold text-ink">
               A venir cette semaine
             </h2>
             {!weekLoading && (
-              <Badge variant="default" className="bg-[#C5A55A]/15 text-[#8B7030] border-[#C5A55A]/30">
+              <Badge variant="default" className="bg-gold/15 text-gold-deep border-gold/30">
                 {weekTasks.length}
               </Badge>
             )}
@@ -691,7 +675,7 @@ export default function AgendaPage() {
           {weekLoading ? (
             <LoadingSpinner text="Chargement..." size="sm" />
           ) : weekError ? (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-sm text-red-700">
+            <div className="bg-danger-light border border-danger/25 rounded-lg p-4 text-sm text-danger-deep">
               {weekError}
             </div>
           ) : weekTasks.length === 0 ? (
@@ -710,26 +694,26 @@ export default function AgendaPage() {
         {/* ============================================================ */}
         {/* SECTION 3 – Fiches sans nouvelles                            */}
         {/* ============================================================ */}
-        <section>
-          <div className="flex items-center gap-2 mb-4">
-            <UserX className="h-5 w-5 text-[#6B3A5B]" />
-            <h2 className="text-lg font-semibold text-[#2D2D2D]">
+        <section className="rounded-[14px] border border-line bg-surface shadow-card p-5 sm:p-6">
+          <div className="flex items-center gap-2 mb-5">
+            <UserX className="h-5 w-5 text-plum" />
+            <h2 className="font-display text-[22px] font-semibold text-ink">
               Fiches sans nouvelles
             </h2>
             {!staleLoading && (
-              <Badge variant="default" className="bg-[#6B3A5B]/10 text-[#6B3A5B] border-[#6B3A5B]/20">
+              <Badge variant="default" className="bg-plum/10 text-plum border-plum/20">
                 {staleCandidates.length}
               </Badge>
             )}
           </div>
-          <p className="text-xs text-[#6B7280] -mt-2 mb-3">
+          <p className="text-xs text-ink-soft -mt-2 mb-3">
             Candidat(e)s actifs sans mise a jour depuis plus de 30 jours
           </p>
 
           {staleLoading ? (
             <LoadingSpinner text="Chargement..." size="sm" />
           ) : staleError ? (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-sm text-red-700">
+            <div className="bg-danger-light border border-danger/25 rounded-lg p-4 text-sm text-danger-deep">
               {staleError}
             </div>
           ) : staleCandidates.length === 0 ? (
@@ -743,25 +727,25 @@ export default function AgendaPage() {
               {staleCandidates.map((c) => (
                 <div
                   key={`${c.type}-${c.id}`}
-                  className="bg-white rounded-lg border border-[#E8E0D4] p-3 flex items-center justify-between gap-3"
+                  className="bg-surface rounded-lg border border-line p-3 flex items-center justify-between gap-3"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-[#2D2D2D] truncate">
+                      <span className="text-sm font-medium text-ink truncate">
                         {c.first_name} {c.last_name}
                       </span>
                       <Badge
                         variant="default"
                         className={
                           c.type === 'woman'
-                            ? 'bg-pink-50 text-pink-600 border-pink-200'
-                            : 'bg-blue-50 text-blue-600 border-blue-200'
+                            ? 'bg-plum-light text-plum border-plum/20'
+                            : 'bg-plum-light text-plum border-plum/20'
                         }
                       >
                         {c.type === 'woman' ? 'F' : 'H'}
                       </Badge>
                     </div>
-                    <p className="text-xs text-[#6B7280] mt-0.5">
+                    <p className="text-xs text-ink-soft mt-0.5">
                       Derniere mise a jour : {formatDate(c.updated_at)}
                     </p>
                   </div>
@@ -782,26 +766,26 @@ export default function AgendaPage() {
         {/* ============================================================ */}
         {/* SECTION 4 – Propositions sans prochaine action               */}
         {/* ============================================================ */}
-        <section>
-          <div className="flex items-center gap-2 mb-4">
-            <LinkIcon className="h-5 w-5 text-[#C45B5B]" />
-            <h2 className="text-lg font-semibold text-[#2D2D2D]">
+        <section className="rounded-[14px] border border-line bg-surface shadow-card p-5 sm:p-6">
+          <div className="flex items-center gap-2 mb-5">
+            <LinkIcon className="h-5 w-5 text-danger" />
+            <h2 className="font-display text-[22px] font-semibold text-ink">
               Propositions sans prochaine action
             </h2>
             {!proposalsLoading && (
-              <Badge variant="default" className="bg-[#C45B5B]/10 text-[#C45B5B] border-[#C45B5B]/20">
+              <Badge variant="default" className="bg-danger/10 text-danger border-danger/20">
                 {danglingProposals.length}
               </Badge>
             )}
           </div>
-          <p className="text-xs text-[#6B7280] -mt-2 mb-3">
+          <p className="text-xs text-ink-soft -mt-2 mb-3">
             Propositions actives sans date de prochaine action definie
           </p>
 
           {proposalsLoading ? (
             <LoadingSpinner text="Chargement..." size="sm" />
           ) : proposalsError ? (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-sm text-red-700">
+            <div className="bg-danger-light border border-danger/25 rounded-lg p-4 text-sm text-danger-deep">
               {proposalsError}
             </div>
           ) : danglingProposals.length === 0 ? (
@@ -815,23 +799,23 @@ export default function AgendaPage() {
               {danglingProposals.map((p) => (
                 <div
                   key={p.id}
-                  className="bg-white rounded-lg border border-[#E8E0D4] p-3 flex items-center justify-between gap-3"
+                  className="bg-surface rounded-lg border border-line p-3 flex items-center justify-between gap-3"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm font-medium text-[#2D2D2D]">
+                      <span className="text-sm font-medium text-ink">
                         {p.woman_name}
                       </span>
-                      <ArrowUpCircle className="h-3.5 w-3.5 text-[#C5A55A] rotate-90" />
-                      <span className="text-sm font-medium text-[#2D2D2D]">
+                      <ArrowUpCircle className="h-3.5 w-3.5 text-gold rotate-90" />
+                      <span className="text-sm font-medium text-ink">
                         {p.man_name}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 mt-1">
-                      <Badge variant="default" className="bg-[#6B3A5B]/10 text-[#6B3A5B] border-[#6B3A5B]/20">
+                      <Badge variant="default" className="bg-plum/10 text-plum border-plum/20">
                         {proposalStatusLabel(p.status)}
                       </Badge>
-                      <span className="text-xs text-[#6B7280]">
+                      <span className="text-xs text-ink-soft">
                         Creee le {formatDate(p.created_at)}
                       </span>
                     </div>
@@ -887,7 +871,7 @@ export default function AgendaPage() {
       >
         <div className="space-y-4">
           {formError && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
+            <div className="bg-danger-light border border-danger/25 rounded-lg p-3 text-sm text-danger-deep">
               {formError}
             </div>
           )}
