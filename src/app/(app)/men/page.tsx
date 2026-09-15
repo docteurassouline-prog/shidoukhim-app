@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Plus, Search, Users, MapPin, Briefcase, BookOpen } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
+import { getMenCandidates } from '@/lib/candidates-men/actions'
 import type { CandidateMan, CandidateStatus } from '@/lib/types'
 import { calculateAge, getStatusLabel, getStatusColor, cn } from '@/lib/utils'
 import Button from '@/components/ui/Button'
@@ -37,18 +37,8 @@ export default function MenPage() {
       setLoading(true)
       setError(null)
       try {
-        const supabase = createClient()
-        const { data, error: fetchError } = await supabase
-          .from('candidates_men')
-          .select('*')
-          .eq('organization_id', ORG_ID)
-          .order('updated_at', { ascending: false })
-
-        if (fetchError) {
-          throw fetchError
-        }
-
-        setMen(data ?? [])
+        const data = await getMenCandidates()
+        setMen(data as unknown as CandidateMan[])
       } catch (err) {
         const message =
           err instanceof Error ? err.message : 'Erreur lors du chargement des fiches.'

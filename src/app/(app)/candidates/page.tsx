@@ -16,7 +16,7 @@ import {
   User,
   Users,
 } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
+import { getCandidates, getMatchmakers } from '@/lib/candidates/actions'
 import type {
   Candidate,
   CandidateStatus,
@@ -138,15 +138,7 @@ export default function CandidatesPage() {
   // Load matchmakers for filter
   useEffect(() => {
     async function loadMatchmakers() {
-      const supabase = createClient()
-      const { data } = await supabase
-        .from('user_profiles')
-        .select('id, full_name')
-        .eq('organization_id', ORG_ID)
-        .eq('is_active', true)
-        .in('role', ['admin', 'matchmaker'])
-        .order('full_name')
-
+      const data = await getMatchmakers()
       if (data) setMatchmakers(data)
     }
     loadMatchmakers()
@@ -156,58 +148,20 @@ export default function CandidatesPage() {
   useEffect(() => {
     async function loadCandidates() {
       setLoading(true)
-      const supabase = createClient()
 
-      let query = supabase
-        .from('candidates')
-        .select(
-          `
-          *,
-          assignments:candidate_assignments(
-            user_id,
-            is_primary,
-            user_profiles(full_name)
-          )
-        `,
-          { count: 'exact' }
-        )
-        .eq('organization_id', ORG_ID)
-        .eq('gender', 'female')
+      const result = await getCandidates({
+        search: search || undefined,
+        status: statusFilter || undefined,
+        availability: availabilityFilter || undefined,
+        city: cityFilter || undefined,
+        sortField,
+        sortOrder,
+        page,
+        perPage: PER_PAGE,
+      })
 
-      // Apply filters
-      if (search) {
-        query = query.or(
-          `first_name.ilike.%${search}%,last_name.ilike.%${search}%`
-        )
-      }
-      if (statusFilter) {
-        query = query.eq('status', statusFilter)
-      }
-      if (availabilityFilter) {
-        query = query.eq('availability', availabilityFilter)
-      }
-      if (cityFilter) {
-        query = query.ilike('city', `%${cityFilter}%`)
-      }
-
-      // Sort
-      query = query.order(sortField, { ascending: sortOrder === 'asc' })
-
-      // Pagination
-      const from = (page - 1) * PER_PAGE
-      query = query.range(from, from + PER_PAGE - 1)
-
-      const { data, count, error } = await query
-
-      if (error) {
-        console.error('Erreur chargement candidates:', error)
-        setCandidates([])
-        setTotalCount(0)
-      } else {
-        setCandidates((data as CandidateWithAssignment[]) ?? [])
-        setTotalCount(count ?? 0)
-      }
-
+      setCandidates(result.candidates as unknown as CandidateWithAssignment[])
+      setTotalCount(result.totalCount)
       setLoading(false)
     }
 
