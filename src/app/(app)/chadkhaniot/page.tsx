@@ -108,29 +108,40 @@ export default function ChadkhaniotPage() {
       setLoading(true)
       setError(null)
 
-      // Get authenticated user
-      const { data: authData, error: authError } = await supabase.auth.getUser()
-      if (authError || !authData.user) {
-        setError('Impossible de recuperer votre session. Veuillez vous reconnecter.')
+      // Get authenticated user (fallback for auth bypass)
+      const { data: authData } = await supabase.auth.getUser()
+
+      let resolvedProfile: UserProfile | null = null
+
+      if (authData?.user) {
+        const { data: currentProfile } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('auth_user_id', authData.user.id)
+          .eq('organization_id', ORG_ID)
+          .single()
+        resolvedProfile = currentProfile as UserProfile | null
+      }
+
+      if (!resolvedProfile) {
+        // Auth bypass: use first admin profile as fallback
+        const { data: fallbackProfile } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('organization_id', ORG_ID)
+          .eq('role', 'admin')
+          .limit(1)
+          .single()
+        resolvedProfile = (fallbackProfile as UserProfile) ?? null
+      }
+
+      if (!resolvedProfile) {
+        setError('Aucun profil trouve pour cette organisation.')
         setLoading(false)
         return
       }
 
-      // Get current user profile
-      const { data: currentProfile, error: profileError } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('auth_user_id', authData.user.id)
-        .eq('organization_id', ORG_ID)
-        .single()
-
-      if (profileError || !currentProfile) {
-        setError('Profil utilisateur introuvable.')
-        setLoading(false)
-        return
-      }
-
-      setCurrentUser(currentProfile as UserProfile)
+      setCurrentUser(resolvedProfile)
 
       // Fetch all active users in the organization
       const { data: allUsers, error: usersError } = await supabase
