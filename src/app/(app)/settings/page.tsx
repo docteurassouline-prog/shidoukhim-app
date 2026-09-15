@@ -34,8 +34,8 @@ function FeedbackMessage({
     <div
       className={`flex items-center gap-2 rounded-lg px-4 py-3 text-sm ${
         type === 'success'
-          ? 'bg-green-50 text-green-700 border border-green-200'
-          : 'bg-red-50 text-red-700 border border-red-200'
+          ? 'bg-sage-light text-sage-deep border border-sage/30'
+          : 'bg-danger-light text-danger-deep border border-danger/25'
       }`}
       role="alert"
     >
@@ -62,12 +62,12 @@ function SectionCard({
   children: React.ReactNode
 }) {
   return (
-    <div className="rounded-xl border border-[#E8E0D4] bg-white p-6 shadow-sm">
+    <div className="rounded-[14px] border border-line bg-surface p-6 shadow-card">
       <div className="mb-6 flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#FFFBF0]">
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-canvas">
           {icon}
         </div>
-        <h2 className="text-lg font-semibold text-[#2D2D2D]">{title}</h2>
+        <h2 className="font-display text-[22px] font-semibold text-ink">{title}</h2>
       </div>
       {children}
     </div>
@@ -359,8 +359,8 @@ export default function SettingsPage() {
   if (pageLoading) {
     return (
       <div className="flex h-full items-center justify-center py-20">
-        <div className="flex flex-col items-center gap-3 text-[#6B7280]">
-          <Loader2 className="h-8 w-8 animate-spin text-[#87A878]" />
+        <div className="flex flex-col items-center gap-3 text-ink-soft">
+          <Loader2 className="h-8 w-8 animate-spin text-sage" />
           <p className="text-sm">Chargement des paramètres...</p>
         </div>
       </div>
@@ -371,14 +371,14 @@ export default function SettingsPage() {
     <div className="mx-auto max-w-3xl space-y-6">
       {/* Page header */}
       <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#87A878]/10">
-          <Settings className="h-5 w-5 text-[#87A878]" />
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-sage/10">
+          <Settings className="h-5 w-5 text-sage" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-[#2D2D2D]">
+          <h1 className="text-[30px] font-semibold text-ink">
             Paramètres
           </h1>
-          <p className="text-sm text-[#6B7280]">
+          <p className="text-sm text-ink-soft">
             Gérez votre profil, votre organisation et vos préférences.
           </p>
         </div>
@@ -390,7 +390,7 @@ export default function SettingsPage() {
       {isAdmin && (
         <SectionCard
           title="Organisation"
-          icon={<Building2 className="h-5 w-5 text-[#C5A55A]" />}
+          icon={<Building2 className="h-5 w-5 text-gold" />}
         >
           <div className="space-y-4">
             <Input
@@ -426,7 +426,7 @@ export default function SettingsPage() {
       {/* ============================================================ */}
       <SectionCard
         title="Mon profil"
-        icon={<User className="h-5 w-5 text-[#87A878]" />}
+        icon={<User className="h-5 w-5 text-sage" />}
       >
         <div className="space-y-4">
           <Input
@@ -437,13 +437,13 @@ export default function SettingsPage() {
           />
 
           <div className="w-full">
-            <label className="block text-sm font-medium text-[#2D2D2D] mb-1.5">
+            <label className="block text-sm font-medium text-ink mb-1.5">
               Adresse e-mail
             </label>
-            <div className="flex h-10 items-center rounded-lg border border-[#E8E0D4] bg-gray-50 px-3 text-sm text-[#6B7280]">
+            <div className="flex h-10 items-center rounded-lg border border-line bg-stone-50 px-3 text-sm text-ink-soft">
               {profile?.email || '—'}
             </div>
-            <p className="mt-1 text-sm text-[#6B7280]">
+            <p className="mt-1 text-sm text-ink-soft">
               L&apos;adresse e-mail ne peut pas être modifiée ici.
             </p>
           </div>
@@ -481,7 +481,7 @@ export default function SettingsPage() {
       {/* ============================================================ */}
       <SectionCard
         title="Changer le mot de passe"
-        icon={<Lock className="h-5 w-5 text-[#6B3A5B]" />}
+        icon={<Lock className="h-5 w-5 text-plum" />}
       >
         <div className="space-y-4">
           <Input
@@ -553,10 +553,10 @@ export default function SettingsPage() {
       {isAdmin && (
         <SectionCard
           title="Délais de relance"
-          icon={<Clock className="h-5 w-5 text-[#C5A55A]" />}
+          icon={<Clock className="h-5 w-5 text-gold" />}
         >
           <div className="space-y-4">
-            <p className="text-sm text-[#6B7280]">
+            <p className="text-sm text-ink-soft">
               Configurez les délais automatiques utilisés pour les relances et
               les invitations.
             </p>

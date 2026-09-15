@@ -32,26 +32,26 @@ import EmptyState from '@/components/ui/EmptyState'
 const ROLE_CONFIG: Record<UserRole, { label: string; bg: string; text: string; icon: typeof Crown }> = {
   admin: {
     label: 'Administratrice',
-    bg: 'bg-purple-100',
-    text: 'text-purple-800',
+    bg: 'bg-plum-light',
+    text: 'text-plum',
     icon: Crown,
   },
   chadkhanit: {
     label: 'Chadkhanit',
-    bg: 'bg-[#87A878]/15',
-    text: 'text-[#5A7A4A]',
+    bg: 'bg-sage/15',
+    text: 'text-sage-deep',
     icon: Handshake,
   },
   assistante: {
     label: 'Assistante',
-    bg: 'bg-blue-100',
-    text: 'text-blue-800',
+    bg: 'bg-plum-light',
+    text: 'text-plum',
     icon: Shield,
   },
   viewer: {
     label: 'Lectrice',
-    bg: 'bg-gray-100',
-    text: 'text-gray-600',
+    bg: 'bg-stone-100',
+    text: 'text-stone-600',
     icon: Eye,
   },
 }
@@ -189,10 +189,10 @@ export default function ChadkhaniotPage() {
     return (
       <div className="py-6">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-xl border border-[#E8E0D4] p-8 text-center">
-            <AlertCircle className="h-12 w-12 text-[#C45B5B] mx-auto mb-4" />
-            <h2 className="text-lg font-semibold text-[#2D2D2D] mb-2">Erreur</h2>
-            <p className="text-sm text-[#4B5563] mb-4">{error}</p>
+          <div className="bg-surface rounded-[14px] border border-line p-8 text-center">
+            <AlertCircle className="h-12 w-12 text-danger mx-auto mb-4" />
+            <h2 className="font-display text-[22px] font-semibold text-ink mb-2">Erreur</h2>
+            <p className="text-sm text-ink-soft mb-4">{error}</p>
             <Button variant="primary" onClick={fetchData}>
               Reessayer
             </Button>
@@ -208,12 +208,12 @@ export default function ChadkhaniotPage() {
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <div className="flex items-center justify-center h-10 w-10 rounded-full bg-[#6B3A5B]/10">
-              <Users className="h-5 w-5 text-[#6B3A5B]" />
+            <div className="flex items-center justify-center h-10 w-10 rounded-full bg-plum/10">
+              <Users className="h-5 w-5 text-plum" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-[#2D2D2D]">Equipe Chadkhaniot</h1>
-              <p className="text-sm text-[#4B5563]">
+              <h1 className="text-[30px] font-semibold text-ink">Equipe Chadkhaniot</h1>
+              <p className="text-sm text-ink-soft">
                 {users.length} membre{users.length !== 1 ? 's' : ''} actif{users.length !== 1 ? 's' : ''}
               </p>
             </div>
@@ -222,12 +222,12 @@ export default function ChadkhaniotPage() {
 
         {/* Error banner (non-blocking) */}
         {error && users.length > 0 && (
-          <div className="mb-6 bg-[#C45B5B]/10 border border-[#C45B5B]/20 rounded-lg p-4 flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-[#C45B5B] shrink-0 mt-0.5" />
+          <div className="mb-6 bg-danger/10 border border-danger/20 rounded-lg p-4 flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-danger shrink-0 mt-0.5" />
             <div className="flex-1">
-              <p className="text-sm text-[#C45B5B]">{error}</p>
+              <p className="text-sm text-danger">{error}</p>
             </div>
-            <button onClick={() => setError(null)} className="text-[#C45B5B] hover:text-[#B04A4A]">
+            <button onClick={() => setError(null)} className="text-danger hover:text-danger-deep">
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -255,8 +255,8 @@ export default function ChadkhaniotPage() {
                 <div
                   key={user.id}
                   className={cn(
-                    'bg-white rounded-xl border border-[#E8E0D4] p-6 transition-shadow hover:shadow-md',
-                    isCurrentUser && 'ring-2 ring-[#87A878]/30'
+                    'bg-surface rounded-[14px] border border-line p-6 transition-shadow hover:shadow-card-hover',
+                    isCurrentUser && 'ring-2 ring-sage/30'
                   )}
                 >
                   {/* Top: Avatar + Name + Role */}
@@ -264,20 +264,20 @@ export default function ChadkhaniotPage() {
                     <div
                       className={cn(
                         'flex items-center justify-center h-14 w-14 rounded-full text-lg font-semibold shrink-0',
-                        user.role === 'admin' && 'bg-purple-100 text-purple-700',
-                        user.role === 'chadkhanit' && 'bg-[#87A878]/15 text-[#5A7A4A]',
-                        user.role === 'assistante' && 'bg-blue-100 text-blue-700',
-                        user.role === 'viewer' && 'bg-gray-100 text-gray-600'
+                        user.role === 'admin' && 'bg-plum-light text-plum',
+                        user.role === 'chadkhanit' && 'bg-sage/15 text-sage-deep',
+                        user.role === 'assistante' && 'bg-plum-light text-plum',
+                        user.role === 'viewer' && 'bg-stone-100 text-stone-600'
                       )}
                     >
                       {getInitials(user.full_name)}
                     </div>
 
                     <div className="min-w-0 flex-1">
-                      <h3 className="text-base font-semibold text-[#2D2D2D] truncate">
+                      <h3 className="text-base font-semibold text-ink truncate">
                         {user.full_name}
                         {isCurrentUser && (
-                          <span className="text-xs font-normal text-[#4B5563] ml-2">(vous)</span>
+                          <span className="text-xs font-normal text-ink-soft ml-2">(vous)</span>
                         )}
                       </h3>
 
@@ -298,38 +298,38 @@ export default function ChadkhaniotPage() {
 
                   {/* Contact info */}
                   <div className="space-y-2 mb-4">
-                    <div className="flex items-center gap-2 text-sm text-[#4B5563]">
-                      <Mail className="h-4 w-4 shrink-0 text-[#4B5563]/60" />
+                    <div className="flex items-center gap-2 text-sm text-ink-soft">
+                      <Mail className="h-4 w-4 shrink-0 text-ink-soft/60" />
                       <span className="truncate">{user.email}</span>
                     </div>
                     {user.phone && (
-                      <div className="flex items-center gap-2 text-sm text-[#4B5563]">
-                        <Phone className="h-4 w-4 shrink-0 text-[#4B5563]/60" />
+                      <div className="flex items-center gap-2 text-sm text-ink-soft">
+                        <Phone className="h-4 w-4 shrink-0 text-ink-soft/60" />
                         <span>{user.phone}</span>
                       </div>
                     )}
                   </div>
 
                   {/* Stats row */}
-                  <div className="bg-[#FFFBF0] rounded-lg p-3 mb-4">
+                  <div className="bg-canvas rounded-lg p-3 mb-4">
                     <div className="grid grid-cols-3 gap-2 text-center">
                       <div>
-                        <p className="text-lg font-semibold text-[#6B3A5B]">
+                        <p className="text-lg font-semibold text-plum">
                           {user.candidatesWomenCount}
                         </p>
-                        <p className="text-xs text-[#4B5563]">Fiches femmes</p>
+                        <p className="text-xs text-ink-soft">Fiches femmes</p>
                       </div>
                       <div>
-                        <p className="text-lg font-semibold text-[#87A878]">
+                        <p className="text-lg font-semibold text-sage">
                           {user.candidatesMenCount}
                         </p>
-                        <p className="text-xs text-[#4B5563]">Fiches hommes</p>
+                        <p className="text-xs text-ink-soft">Fiches hommes</p>
                       </div>
                       <div>
-                        <p className="text-lg font-semibold text-[#C5A55A]">
+                        <p className="text-lg font-semibold text-gold">
                           {user.activeProposalsCount}
                         </p>
-                        <p className="text-xs text-[#4B5563]">Propositions</p>
+                        <p className="text-xs text-ink-soft">Propositions</p>
                       </div>
                     </div>
                   </div>
@@ -338,7 +338,7 @@ export default function ChadkhaniotPage() {
                   <div className="flex flex-col gap-2">
                     <Link
                       href={`/candidates?created_by=${user.id}`}
-                      className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border border-[#E8E0D4] bg-white text-[#2D2D2D] hover:bg-gray-50 transition-colors"
+                      className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border border-line bg-surface text-ink hover:bg-stone-50 transition-colors"
                     >
                       <FileText className="h-4 w-4" />
                       Voir ses fiches
@@ -359,7 +359,7 @@ export default function ChadkhaniotPage() {
                             Changer le role
                           </Button>
                         ) : (
-                          <div className="border border-[#E8E0D4] rounded-lg p-3 bg-[#FFFBF0]">
+                          <div className="border border-line rounded-lg p-3 bg-canvas">
                             <Select
                               label="Nouveau role"
                               options={ROLE_OPTIONS_WITH_ADMIN}
@@ -395,7 +395,7 @@ export default function ChadkhaniotPage() {
 
                   {/* Last login */}
                   {user.last_login_at && (
-                    <p className="text-xs text-[#4B5563]/60 mt-3 pt-3 border-t border-[#E8E0D4]">
+                    <p className="text-xs text-ink-soft/60 mt-3 pt-3 border-t border-line">
                       Derniere connexion : {formatDate(user.last_login_at)}
                     </p>
                   )}
@@ -407,16 +407,16 @@ export default function ChadkhaniotPage() {
 
         {/* Admin section: Invite new chadkhanit */}
         {isAdmin && (
-          <div className="bg-white rounded-xl border border-[#E8E0D4] p-6">
+          <div className="bg-surface rounded-[14px] border border-line p-6">
             <div className="flex items-center gap-3 mb-6">
-              <div className="flex items-center justify-center h-10 w-10 rounded-full bg-[#C5A55A]/10">
-                <UserPlus className="h-5 w-5 text-[#C5A55A]" />
+              <div className="flex items-center justify-center h-10 w-10 rounded-full bg-gold/10">
+                <UserPlus className="h-5 w-5 text-gold" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-[#2D2D2D]">
+                <h2 className="font-display text-[22px] font-semibold text-ink">
                   Inviter une nouvelle chadkhanit
                 </h2>
-                <p className="text-sm text-[#4B5563]">
+                <p className="text-sm text-ink-soft">
                   L&apos;invitation sera valable 7 jours.
                 </p>
               </div>
@@ -460,18 +460,18 @@ export default function ChadkhaniotPage() {
 
             {/* Success message */}
             {inviteSuccess && (
-              <div className="mt-4 bg-[#87A878]/10 border border-[#87A878]/20 rounded-lg p-4">
+              <div className="mt-4 bg-sage/10 border border-sage/20 rounded-lg p-4">
                 <div className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-[#87A878] shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-sage shrink-0 mt-0.5" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[#5A7A4A] mb-1">
+                    <p className="text-sm font-medium text-sage-deep mb-1">
                       Invitation creee avec succes !
                     </p>
-                    <p className="text-sm text-[#4B5563] mb-2">
+                    <p className="text-sm text-ink-soft mb-2">
                       Partagez ce lien avec la personne invitee :
                     </p>
-                    <div className="bg-white rounded-lg border border-[#E8E0D4] p-3 flex items-center gap-2">
-                      <code className="text-xs text-[#2D2D2D] flex-1 break-all">
+                    <div className="bg-surface rounded-lg border border-line p-3 flex items-center gap-2">
+                      <code className="text-xs text-ink flex-1 break-all">
                         {inviteSuccess}
                       </code>
                       <Button
