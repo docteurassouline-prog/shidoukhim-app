@@ -1,38 +1,95 @@
 @import "tailwindcss";
 
+/* ------------------------------------------------------------------
+   Design tokens — « premium sobre »
+   Palette : ivoire chaud, encre, prune profonde, sauge, or discret.
+   ------------------------------------------------------------------ */
 @theme inline {
-  --color-ivory: #FFFBF0;
-  --color-ivory-dark: #F5EFE3;
-  --color-sage: #87A878;
-  --color-sage-hover: #6B8C5E;
-  --color-sage-light: #E8F0E4;
-  --color-plum: #6B3A5B;
-  --color-plum-light: #F0E4EC;
-  --color-plum-hover: #5A2E4B;
-  --color-gold: #C5A55A;
-  --color-gold-light: #F5EDD4;
-  --color-warm-border: #E8E0D4;
-  --color-warm-gray: #9B9284;
-  --color-danger: #C45B5B;
-  --color-danger-light: #F5E4E4;
-  --color-text-primary: #2D2D2D;
-  --color-text-secondary: #6B7280;
-  --color-text-muted: #9CA3AF;
+  /* Surfaces */
+  --color-canvas: #F6F3ED;
+  --color-canvas-deep: #EFEAE1;
+  --color-surface: #FFFFFF;
+  --color-surface-muted: #FBF9F5;
+  --color-line: #E7E1D6;
+  --color-line-strong: #D8CFC0;
+
+  /* Texte */
+  --color-ink: #1F1B1E;
+  --color-ink-soft: #5F5A5E;
+  --color-ink-muted: #948D91;
+
+  /* Prune — identité */
+  --color-plum: #5E3350;
+  --color-plum-hover: #4B2840;
+  --color-plum-light: #F3EAF0;
+  --color-plum-deep: #3E1F35;
+
+  /* Sauge — succès, secondaire */
+  --color-sage: #7A9A6C;
+  --color-sage-hover: #64825A;
+  --color-sage-light: #EAF0E5;
+  --color-sage-deep: #4F6B43;
+
+  /* Or — accent rare */
+  --color-gold: #B8974E;
+  --color-gold-light: #F4ECD8;
+  --color-gold-deep: #7A6230;
+
+  /* Danger */
+  --color-danger: #B5484A;
+  --color-danger-light: #F8E7E7;
+  --color-danger-deep: #9A3B3D;
+
+  /* Compatibilité avec les anciens noms de tokens */
+  --color-ivory: #F6F3ED;
+  --color-ivory-dark: #EFEAE1;
+  --color-warm-border: #E7E1D6;
+  --color-warm-gray: #948D91;
+  --color-text-primary: #1F1B1E;
+  --color-text-secondary: #5F5A5E;
+  --color-text-muted: #948D91;
   --color-card: #FFFFFF;
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  --font-sans: var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
+
+  --shadow-card: 0 1px 2px rgba(31, 27, 30, 0.04), 0 1px 3px rgba(31, 27, 30, 0.03);
+  --shadow-card-hover: 0 2px 6px rgba(31, 27, 30, 0.06), 0 8px 24px rgba(31, 27, 30, 0.06);
+  --shadow-float: 0 12px 40px rgba(31, 27, 30, 0.14), 0 2px 8px rgba(31, 27, 30, 0.06);
+
+  --radius-card: 14px;
+}
+
+html {
+  background: var(--color-canvas);
 }
 
 body {
-  background: var(--color-ivory);
-  color: var(--color-text-primary);
+  background: var(--color-canvas);
+  color: var(--color-ink);
   font-family: var(--font-sans);
+  font-size: 14.5px;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Titres de page : serif élégant */
+h1 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.font-display {
+  font-family: var(--font-display);
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-warm-border) transparent;
+  scrollbar-color: var(--color-line-strong) transparent;
 }
 
 ::selection {
@@ -40,9 +97,37 @@ body {
   color: var(--color-plum);
 }
 
+/* Focus cohérent et discret */
 input:focus, select:focus, textarea:focus {
   outline: none;
-  box-shadow: 0 0 0 2px var(--color-sage-light), 0 0 0 3px var(--color-sage);
+  border-color: var(--color-plum) !important;
+  box-shadow: 0 0 0 3px rgba(94, 51, 80, 0.12);
+}
+
+/* Cartes : élévation douce au survol */
+.card-hover {
+  transition: box-shadow 200ms ease, transform 200ms ease, border-color 200ms ease;
+}
+.card-hover:hover {
+  box-shadow: var(--shadow-card-hover);
+  border-color: var(--color-line-strong);
+  transform: translateY(-1px);
+}
+
+/* Tableaux */
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+thead th {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+tbody tr {
+  transition: background-color 120ms ease;
 }
 
 @keyframes fadeIn {
@@ -70,4 +155,11 @@ input:focus, select:focus, textarea:focus {
 
 .animate-spin-slow {
   animation: spin 1.2s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

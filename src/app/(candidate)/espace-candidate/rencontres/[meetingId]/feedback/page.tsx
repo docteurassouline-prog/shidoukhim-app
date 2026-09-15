@@ -252,10 +252,10 @@ export default function FeedbackPage(props: {
   if (accessError) {
     return (
       <div className="text-center py-16 space-y-3">
-        <p className="text-[#C45B5B] font-medium">{accessError}</p>
+        <p className="text-danger font-medium">{accessError}</p>
         <Link
           href="/espace-candidate/rencontres"
-          className="inline-flex items-center gap-1.5 text-sm text-[#6B3A5B] hover:underline"
+          className="inline-flex items-center gap-1.5 text-sm text-plum hover:underline"
         >
           <ArrowLeft className="h-4 w-4" />
           Retour aux rencontres
@@ -268,16 +268,16 @@ export default function FeedbackPage(props: {
   if (submitted) {
     return (
       <div className="text-center py-16 space-y-4">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#87A878]/15">
-          <CheckCircle2 className="w-8 h-8 text-[#87A878]" />
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-sage/15">
+          <CheckCircle2 className="w-8 h-8 text-sage" />
         </div>
-        <h2 className="text-xl font-semibold text-[#2D2D2D]">
+        <h2 className="font-display text-[24px] font-semibold text-ink">
           Merci pour votre retour !
         </h2>
-        <p className="text-sm text-[#6B7280]">
+        <p className="text-sm text-ink-soft">
           Votre avis a bien ete enregistre. Hava le prendra en compte pour la suite.
         </p>
-        <p className="text-xs text-[#9CA3AF]">
+        <p className="text-xs text-ink-muted">
           Redirection en cours...
         </p>
       </div>
@@ -292,7 +292,7 @@ export default function FeedbackPage(props: {
       {/* Back link */}
       <Link
         href="/espace-candidate/rencontres"
-        className="inline-flex items-center gap-1.5 text-sm text-[#6B3A5B] hover:text-[#5A2E4D] transition-colors"
+        className="inline-flex items-center gap-1.5 text-sm text-plum hover:text-plum-hover transition-colors"
       >
         <ArrowLeft className="h-4 w-4" />
         Retour aux rencontres
@@ -300,11 +300,11 @@ export default function FeedbackPage(props: {
 
       {/* Title */}
       <div>
-        <h1 className="text-2xl font-bold text-[#6B3A5B] flex items-center gap-2">
+        <h1 className="text-[30px] font-semibold text-plum flex items-center gap-2">
           <MessageCircleHeart className="h-6 w-6" />
           {isReadOnly ? 'Mon retour' : 'Donner mon avis'}
         </h1>
-        <p className="text-sm text-[#6B7280] mt-1">
+        <p className="text-sm text-ink-soft mt-1">
           {isReadOnly
             ? 'Voici le retour que vous avez partage. Il est transmis a votre chadkhanit.'
             : 'Partagez votre ressenti en toute confidentialite. Seule votre chadkhanit y aura acces.'}
@@ -313,8 +313,8 @@ export default function FeedbackPage(props: {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* ---- Ce qui m'a plu ---- */}
-        <fieldset className="bg-white rounded-xl border border-[#E8E0D4] p-5 space-y-4">
-          <legend className="text-base font-semibold text-[#87A878] px-1">
+        <fieldset className="bg-surface rounded-[14px] border border-line p-5 space-y-4">
+          <legend className="text-base font-semibold text-sage px-1">
             Ce qui m&apos;a plu
           </legend>
 
@@ -364,7 +364,7 @@ export default function FeedbackPage(props: {
           </div>
 
           <div>
-            <label className="block text-sm text-[#6B7280] mb-1">
+            <label className="block text-sm text-ink-soft mb-1">
               Autre (precisez)
             </label>
             <input
@@ -373,16 +373,16 @@ export default function FeedbackPage(props: {
               onChange={(e) => updateText('liked_other', e.target.value)}
               disabled={isReadOnly}
               placeholder="Ex : sa culture, sa douceur..."
-              className="w-full px-3 py-2 rounded-lg border border-[#E8E0D4] text-sm text-[#2D2D2D]
-                         placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#87A878]
-                         disabled:bg-[#F9F7F3] disabled:cursor-not-allowed"
+              className="w-full px-3 py-2 rounded-lg border border-line text-sm text-ink
+                         placeholder-ink-muted focus:outline-none focus:ring-2 focus:ring-sage
+                         disabled:bg-surface-muted disabled:cursor-not-allowed"
             />
           </div>
         </fieldset>
 
         {/* ---- Ce qui n'a pas fonctionne ---- */}
-        <fieldset className="bg-white rounded-xl border border-[#E8E0D4] p-5 space-y-4">
-          <legend className="text-base font-semibold text-[#C45B5B] px-1">
+        <fieldset className="bg-surface rounded-[14px] border border-line p-5 space-y-4">
+          <legend className="text-base font-semibold text-danger px-1">
             Ce qui n&apos;a pas fonctionne
           </legend>
 
@@ -425,7 +425,7 @@ export default function FeedbackPage(props: {
           </div>
 
           <div>
-            <label className="block text-sm text-[#6B7280] mb-1">
+            <label className="block text-sm text-ink-soft mb-1">
               Autre (precisez)
             </label>
             <input
@@ -434,16 +434,16 @@ export default function FeedbackPage(props: {
               onChange={(e) => updateText('issue_other', e.target.value)}
               disabled={isReadOnly}
               placeholder="Ex : trop timide, pas assez mature..."
-              className="w-full px-3 py-2 rounded-lg border border-[#E8E0D4] text-sm text-[#2D2D2D]
-                         placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#87A878]
-                         disabled:bg-[#F9F7F3] disabled:cursor-not-allowed"
+              className="w-full px-3 py-2 rounded-lg border border-line text-sm text-ink
+                         placeholder-ink-muted focus:outline-none focus:ring-2 focus:ring-sage
+                         disabled:bg-surface-muted disabled:cursor-not-allowed"
             />
           </div>
         </fieldset>
 
         {/* ---- Impression generale ---- */}
-        <fieldset className="bg-white rounded-xl border border-[#E8E0D4] p-5 space-y-3">
-          <legend className="text-base font-semibold text-[#6B3A5B] px-1">
+        <fieldset className="bg-surface rounded-[14px] border border-line p-5 space-y-3">
+          <legend className="text-base font-semibold text-plum px-1">
             Impression generale
           </legend>
           <textarea
@@ -452,15 +452,15 @@ export default function FeedbackPage(props: {
             disabled={isReadOnly}
             rows={3}
             placeholder="Comment avez-vous vecu cette rencontre ? Qu'avez-vous ressenti ?"
-            className="w-full px-3 py-2 rounded-lg border border-[#E8E0D4] text-sm text-[#2D2D2D]
-                       placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#87A878]
-                       resize-none disabled:bg-[#F9F7F3] disabled:cursor-not-allowed"
+            className="w-full px-3 py-2 rounded-lg border border-line text-sm text-ink
+                       placeholder-ink-muted focus:outline-none focus:ring-2 focus:ring-sage
+                       resize-none disabled:bg-surface-muted disabled:cursor-not-allowed"
           />
         </fieldset>
 
         {/* ---- Prochaine rencontre ---- */}
-        <fieldset className="bg-white rounded-xl border border-[#E8E0D4] p-5 space-y-3">
-          <legend className="text-base font-semibold text-[#6B3A5B] px-1">
+        <fieldset className="bg-surface rounded-[14px] border border-line p-5 space-y-3">
+          <legend className="text-base font-semibold text-plum px-1">
             Souhaitez-vous une prochaine rencontre ?
           </legend>
           <div className="flex flex-wrap gap-3">
@@ -474,8 +474,8 @@ export default function FeedbackPage(props: {
                 className={[
                   'flex items-center gap-2 px-4 py-2.5 rounded-lg border text-sm font-medium cursor-pointer transition-all',
                   feedback.wants_next_meeting === option.value
-                    ? 'border-[#6B3A5B] bg-[#6B3A5B]/5 text-[#6B3A5B] ring-1 ring-[#6B3A5B]'
-                    : 'border-[#E8E0D4] text-[#6B7280] hover:border-[#C5A55A] hover:text-[#2D2D2D]',
+                    ? 'border-plum bg-plum/5 text-plum ring-1 ring-plum'
+                    : 'border-line text-ink-soft hover:border-gold hover:text-ink',
                   isReadOnly ? 'cursor-not-allowed opacity-75' : '',
                 ].join(' ')}
               >
@@ -496,8 +496,8 @@ export default function FeedbackPage(props: {
         </fieldset>
 
         {/* ---- Commentaires supplementaires ---- */}
-        <fieldset className="bg-white rounded-xl border border-[#E8E0D4] p-5 space-y-3">
-          <legend className="text-base font-semibold text-[#6B3A5B] px-1">
+        <fieldset className="bg-surface rounded-[14px] border border-line p-5 space-y-3">
+          <legend className="text-base font-semibold text-plum px-1">
             Commentaires supplementaires
           </legend>
           <textarea
@@ -506,15 +506,15 @@ export default function FeedbackPage(props: {
             disabled={isReadOnly}
             rows={3}
             placeholder="Tout ce que vous aimeriez ajouter pour aider votre chadkhanit..."
-            className="w-full px-3 py-2 rounded-lg border border-[#E8E0D4] text-sm text-[#2D2D2D]
-                       placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#87A878]
-                       resize-none disabled:bg-[#F9F7F3] disabled:cursor-not-allowed"
+            className="w-full px-3 py-2 rounded-lg border border-line text-sm text-ink
+                       placeholder-ink-muted focus:outline-none focus:ring-2 focus:ring-sage
+                       resize-none disabled:bg-surface-muted disabled:cursor-not-allowed"
           />
         </fieldset>
 
         {/* ---- Submit / Error ---- */}
         {error && (
-          <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-[#C45B5B]">
+          <div className="p-3 rounded-lg bg-danger-light border border-danger/25 text-sm text-danger">
             {error}
           </div>
         )}
@@ -525,8 +525,8 @@ export default function FeedbackPage(props: {
               type="submit"
               disabled={submitting}
               className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg
-                         bg-[#6B3A5B] text-white text-sm font-medium shadow-sm
-                         hover:bg-[#5A2E4D] transition-colors
+                         bg-plum text-white text-sm font-medium shadow-card
+                         hover:bg-plum-hover transition-colors
                          disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {submitting ? (
@@ -545,8 +545,8 @@ export default function FeedbackPage(props: {
         )}
 
         {isReadOnly && (
-          <div className="p-4 rounded-lg bg-[#87A878]/10 border border-[#87A878]/20 text-center">
-            <p className="text-sm text-[#4A7A3B] font-medium">
+          <div className="p-4 rounded-lg bg-sage/10 border border-sage/20 text-center">
+            <p className="text-sm text-sage-deep font-medium">
               Votre retour a deja ete envoye. Merci !
             </p>
           </div>
@@ -573,16 +573,16 @@ function CheckboxItem({
   disabled: boolean
   color: 'sage' | 'rose'
 }) {
-  const borderChecked = color === 'sage' ? 'border-[#87A878]' : 'border-[#C45B5B]'
-  const bgChecked = color === 'sage' ? 'bg-[#87A878]/10' : 'bg-red-50'
-  const checkColor = color === 'sage' ? 'text-[#87A878]' : 'text-[#C45B5B]'
+  const borderChecked = color === 'sage' ? 'border-sage' : 'border-danger'
+  const bgChecked = color === 'sage' ? 'bg-sage/10' : 'bg-danger-light'
+  const checkColor = color === 'sage' ? 'text-sage' : 'text-danger'
 
   return (
     <label
       className={[
         'flex items-center gap-2.5 px-3 py-2.5 rounded-lg border text-sm cursor-pointer transition-all',
-        checked ? `${borderChecked} ${bgChecked}` : 'border-[#E8E0D4]',
-        disabled ? 'cursor-not-allowed opacity-75' : 'hover:border-[#C5A55A]',
+        checked ? `${borderChecked} ${bgChecked}` : 'border-line',
+        disabled ? 'cursor-not-allowed opacity-75' : 'hover:border-gold',
       ].join(' ')}
     >
       <input
@@ -597,7 +597,7 @@ function CheckboxItem({
           'flex items-center justify-center w-5 h-5 rounded border-2 flex-shrink-0 transition-colors',
           checked
             ? `${borderChecked} ${bgChecked}`
-            : 'border-[#D1D5DB]',
+            : 'border-line-strong',
         ].join(' ')}
       >
         {checked && (
@@ -616,7 +616,7 @@ function CheckboxItem({
           </svg>
         )}
       </span>
-      <span className="text-[#2D2D2D]">{label}</span>
+      <span className="text-ink">{label}</span>
     </label>
   )
 }

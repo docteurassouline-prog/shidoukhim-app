@@ -744,22 +744,22 @@ export default function NewCandidatePage() {
 
     return (
       <div className="space-y-6">
-        <div className="bg-[#87A878]/5 rounded-lg p-4 border border-[#87A878]/20">
-          <p className="text-sm text-[#5A7A4A] font-medium">
+        <div className="bg-sage/5 rounded-lg p-4 border border-sage/20">
+          <p className="text-sm text-sage-deep font-medium">
             Vérifiez les informations avant de soumettre la fiche.
           </p>
         </div>
 
         {summaryFields.map((section) => (
           <div key={section.section}>
-            <h3 className="text-sm font-semibold text-[#6B7280] uppercase tracking-wider mb-2">
+            <h3 className="text-sm font-semibold text-ink-soft uppercase tracking-wider mb-2">
               {section.section}
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1">
               {section.items.map((item) => (
                 <div key={item.label} className="py-1.5">
-                  <span className="text-xs text-[#6B7280]">{item.label}</span>
-                  <p className={`text-sm ${item.value === nr ? 'text-[#6B7280]/50 italic' : 'text-[#2D2D2D]'}`}>
+                  <span className="text-xs text-ink-soft">{item.label}</span>
+                  <p className={`text-sm ${item.value === nr ? 'text-ink-soft/50 italic' : 'text-ink'}`}>
                     {item.value}
                   </p>
                 </div>
@@ -778,13 +778,13 @@ export default function NewCandidatePage() {
       {/* Retour */}
       <Link
         href="/candidates"
-        className="inline-flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-[#2D2D2D] transition-colors"
+        className="inline-flex items-center gap-1.5 text-sm text-ink-soft hover:text-ink transition-colors"
       >
         <ArrowLeft className="h-4 w-4" />
         Retour a la liste
       </Link>
 
-      <h1 className="text-2xl font-bold text-[#2D2D2D]">Nouvelle fiche candidate</h1>
+      <h1 className="text-[30px] font-semibold text-ink">Nouvelle fiche candidate</h1>
 
       {/* Progress bar */}
       <div className="flex items-center gap-1">
@@ -803,20 +803,20 @@ export default function NewCandidatePage() {
                 }}
                 className={`flex items-center gap-2 text-xs font-medium transition-colors ${
                   isActive
-                    ? 'text-[#6B3A5B]'
+                    ? 'text-plum'
                     : isCompleted
-                      ? 'text-[#87A878]'
-                      : 'text-[#6B7280]/50'
+                      ? 'text-sage'
+                      : 'text-ink-soft/50'
                 }`}
                 title={step.label}
               >
                 <div
                   className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 text-sm font-medium ${
                     isActive
-                      ? 'bg-[#6B3A5B] text-white'
+                      ? 'bg-plum text-white'
                       : isCompleted
-                        ? 'bg-[#87A878] text-white'
-                        : 'bg-gray-100 text-[#6B7280]'
+                        ? 'bg-sage text-white'
+                        : 'bg-stone-100 text-ink-soft'
                   }`}
                 >
                   {isCompleted ? <Check className="h-4 w-4" /> : <StepIcon className="h-4 w-4" />}
@@ -826,7 +826,7 @@ export default function NewCandidatePage() {
               {i < STEPS.length - 1 && (
                 <div
                   className={`flex-1 h-0.5 mx-2 rounded ${
-                    isCompleted ? 'bg-[#87A878]' : 'bg-gray-200'
+                    isCompleted ? 'bg-sage' : 'bg-stone-200'
                   }`}
                 />
               )}
@@ -838,7 +838,7 @@ export default function NewCandidatePage() {
       {/* Step content */}
       <Card>
         <div className="mb-4">
-          <h2 className="text-lg font-semibold text-[#2D2D2D]">
+          <h2 className="font-display text-[22px] font-semibold text-ink">
             {STEPS[currentStep].label}
           </h2>
         </div>

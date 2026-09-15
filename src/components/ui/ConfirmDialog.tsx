@@ -51,19 +51,19 @@ export default function ConfirmDialog({
         <div
           className={[
             'shrink-0 flex items-center justify-center h-12 w-12 rounded-full',
-            variant === 'danger' ? 'bg-[#C45B5B]/10' : 'bg-[#C5A55A]/10',
+            variant === 'danger' ? 'bg-danger-light' : 'bg-gold-light',
           ].join(' ')}
         >
           <AlertTriangle
             className={[
               'h-6 w-6',
-              variant === 'danger' ? 'text-[#C45B5B]' : 'text-[#C5A55A]',
+              variant === 'danger' ? 'text-danger' : 'text-gold-deep',
             ].join(' ')}
           />
         </div>
         <div>
-          <h3 className="text-base font-semibold text-[#2D2D2D] mb-1">{title}</h3>
-          <p className="text-sm text-[#6B7280]">{message}</p>
+          <h3 className="text-base font-semibold text-ink mb-1">{title}</h3>
+          <p className="text-sm text-ink-soft">{message}</p>
         </div>
       </div>
     </Modal>

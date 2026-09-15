@@ -56,16 +56,16 @@ function getRoleLabel(role: string | null): string {
 function getRoleBadgeClass(role: string | null): string {
   switch (role) {
     case 'rabbin':
-      return 'bg-purple-100 text-purple-800 border-purple-200'
+      return 'bg-plum-light text-plum border-plum/20'
     case 'responsable_communautaire':
-      return 'bg-blue-100 text-blue-800 border-blue-200'
+      return 'bg-plum-light text-plum border-plum/20'
     case 'enseignant':
-      return 'bg-[#87A878]/15 text-[#5A7A4A] border-[#87A878]/30'
+      return 'bg-sage/15 text-sage-deep border-sage/30'
     case 'ami':
     case 'proche':
-      return 'bg-amber-100 text-amber-800 border-amber-200'
+      return 'bg-gold-light text-gold-deep border-gold/30'
     default:
-      return 'bg-gray-100 text-gray-600 border-gray-200'
+      return 'bg-stone-100 text-stone-600 border-stone-200'
   }
 }
 
@@ -220,7 +220,7 @@ export default function ContactsPage() {
         // Fetch references where this contact is referenced
         const { data: refs } = await supabase
           .from('candidate_references')
-          .select('id, candidate_id, candidate_type, reference_name, relationship')
+          .select('id, candidate_id, candidate_man_id, role, relationship_context')
           .eq('contact_id', contactId)
 
         if (!refs || refs.length === 0) {
@@ -234,12 +234,14 @@ export default function ContactsPage() {
         for (const ref of refs) {
           let candidateFirstName: string | null = null
           let candidateLastName: string | null = null
+          const candidateType: 'woman' | 'man' = ref.candidate_man_id ? 'man' : 'woman'
+          const candidateId: string = ref.candidate_man_id ?? ref.candidate_id
 
-          if (ref.candidate_type === 'woman') {
+          if (candidateType === 'woman') {
             const { data: cand } = await supabase
               .from('candidates')
               .select('first_name, last_name')
-              .eq('id', ref.candidate_id)
+              .eq('id', candidateId)
               .single()
             if (cand) {
               candidateFirstName = cand.first_name
@@ -249,7 +251,7 @@ export default function ContactsPage() {
             const { data: cand } = await supabase
               .from('candidates_men')
               .select('first_name, last_name')
-              .eq('id', ref.candidate_id)
+              .eq('id', candidateId)
               .single()
             if (cand) {
               candidateFirstName = cand.first_name
@@ -259,10 +261,10 @@ export default function ContactsPage() {
 
           results.push({
             id: ref.id,
-            reference_name: ref.reference_name,
-            candidate_type: ref.candidate_type,
-            relationship: ref.relationship,
-            candidate_id: ref.candidate_id,
+            reference_name: ref.role ?? 'Référence',
+            candidate_type: candidateType,
+            relationship: ref.relationship_context,
+            candidate_id: candidateId,
             candidate_first_name: candidateFirstName,
             candidate_last_name: candidateLastName,
           })
@@ -430,11 +432,11 @@ export default function ContactsPage() {
   if (error) {
     return (
       <div className="min-h-[40vh] flex flex-col items-center justify-center gap-4 px-4">
-        <div className="flex items-center gap-2 text-[#C45B5B]">
+        <div className="flex items-center gap-2 text-danger">
           <AlertTriangle className="h-6 w-6" />
           <p className="text-lg font-medium">Erreur</p>
         </div>
-        <p className="text-sm text-[#6B7280] text-center max-w-md">{error}</p>
+        <p className="text-sm text-ink-soft text-center max-w-md">{error}</p>
         <Button variant="secondary" onClick={fetchContacts}>
           Reessayer
         </Button>
@@ -447,8 +449,8 @@ export default function ContactsPage() {
       {/* ---- Header ---- */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#2D2D2D]">Contacts</h1>
-          <p className="text-sm text-[#6B7280] mt-1">
+          <h1 className="text-[30px] font-semibold text-ink">Contacts</h1>
+          <p className="text-sm text-ink-soft mt-1">
             {contacts.length} contact{contacts.length !== 1 ? 's' : ''} au total
           </p>
         </div>
@@ -481,7 +483,7 @@ export default function ContactsPage() {
 
       {/* ---- Results info ---- */}
       {(search || roleFilter) && (
-        <p className="text-sm text-[#6B7280]">
+        <p className="text-sm text-ink-soft">
           {filteredContacts.length} resultat{filteredContacts.length !== 1 ? 's' : ''}
           {search && ` pour "${search}"`}
           {roleFilter && ` (${getRoleLabel(roleFilter)})`}
@@ -510,30 +512,30 @@ export default function ContactsPage() {
               <div
                 key={contact.id}
                 className={cn(
-                  'bg-white rounded-xl border border-[#E8E0D4] overflow-hidden transition-shadow duration-200',
-                  isExpanded && 'ring-2 ring-[#87A878]/40 shadow-md md:col-span-2 xl:col-span-3'
+                  'bg-surface rounded-[14px] border border-line overflow-hidden transition-shadow duration-200',
+                  isExpanded && 'ring-2 ring-sage/40 shadow-card-hover md:col-span-2 xl:col-span-3'
                 )}
               >
                 {/* Card header - clickable */}
                 <button
                   type="button"
-                  className="w-full text-left p-4 hover:bg-[#FFFBF0]/60 transition-colors"
+                  className="w-full text-left p-4 hover:bg-canvas/60 transition-colors"
                   onClick={() => handleToggleExpand(contact.id)}
                   aria-expanded={isExpanded}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
                       {/* Avatar circle */}
-                      <div className="flex-shrink-0 h-10 w-10 rounded-full bg-[#87A878]/10 flex items-center justify-center">
-                        <User className="h-5 w-5 text-[#87A878]" />
+                      <div className="flex-shrink-0 h-10 w-10 rounded-full bg-sage/10 flex items-center justify-center">
+                        <User className="h-5 w-5 text-sage" />
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <h3 className="font-semibold text-[#2D2D2D] truncate">
+                          <h3 className="font-semibold text-ink truncate">
                             {contact.first_name} {contact.last_name}
                           </h3>
                           {contact.is_reference && (
-                            <Star className="h-4 w-4 text-[#C5A55A] fill-[#C5A55A] flex-shrink-0" />
+                            <Star className="h-4 w-4 text-gold fill-gold flex-shrink-0" />
                           )}
                         </div>
                         <Badge variant="default" className={getRoleBadgeClass(contact.role)}>
@@ -541,7 +543,7 @@ export default function ContactsPage() {
                         </Badge>
                       </div>
                     </div>
-                    <div className="flex-shrink-0 text-[#6B7280]">
+                    <div className="flex-shrink-0 text-ink-soft">
                       {isExpanded ? (
                         <ChevronUp className="h-5 w-5" />
                       ) : (
@@ -551,7 +553,7 @@ export default function ContactsPage() {
                   </div>
 
                   {/* Quick info */}
-                  <div className="mt-3 flex flex-col gap-1 text-sm text-[#6B7280]">
+                  <div className="mt-3 flex flex-col gap-1 text-sm text-ink-soft">
                     {contact.phone && (
                       <span className="flex items-center gap-1.5">
                         <Phone className="h-3.5 w-3.5 flex-shrink-0" />
@@ -568,7 +570,7 @@ export default function ContactsPage() {
 
                   {/* Notes preview */}
                   {contact.notes && !isExpanded && (
-                    <p className="mt-2 text-xs text-[#6B7280] line-clamp-2">
+                    <p className="mt-2 text-xs text-ink-soft line-clamp-2">
                       {contact.notes}
                     </p>
                   )}
@@ -576,26 +578,26 @@ export default function ContactsPage() {
 
                 {/* ---- Expanded detail panel ---- */}
                 {isExpanded && (
-                  <div className="border-t border-[#E8E0D4] p-4 space-y-5 bg-[#FFFBF0]/30">
+                  <div className="border-t border-line p-4 space-y-5 bg-canvas/30">
                     {/* Full contact info */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                       <div>
-                        <span className="font-medium text-[#2D2D2D]">Nom complet</span>
-                        <p className="text-[#6B7280]">
+                        <span className="font-medium text-ink">Nom complet</span>
+                        <p className="text-ink-soft">
                           {contact.first_name} {contact.last_name}
                         </p>
                       </div>
                       <div>
-                        <span className="font-medium text-[#2D2D2D]">Role</span>
-                        <p className="text-[#6B7280]">{getRoleLabel(contact.role)}</p>
+                        <span className="font-medium text-ink">Role</span>
+                        <p className="text-ink-soft">{getRoleLabel(contact.role)}</p>
                       </div>
                       {contact.phone && (
                         <div>
-                          <span className="font-medium text-[#2D2D2D]">Telephone</span>
+                          <span className="font-medium text-ink">Telephone</span>
                           <p>
                             <a
                               href={`tel:${contact.phone}`}
-                              className="text-[#87A878] hover:underline"
+                              className="text-sage hover:underline"
                               onClick={(e) => e.stopPropagation()}
                             >
                               {contact.phone}
@@ -605,11 +607,11 @@ export default function ContactsPage() {
                       )}
                       {contact.email && (
                         <div>
-                          <span className="font-medium text-[#2D2D2D]">Email</span>
+                          <span className="font-medium text-ink">Email</span>
                           <p>
                             <a
                               href={`mailto:${contact.email}`}
-                              className="text-[#87A878] hover:underline"
+                              className="text-sage hover:underline"
                               onClick={(e) => e.stopPropagation()}
                             >
                               {contact.email}
@@ -619,31 +621,31 @@ export default function ContactsPage() {
                       )}
                       {contact.relationship_to && (
                         <div>
-                          <span className="font-medium text-[#2D2D2D]">Lien avec un(e) candidat(e)</span>
-                          <p className="text-[#6B7280]">{contact.relationship_to}</p>
+                          <span className="font-medium text-ink">Lien avec un(e) candidat(e)</span>
+                          <p className="text-ink-soft">{contact.relationship_to}</p>
                         </div>
                       )}
                       <div>
-                        <span className="font-medium text-[#2D2D2D]">Reference</span>
-                        <p className="text-[#6B7280]">
+                        <span className="font-medium text-ink">Reference</span>
+                        <p className="text-ink-soft">
                           {contact.is_reference ? 'Oui' : 'Non'}
                         </p>
                       </div>
                       <div>
-                        <span className="font-medium text-[#2D2D2D]">Cree le</span>
-                        <p className="text-[#6B7280]">{formatDate(contact.created_at)}</p>
+                        <span className="font-medium text-ink">Cree le</span>
+                        <p className="text-ink-soft">{formatDate(contact.created_at)}</p>
                       </div>
                       <div>
-                        <span className="font-medium text-[#2D2D2D]">Mis a jour le</span>
-                        <p className="text-[#6B7280]">{formatDate(contact.updated_at)}</p>
+                        <span className="font-medium text-ink">Mis a jour le</span>
+                        <p className="text-ink-soft">{formatDate(contact.updated_at)}</p>
                       </div>
                     </div>
 
                     {/* Notes */}
                     {contact.notes && (
                       <div>
-                        <span className="text-sm font-medium text-[#2D2D2D]">Notes</span>
-                        <p className="mt-1 text-sm text-[#6B7280] whitespace-pre-wrap">
+                        <span className="text-sm font-medium text-ink">Notes</span>
+                        <p className="mt-1 text-sm text-ink-soft whitespace-pre-wrap">
                           {contact.notes}
                         </p>
                       </div>
@@ -651,14 +653,14 @@ export default function ContactsPage() {
 
                     {/* Related candidates */}
                     <div>
-                      <h4 className="text-sm font-medium text-[#2D2D2D] flex items-center gap-2 mb-2">
-                        <Users className="h-4 w-4 text-[#6B3A5B]" />
+                      <h4 className="text-sm font-medium text-ink flex items-center gap-2 mb-2">
+                        <Users className="h-4 w-4 text-plum" />
                         Candidat(e)s lie(e)s
                       </h4>
                       {loadingRelated ? (
                         <LoadingSpinner size="sm" text="Chargement..." />
                       ) : relatedCandidates.length === 0 ? (
-                        <p className="text-sm text-[#6B7280] italic">
+                        <p className="text-sm text-ink-soft italic">
                           Aucun(e) candidat(e) lie(e) a ce contact.
                         </p>
                       ) : (
@@ -666,23 +668,23 @@ export default function ContactsPage() {
                           {relatedCandidates.map((rc) => (
                             <div
                               key={rc.id}
-                              className="flex items-center gap-3 rounded-lg bg-white border border-[#E8E0D4] px-3 py-2 text-sm"
+                              className="flex items-center gap-3 rounded-lg bg-surface border border-line px-3 py-2 text-sm"
                             >
                               <div
                                 className={cn(
                                   'h-2 w-2 rounded-full flex-shrink-0',
                                   rc.candidate_type === 'woman'
-                                    ? 'bg-[#6B3A5B]'
-                                    : 'bg-[#87A878]'
+                                    ? 'bg-plum'
+                                    : 'bg-sage'
                                 )}
                               />
                               <div className="min-w-0 flex-1">
-                                <span className="font-medium text-[#2D2D2D]">
+                                <span className="font-medium text-ink">
                                   {rc.candidate_first_name ?? ''}{' '}
                                   {rc.candidate_last_name ?? ''}
                                 </span>
                                 {rc.relationship && (
-                                  <span className="text-[#6B7280] ml-1">
+                                  <span className="text-ink-soft ml-1">
                                     ({rc.relationship})
                                   </span>
                                 )}
@@ -691,8 +693,8 @@ export default function ContactsPage() {
                                 variant="default"
                                 className={
                                   rc.candidate_type === 'woman'
-                                    ? 'bg-[#6B3A5B]/10 text-[#6B3A5B] border-[#6B3A5B]/20'
-                                    : 'bg-[#87A878]/15 text-[#5A7A4A] border-[#87A878]/30'
+                                    ? 'bg-plum/10 text-plum border-plum/20'
+                                    : 'bg-sage/15 text-sage-deep border-sage/30'
                                 }
                               >
                                 {rc.candidate_type === 'woman' ? 'Femme' : 'Homme'}
@@ -704,7 +706,7 @@ export default function ContactsPage() {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex items-center gap-3 pt-2 border-t border-[#E8E0D4]">
+                    <div className="flex items-center gap-3 pt-2 border-t border-line">
                       <Button
                         variant="secondary"
                         size="sm"
@@ -758,10 +760,10 @@ export default function ContactsPage() {
           />
 
           {/* Modal card */}
-          <div className="relative z-10 w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-xl border border-[#E8E0D4]">
+          <div className="relative z-10 w-full max-w-lg max-h-[90vh] overflow-y-auto bg-surface rounded-2xl shadow-xl border border-line">
             {/* Modal header */}
-            <div className="sticky top-0 bg-white border-b border-[#E8E0D4] px-6 py-4 rounded-t-2xl flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-[#2D2D2D]">
+            <div className="sticky top-0 bg-surface border-b border-line px-6 py-4 rounded-t-2xl flex items-center justify-between">
+              <h2 className="font-display text-[22px] font-semibold text-ink">
                 {editingContact ? 'Modifier le contact' : 'Nouveau contact'}
               </h2>
               <button
@@ -772,7 +774,7 @@ export default function ContactsPage() {
                     setEditingContact(null)
                   }
                 }}
-                className="rounded-lg p-1.5 text-[#6B7280] hover:bg-gray-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#87A878]"
+                className="rounded-lg p-1.5 text-ink-soft hover:bg-stone-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
                 aria-label="Fermer"
               >
                 <X className="h-5 w-5" />
@@ -783,7 +785,7 @@ export default function ContactsPage() {
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               {/* Duplicate warning */}
               {duplicateWarning && (
-                <div className="flex items-start gap-2 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2.5 text-sm text-amber-800">
+                <div className="flex items-start gap-2 rounded-lg bg-gold-light border border-gold/30 px-3 py-2.5 text-sm text-gold-deep">
                   <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
                   <span>{duplicateWarning}</span>
                 </div>
@@ -868,7 +870,7 @@ export default function ContactsPage() {
                     }
                     className="peer sr-only"
                   />
-                  <div className="h-5 w-5 rounded border border-[#E8E0D4] bg-white transition-colors peer-checked:bg-[#87A878] peer-checked:border-[#87A878] peer-focus-visible:ring-2 peer-focus-visible:ring-[#87A878] peer-focus-visible:ring-offset-2 flex items-center justify-center">
+                  <div className="h-5 w-5 rounded border border-line bg-surface transition-colors peer-checked:bg-sage peer-checked:border-sage peer-focus-visible:ring-2 peer-focus-visible:ring-sage peer-focus-visible:ring-offset-2 flex items-center justify-center">
                     <svg
                       className="h-3.5 w-3.5 text-white opacity-0 peer-checked:opacity-100 transition-opacity"
                       fill="none"
@@ -893,10 +895,10 @@ export default function ContactsPage() {
                   )}
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-[#2D2D2D] group-hover:text-[#87A878] transition-colors">
+                  <span className="text-sm font-medium text-ink group-hover:text-sage transition-colors">
                     Personne de reference
                   </span>
-                  <p className="text-xs text-[#6B7280]">
+                  <p className="text-xs text-ink-soft">
                     Ce contact peut etre cite comme reference pour des candidat(e)s
                   </p>
                 </div>
@@ -917,14 +919,14 @@ export default function ContactsPage() {
 
               {/* Form error */}
               {formError && (
-                <div className="flex items-center gap-2 text-sm text-[#C45B5B]">
+                <div className="flex items-center gap-2 text-sm text-danger">
                   <AlertTriangle className="h-4 w-4 flex-shrink-0" />
                   <span>{formError}</span>
                 </div>
               )}
 
               {/* Modal footer */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#E8E0D4]">
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-line">
                 <Button
                   type="button"
                   variant="secondary"

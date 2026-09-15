@@ -79,8 +79,8 @@ const availabilityColumns: CandidateAvailability[] = [
 
 interface CandidateWithAssignment extends Candidate {
   assignments?: Array<{
-    user_id: string
-    is_primary: boolean
+    chadkhanit_id: string | null
+    role: string | null
     user_profiles: { full_name: string } | null
   }>
 }
@@ -171,7 +171,7 @@ export default function CandidatesPage() {
   const totalPages = Math.max(1, Math.ceil(totalCount / PER_PAGE))
 
   function getAssigneeName(c: CandidateWithAssignment): string | null {
-    const primary = c.assignments?.find((a) => a.is_primary)
+    const primary = c.assignments?.find((a) => a.role === 'principale' || a.role === 'primary')
     return primary?.user_profiles?.full_name ?? c.assignments?.[0]?.user_profiles?.full_name ?? null
   }
 
@@ -212,7 +212,7 @@ export default function CandidatesPage() {
           value={cityFilter}
           onChange={(e) => updateParams({ city: e.target.value })}
           placeholder="Ville..."
-          className="w-full sm:w-40 rounded-lg border border-[#E8E0D4] bg-white px-3 py-2 text-sm h-10 placeholder:text-[#6B7280]/60 focus:outline-none focus:ring-2 focus:ring-[#87A878] focus:border-[#87A878]"
+          className="w-full sm:w-40 rounded-lg border border-line bg-surface px-3 py-2 text-sm h-10 placeholder:text-ink-soft/60 focus:outline-none focus:ring-2 focus:ring-sage focus:border-sage"
         />
         {matchmakers.length > 0 && (
           <Select
@@ -234,7 +234,7 @@ export default function CandidatesPage() {
 
     return (
       <div className="flex items-center justify-between pt-4">
-        <p className="text-sm text-[#6B7280]">
+        <p className="text-sm text-ink-soft">
           {totalCount} resultat{totalCount > 1 ? 's' : ''}
         </p>
         <div className="flex items-center gap-2">
@@ -247,7 +247,7 @@ export default function CandidatesPage() {
           >
             Precedent
           </Button>
-          <span className="text-sm text-[#6B7280] px-2">
+          <span className="text-sm text-ink-soft px-2">
             {page} / {totalPages}
           </span>
           <Button
@@ -269,7 +269,7 @@ export default function CandidatesPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {candidates.map((c) => (
           <Link key={c.id} href={`/candidates/${c.id}`}>
-            <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
+            <Card className="card-hover cursor-pointer h-full">
               <div className="flex items-start gap-3">
                 <Avatar
                   src={null}
@@ -277,14 +277,14 @@ export default function CandidatesPage() {
                   size="lg"
                 />
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-semibold text-[#2D2D2D] truncate">
+                  <h3 className="text-sm font-semibold text-ink truncate">
                     {c.first_name} {c.last_name}
                   </h3>
-                  <p className="text-xs text-[#6B7280] mt-0.5">
+                  <p className="text-xs text-ink-soft mt-0.5">
                     {calculateAge(c.date_of_birth, c.age_estimate, c.is_age_estimate)}
                   </p>
                   {c.city && (
-                    <p className="text-xs text-[#6B7280] flex items-center gap-1 mt-0.5">
+                    <p className="text-xs text-ink-soft flex items-center gap-1 mt-0.5">
                       <MapPin className="h-3 w-3" />
                       {c.city}
                     </p>
@@ -311,7 +311,7 @@ export default function CandidatesPage() {
                 </span>
               </div>
 
-              <div className="mt-3 pt-3 border-t border-[#E8E0D4] flex items-center justify-between text-xs text-[#6B7280]">
+              <div className="mt-3 pt-3 border-t border-line flex items-center justify-between text-xs text-ink-soft">
                 {getAssigneeName(c) ? (
                   <span className="flex items-center gap-1 truncate">
                     <User className="h-3 w-3" />
@@ -346,35 +346,35 @@ export default function CandidatesPage() {
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-[#E8E0D4]">
+            <tr className="border-b border-line">
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className="text-left py-3 px-4 text-xs font-medium text-[#6B7280] uppercase tracking-wider"
+                  className="text-left py-3 px-4 text-xs font-medium text-ink-soft uppercase tracking-wider"
                 >
                   <button
                     onClick={() => handleSort(col.key)}
-                    className="flex items-center gap-1 hover:text-[#2D2D2D] transition-colors"
+                    className="flex items-center gap-1 hover:text-ink transition-colors"
                   >
                     {col.label}
                     <ArrowUpDown className={cn(
                       'h-3 w-3',
-                      sortField === col.key ? 'text-[#87A878]' : 'text-[#6B7280]/40'
+                      sortField === col.key ? 'text-sage' : 'text-ink-soft/40'
                     )} />
                   </button>
                 </th>
               ))}
-              <th className="text-left py-3 px-4 text-xs font-medium text-[#6B7280] uppercase tracking-wider">
+              <th className="text-left py-3 px-4 text-xs font-medium text-ink-soft uppercase tracking-wider">
                 Chadkhanit
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#E8E0D4]">
+          <tbody className="divide-y divide-line">
             {candidates.map((c) => (
               <tr
                 key={c.id}
                 onClick={() => router.push(`/candidates/${c.id}`)}
-                className="hover:bg-gray-50/50 cursor-pointer transition-colors"
+                className="hover:bg-stone-50/50 cursor-pointer transition-colors"
               >
                 <td className="py-3 px-4">
                   <div className="flex items-center gap-3">
@@ -383,16 +383,16 @@ export default function CandidatesPage() {
                       name={`${c.first_name} ${c.last_name}`}
                       size="sm"
                     />
-                    <span className="font-medium text-[#2D2D2D]">
+                    <span className="font-medium text-ink">
                       {c.first_name} {c.last_name}
                     </span>
                   </div>
                 </td>
-                <td className="py-3 px-4 text-[#6B7280]">
+                <td className="py-3 px-4 text-ink-soft">
                   {calculateAge(c.date_of_birth, c.age_estimate, c.is_age_estimate)}
                 </td>
-                <td className="py-3 px-4 text-[#6B7280]">
-                  {c.city ?? <span className="italic text-[#6B7280]/50">--</span>}
+                <td className="py-3 px-4 text-ink-soft">
+                  {c.city ?? <span className="italic text-ink-soft/50">--</span>}
                 </td>
                 <td className="py-3 px-4">
                   <span
@@ -414,10 +414,10 @@ export default function CandidatesPage() {
                     {getStatusLabel(c.status)}
                   </span>
                 </td>
-                <td className="py-3 px-4 text-[#6B7280] text-xs">
+                <td className="py-3 px-4 text-ink-soft text-xs">
                   {formatDate(c.updated_at)}
                 </td>
-                <td className="py-3 px-4 text-[#6B7280] text-xs">
+                <td className="py-3 px-4 text-ink-soft text-xs">
                   {getAssigneeName(c) ?? <span className="italic">--</span>}
                 </td>
               </tr>
@@ -438,24 +438,24 @@ export default function CandidatesPage() {
           return (
             <div
               key={avail}
-              className="shrink-0 w-72 bg-gray-50/50 rounded-xl p-3"
+              className="shrink-0 w-72 bg-stone-50/50 rounded-xl p-3"
             >
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold text-[#2D2D2D]">
+                <h3 className="text-sm font-semibold text-ink">
                   {getAvailabilityLabel(avail)}
                 </h3>
-                <span className="text-xs text-[#6B7280] bg-white rounded-full px-2 py-0.5 border border-[#E8E0D4]">
+                <span className="text-xs text-ink-soft bg-surface rounded-full px-2 py-0.5 border border-line">
                   {colCandidates.length}
                 </span>
               </div>
               <div className="space-y-2">
                 {colCandidates.map((c) => (
                   <Link key={c.id} href={`/candidates/${c.id}`}>
-                    <div className="bg-white rounded-lg border border-[#E8E0D4] p-3 hover:shadow-sm transition-shadow cursor-pointer">
-                      <p className="text-sm font-medium text-[#2D2D2D] truncate">
+                    <div className="bg-surface rounded-lg border border-line p-3 hover:shadow-card transition-shadow cursor-pointer">
+                      <p className="text-sm font-medium text-ink truncate">
                         {c.first_name} {c.last_name}
                       </p>
-                      <p className="text-xs text-[#6B7280] mt-0.5">
+                      <p className="text-xs text-ink-soft mt-0.5">
                         {calculateAge(c.date_of_birth, c.age_estimate, c.is_age_estimate)}
                         {c.city && ` - ${c.city}`}
                       </p>
@@ -463,7 +463,7 @@ export default function CandidatesPage() {
                   </Link>
                 ))}
                 {colCandidates.length === 0 && (
-                  <p className="text-xs text-[#6B7280] text-center py-4 italic">
+                  <p className="text-xs text-ink-soft text-center py-4 italic">
                     Aucune candidate
                   </p>
                 )}
@@ -482,14 +482,14 @@ export default function CandidatesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#2D2D2D]">Candidates</h1>
-          <p className="text-sm text-[#6B7280] mt-1">
+          <h1 className="text-[30px] font-semibold text-ink">Candidates</h1>
+          <p className="text-sm text-ink-soft mt-1">
             {totalCount} fiche{totalCount > 1 ? 's' : ''} au total
           </p>
         </div>
         <div className="flex items-center gap-3">
           {/* View toggle */}
-          <div className="flex items-center bg-white border border-[#E8E0D4] rounded-lg p-0.5">
+          <div className="flex items-center bg-surface border border-line rounded-lg p-0.5">
             {(
               [
                 { mode: 'cards' as ViewMode, icon: LayoutGrid, label: 'Cartes' },
@@ -503,8 +503,8 @@ export default function CandidatesPage() {
                 className={cn(
                   'p-2 rounded-md transition-colors',
                   viewMode === mode
-                    ? 'bg-[#87A878]/10 text-[#87A878]'
-                    : 'text-[#6B7280] hover:bg-gray-100'
+                    ? 'bg-sage/10 text-sage'
+                    : 'text-ink-soft hover:bg-stone-100'
                 )}
                 title={label}
                 aria-label={label}
@@ -524,7 +524,7 @@ export default function CandidatesPage() {
       {renderFilters()}
 
       {/* Content */}
-      <Card padding="none" className="overflow-hidden">
+      <Card padding="none" className={viewMode !== 'table' && !loading && candidates.length > 0 ? 'hidden' : 'overflow-hidden'}>
         {loading ? (
           <LoadingSpinner text="Chargement des candidates..." />
         ) : candidates.length === 0 ? (
@@ -547,14 +547,12 @@ export default function CandidatesPage() {
                 : undefined
             }
           />
-        ) : (
-          <div className={viewMode === 'table' ? '' : 'p-4'}>
-            {viewMode === 'cards' && renderCardView()}
-            {viewMode === 'table' && renderTableView()}
-            {viewMode === 'status' && renderStatusView()}
-          </div>
-        )}
+        ) : viewMode === 'table' ? (
+          renderTableView()
+        ) : null}
       </Card>
+      {!loading && candidates.length > 0 && viewMode === 'cards' && renderCardView()}
+      {!loading && candidates.length > 0 && viewMode === 'status' && renderStatusView()}
 
       {/* Pagination */}
       {!loading && candidates.length > 0 && renderPagination()}

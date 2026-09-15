@@ -10,8 +10,8 @@ interface CardProps {
 
 const paddingClasses = {
   none: '',
-  sm: 'p-3',
-  md: 'p-4 sm:p-6',
+  sm: 'p-4',
+  md: 'p-5 sm:p-6',
   lg: 'p-6 sm:p-8',
 }
 
@@ -25,12 +25,12 @@ export default function Card({
   return (
     <div
       className={[
-        'bg-white rounded-xl border border-[#E8E0D4] shadow-sm',
+        'bg-surface rounded-[14px] border border-line shadow-card',
         className,
       ].join(' ')}
     >
       {header && (
-        <div className="px-4 py-3 sm:px-6 sm:py-4 border-b border-[#E8E0D4]">
+        <div className="px-5 py-4 sm:px-6 border-b border-line">
           {header}
         </div>
       )}
@@ -38,7 +38,7 @@ export default function Card({
       <div className={paddingClasses[padding]}>{children}</div>
 
       {footer && (
-        <div className="px-4 py-3 sm:px-6 sm:py-4 border-t border-[#E8E0D4]">
+        <div className="px-5 py-4 sm:px-6 border-t border-line bg-surface-muted/60 rounded-b-[14px]">
           {footer}
         </div>
       )}

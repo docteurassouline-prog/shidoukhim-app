@@ -66,13 +66,13 @@ function FieldRow({ label, value }: DetailField) {
 
   return (
     <div className="py-2">
-      <dt className="text-xs font-medium text-[#6B7280] uppercase tracking-wider">
+      <dt className="text-xs font-medium text-ink-soft uppercase tracking-wider">
         {label}
       </dt>
       <dd
         className={cn(
           'mt-0.5 text-sm',
-          isEmpty ? 'text-[#6B7280]/50 italic' : 'text-[#2D2D2D]'
+          isEmpty ? 'text-ink-soft/50 italic' : 'text-ink'
         )}
       >
         {displayValue}
@@ -190,10 +190,10 @@ function CandidateDetailTabs({
     <>
       {/* Resume */}
       <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-[#2D2D2D]">Resume</h2>
+        <h2 className="font-display text-[22px] font-semibold text-ink">Resume</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card>
-            <h3 className="text-sm font-semibold text-[#6B7280] uppercase tracking-wider mb-3">
+            <h3 className="text-sm font-semibold text-ink-soft uppercase tracking-wider mb-3">
               Informations cles
             </h3>
             <SectionGrid
@@ -208,11 +208,11 @@ function CandidateDetailTabs({
           </Card>
 
           <Card>
-            <h3 className="text-sm font-semibold text-[#6B7280] uppercase tracking-wider mb-3">
+            <h3 className="text-sm font-semibold text-ink-soft uppercase tracking-wider mb-3">
               Note personnelle
             </h3>
-            <p className="text-sm text-[#2D2D2D] whitespace-pre-wrap">
-              {(c.personal_note as string) || <span className="text-[#6B7280]/50 italic">Non renseigné</span>}
+            <p className="text-sm text-ink whitespace-pre-wrap">
+              {(c.personal_note as string) || <span className="text-ink-soft/50 italic">Non renseigné</span>}
             </p>
           </Card>
         </div>
@@ -220,7 +220,7 @@ function CandidateDetailTabs({
 
       {/* Identite */}
       <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-[#2D2D2D]">Identite et contact</h2>
+        <h2 className="font-display text-[22px] font-semibold text-ink">Identite et contact</h2>
         <Card>
           <SectionGrid fields={identityFields} />
         </Card>
@@ -228,7 +228,7 @@ function CandidateDetailTabs({
 
       {/* Famille */}
       <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-[#2D2D2D]">Famille</h2>
+        <h2 className="font-display text-[22px] font-semibold text-ink">Famille</h2>
         <Card>
           <SectionGrid fields={familyFields} />
         </Card>
@@ -236,7 +236,7 @@ function CandidateDetailTabs({
 
       {/* Vie religieuse */}
       <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-[#2D2D2D]">Vie religieuse</h2>
+        <h2 className="font-display text-[22px] font-semibold text-ink">Vie religieuse</h2>
         <Card>
           <SectionGrid fields={religiousFields} />
         </Card>
@@ -244,7 +244,7 @@ function CandidateDetailTabs({
 
       {/* Personnalite */}
       <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-[#2D2D2D]">Personnalite et parcours</h2>
+        <h2 className="font-display text-[22px] font-semibold text-ink">Personnalite et parcours</h2>
         <Card>
           <SectionGrid fields={personalityFields} />
         </Card>
@@ -252,7 +252,7 @@ function CandidateDetailTabs({
 
       {/* Attentes */}
       <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-[#2D2D2D]">Attentes</h2>
+        <h2 className="font-display text-[22px] font-semibold text-ink">Attentes</h2>
         <Card>
           <SectionGrid fields={expectationFields} />
         </Card>
@@ -260,10 +260,10 @@ function CandidateDetailTabs({
 
       {/* References */}
       <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-[#2D2D2D]">References</h2>
+        <h2 className="font-display text-[22px] font-semibold text-ink">References</h2>
         <Card>
           {references.length === 0 ? (
-            <p className="text-sm text-[#6B7280] italic py-4 text-center">
+            <p className="text-sm text-ink-soft italic py-4 text-center">
               Aucune reference enregistree
             </p>
           ) : (
@@ -271,19 +271,19 @@ function CandidateDetailTabs({
               {references.map((ref) => (
                 <div
                   key={ref.id as string}
-                  className="flex items-start gap-3 p-3 rounded-lg bg-gray-50/50 border border-[#E8E0D4]"
+                  className="flex items-start gap-3 p-3 rounded-lg bg-stone-50/50 border border-line"
                 >
-                  <Star className="h-5 w-5 text-[#C5A55A] shrink-0 mt-0.5" />
+                  <Star className="h-5 w-5 text-gold shrink-0 mt-0.5" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[#2D2D2D]">
+                    <p className="text-sm font-medium text-ink">
                       {ref.reference_name as string}
                     </p>
                     {ref.relationship ? (
-                      <p className="text-xs text-[#6B7280] mt-0.5">
+                      <p className="text-xs text-ink-soft mt-0.5">
                         {String(ref.relationship)}
                       </p>
                     ) : null}
-                    <div className="flex flex-wrap gap-3 mt-1 text-xs text-[#6B7280]">
+                    <div className="flex flex-wrap gap-3 mt-1 text-xs text-ink-soft">
                       {ref.reference_phone ? (
                         <span className="flex items-center gap-1">
                           <Phone className="h-3 w-3" /> {String(ref.reference_phone)}
@@ -296,7 +296,7 @@ function CandidateDetailTabs({
                       ) : null}
                     </div>
                     {ref.feedback ? (
-                      <p className="text-sm text-[#2D2D2D] mt-2 whitespace-pre-wrap">
+                      <p className="text-sm text-ink mt-2 whitespace-pre-wrap">
                         {String(ref.feedback)}
                       </p>
                     ) : null}
@@ -310,30 +310,30 @@ function CandidateDetailTabs({
 
       {/* Propositions */}
       <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-[#2D2D2D]">Propositions</h2>
+        <h2 className="font-display text-[22px] font-semibold text-ink">Propositions</h2>
         <Card>
           {proposals.length === 0 ? (
-            <p className="text-sm text-[#6B7280] italic py-4 text-center">
+            <p className="text-sm text-ink-soft italic py-4 text-center">
               Aucune proposition pour cette candidate
             </p>
           ) : (
-            <ul className="divide-y divide-[#E8E0D4]">
+            <ul className="divide-y divide-line">
               {proposals.map((p) => {
                 const man = p.candidate_man as Record<string, unknown> | null
                 return (
                   <li key={p.id as string}>
                     <Link
                       href={`/proposals/${p.id}`}
-                      className="flex items-center justify-between py-3 hover:bg-gray-50/50 px-2 rounded-lg transition-colors"
+                      className="flex items-center justify-between py-3 hover:bg-stone-50/50 px-2 rounded-lg transition-colors"
                     >
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-[#2D2D2D]">
+                        <p className="text-sm font-medium text-ink">
                           Proposition avec{' '}
                           {man
                             ? `${man.first_name} ${man.last_name}`
                             : 'candidat inconnu'}
                         </p>
-                        <p className="text-xs text-[#6B7280] mt-0.5">
+                        <p className="text-xs text-ink-soft mt-0.5">
                           {formatDate(p.created_at as string)}
                         </p>
                       </div>
@@ -346,7 +346,7 @@ function CandidateDetailTabs({
                         >
                           {getStatusLabel(p.status as string)}
                         </span>
-                        <ChevronRight className="h-4 w-4 text-[#6B7280]" />
+                        <ChevronRight className="h-4 w-4 text-ink-soft" />
                       </div>
                     </Link>
                   </li>
@@ -359,10 +359,10 @@ function CandidateDetailTabs({
 
       {/* Historique */}
       <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-[#2D2D2D]">Historique</h2>
+        <h2 className="font-display text-[22px] font-semibold text-ink">Historique</h2>
         <Card>
           {auditLogs.length === 0 ? (
-            <p className="text-sm text-[#6B7280] italic py-4 text-center">
+            <p className="text-sm text-ink-soft italic py-4 text-center">
               Aucune entree dans l'historique
             </p>
           ) : (
@@ -374,16 +374,16 @@ function CandidateDetailTabs({
                     key={log.id as string}
                     className="flex items-start gap-3 text-sm"
                   >
-                    <Clock className="h-4 w-4 text-[#6B7280] shrink-0 mt-0.5" />
+                    <Clock className="h-4 w-4 text-ink-soft shrink-0 mt-0.5" />
                     <div className="min-w-0">
-                      <p className="text-[#2D2D2D]">
+                      <p className="text-ink">
                         <span className="font-medium">
                           {logUser?.full_name as string ?? 'Systeme'}
                         </span>
                         {' '}
                         {getStatusLabel(log.action as string)} - {log.entity_type as string}
                       </p>
-                      <p className="text-xs text-[#6B7280] mt-0.5">
+                      <p className="text-xs text-ink-soft mt-0.5">
                         {formatDateTime(log.created_at as string)}
                       </p>
                     </div>
@@ -450,14 +450,14 @@ export default async function CandidateDetailPage({
       .order('created_at', { ascending: false }),
 
     supabase
-      .from('audit_logs')
+      .from('audit_log')
       .select(`
         id,
         action,
         entity_type,
         details,
         created_at,
-        user:user_profiles!audit_logs_user_id_fkey(full_name)
+        user:user_profiles!audit_log_user_id_fkey(full_name)
       `)
       .eq('entity_id', id)
       .eq('entity_type', 'candidate')
@@ -486,7 +486,7 @@ export default async function CandidateDetailPage({
       {/* Retour */}
       <Link
         href="/candidates"
-        className="inline-flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-[#2D2D2D] transition-colors"
+        className="inline-flex items-center gap-1.5 text-sm text-ink-soft hover:text-ink transition-colors"
       >
         <ArrowLeft className="h-4 w-4" />
         Retour a la liste
@@ -502,7 +502,7 @@ export default async function CandidateDetailPage({
 
         <div className="flex-1 min-w-0">
           <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-            <h1 className="text-2xl font-bold text-[#2D2D2D]">
+            <h1 className="text-[30px] font-semibold text-ink">
               {candidate.first_name} {candidate.last_name}
             </h1>
             <div className="flex flex-wrap gap-2">
@@ -525,7 +525,7 @@ export default async function CandidateDetailPage({
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-sm text-[#6B7280]">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-sm text-ink-soft">
             <span>
               {calculateAge(
                 candidate.date_of_birth,
@@ -558,7 +558,7 @@ export default async function CandidateDetailPage({
             {candidate.phone && (
               <a
                 href={`tel:${candidate.phone}`}
-                className="inline-flex items-center gap-1.5 text-xs text-[#87A878] hover:underline"
+                className="inline-flex items-center gap-1.5 text-xs text-sage hover:underline"
               >
                 <Phone className="h-3.5 w-3.5" />
                 {candidate.phone}
@@ -567,7 +567,7 @@ export default async function CandidateDetailPage({
             {candidate.email && (
               <a
                 href={`mailto:${candidate.email}`}
-                className="inline-flex items-center gap-1.5 text-xs text-[#87A878] hover:underline"
+                className="inline-flex items-center gap-1.5 text-xs text-sage hover:underline"
               >
                 <Mail className="h-3.5 w-3.5" />
                 {candidate.email}
@@ -602,8 +602,8 @@ export default async function CandidateDetailPage({
                 className={cn(
                   'shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2',
                   photo.is_primary
-                    ? 'border-[#87A878]'
-                    : 'border-[#E8E0D4]'
+                    ? 'border-sage'
+                    : 'border-line'
                 )}
               >
                 <img
@@ -625,7 +625,7 @@ export default async function CandidateDetailPage({
       />
 
       {/* Meta */}
-      <div className="text-xs text-[#6B7280] flex flex-wrap gap-4 pt-4 border-t border-[#E8E0D4]">
+      <div className="text-xs text-ink-soft flex flex-wrap gap-4 pt-4 border-t border-line">
         <span>Cree le {formatDate(candidate.created_at)}</span>
         <span>Mis a jour le {formatDate(candidate.updated_at)}</span>
         {candidate.source && <span>Source : {candidate.source}</span>}

@@ -19,14 +19,24 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
 const Select = forwardRef<HTMLSelectElement, SelectProps>(
   ({ label, error, options, placeholder, id, className = '', ...props }, ref) => {
     const selectId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined)
-    const borderClass = error ? 'border-[#C45B5B]' : 'border-[#E8E0D4]'
+    const borderClass = error ? 'border-danger' : 'border-line'
+
+    // Les classes de largeur (w-*, sm:w-*) pilotent le conteneur ; le select reste pleine largeur.
+    const widthClasses = className
+      .split(/\s+/)
+      .filter((c) => /^(sm:|md:|lg:)?(w-|min-w-|max-w-)/.test(c))
+      .join(' ')
+    const innerClasses = className
+      .split(/\s+/)
+      .filter((c) => c && !/^(sm:|md:|lg:)?(w-|min-w-|max-w-)/.test(c))
+      .join(' ')
 
     return (
-      <div className="w-full">
+      <div className={widthClasses || 'w-full'}>
         {label && (
           <label
             htmlFor={selectId}
-            className="block text-sm font-medium text-[#2D2D2D] mb-1.5"
+            className="block text-[13px] font-medium text-ink-soft mb-1.5"
           >
             {label}
           </label>
@@ -37,14 +47,14 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             ref={ref}
             id={selectId}
             className={[
-              'w-full rounded-lg border bg-white px-3 py-2 pr-10 text-sm text-[#2D2D2D]',
+              'w-full rounded-[10px] border bg-surface px-3.5 py-2 pr-10 text-sm text-ink',
               'appearance-none',
-              'transition-colors duration-150',
-              'focus:outline-none focus:ring-2 focus:ring-[#87A878] focus:border-[#87A878]',
-              'disabled:bg-gray-50 disabled:text-[#6B7280] disabled:cursor-not-allowed',
+              'transition-colors duration-150 hover:border-line-strong',
+              'focus:outline-none focus:border-plum',
+              'disabled:bg-surface-muted disabled:text-ink-muted disabled:cursor-not-allowed',
               borderClass,
               'h-10',
-              className,
+              innerClasses,
             ].join(' ')}
             aria-invalid={error ? 'true' : undefined}
             aria-describedby={error ? `${selectId}-error` : undefined}
@@ -62,13 +72,13 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             ))}
           </select>
           <ChevronDown
-            className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6B7280] pointer-events-none"
+            className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted pointer-events-none"
             aria-hidden="true"
           />
         </div>
 
         {error && (
-          <p id={`${selectId}-error`} className="mt-1 text-sm text-[#C45B5B]" role="alert">
+          <p id={`${selectId}-error`} className="mt-1.5 text-[12.5px] text-danger" role="alert">
             {error}
           </p>
         )}

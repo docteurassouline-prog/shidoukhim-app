@@ -39,9 +39,9 @@ const FEE_TYPE_LABELS: Record<string, string> = {
 }
 
 const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
-  en_attente: { label: 'En attente', bg: 'bg-[#C5A55A]/15', text: 'text-[#6B5020]' },
-  paye: { label: 'Paye', bg: 'bg-[#87A878]/15', text: 'text-[#2E5A22]' },
-  en_retard: { label: 'En retard', bg: 'bg-[#C45B5B]/10', text: 'text-[#9B3030]' },
+  en_attente: { label: 'En attente', bg: 'bg-gold/15', text: 'text-gold-deep' },
+  paye: { label: 'Paye', bg: 'bg-sage/15', text: 'text-sage-deep' },
+  en_retard: { label: 'En retard', bg: 'bg-danger/10', text: 'text-danger-deep' },
 }
 
 function formatEuro(amount: number): string {
@@ -92,19 +92,19 @@ function ProposalFeesCard({
   const shadkhaniotFees = proposal.fees.filter((f) => f.fee_type.startsWith('shadkhaniot'))
 
   return (
-    <div className="bg-white rounded-xl border border-[#E8E0D4] overflow-hidden">
+    <div className="bg-surface rounded-[14px] border border-line overflow-hidden">
       <button
         type="button"
         onClick={() => setExpanded(!expanded)}
-        className="w-full px-4 py-4 sm:px-6 flex items-center justify-between hover:bg-gray-50/50 transition-colors"
+        className="w-full px-4 py-4 sm:px-6 flex items-center justify-between hover:bg-stone-50/50 transition-colors"
       >
         <div className="flex items-center gap-3 min-w-0">
-          <Heart className="h-4 w-4 text-[#6B3A5B] shrink-0" />
+          <Heart className="h-4 w-4 text-plum shrink-0" />
           <div className="text-left min-w-0">
-            <p className="text-sm font-semibold text-[#2D2D2D] truncate">
+            <p className="text-sm font-semibold text-ink truncate">
               {proposal.woman_name} & {proposal.man_name}
             </p>
-            <p className="text-xs text-[#4B5563]">
+            <p className="text-xs text-ink-soft">
               {proposal.meetings_count} rencontre{proposal.meetings_count !== 1 ? 's' : ''}
               {shadkhaniotFees.length > 0 && ' · Shadkhaniot facturees'}
             </p>
@@ -113,51 +113,51 @@ function ProposalFeesCard({
 
         <div className="flex items-center gap-4 shrink-0">
           <div className="text-right hidden sm:block">
-            <p className="text-sm font-semibold text-[#2D2D2D]">{formatEuro(proposal.total_due)}</p>
+            <p className="text-sm font-semibold text-ink">{formatEuro(proposal.total_due)}</p>
             {proposal.total_pending > 0 && (
-              <p className="text-xs text-[#C45B5B]">{formatEuro(proposal.total_pending)} en attente</p>
+              <p className="text-xs text-danger">{formatEuro(proposal.total_pending)} en attente</p>
             )}
             {proposal.total_pending === 0 && proposal.total_due > 0 && (
-              <p className="text-xs text-[#2E5A22]">Tout regle</p>
+              <p className="text-xs text-sage-deep">Tout regle</p>
             )}
           </div>
-          {expanded ? <ChevronUp className="h-4 w-4 text-[#4B5563]" /> : <ChevronDown className="h-4 w-4 text-[#4B5563]" />}
+          {expanded ? <ChevronUp className="h-4 w-4 text-ink-soft" /> : <ChevronDown className="h-4 w-4 text-ink-soft" />}
         </div>
       </button>
 
       {expanded && (
-        <div className="border-t border-[#E8E0D4]">
+        <div className="border-t border-line">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#E8E0D4] bg-[#FFFBF0]/50">
-                  <th className="px-4 py-2 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider">Type</th>
-                  <th className="px-4 py-2 text-right text-xs font-medium text-[#4B5563] uppercase tracking-wider">Montant</th>
-                  <th className="px-4 py-2 text-center text-xs font-medium text-[#4B5563] uppercase tracking-wider">Statut</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider">Echeance</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-[#4B5563] uppercase tracking-wider">Paye le</th>
-                  <th className="px-4 py-2 text-right text-xs font-medium text-[#4B5563] uppercase tracking-wider">Actions</th>
+                <tr className="border-b border-line bg-canvas/50">
+                  <th className="px-4 py-2 text-left text-xs font-medium text-ink-soft uppercase tracking-wider">Type</th>
+                  <th className="px-4 py-2 text-right text-xs font-medium text-ink-soft uppercase tracking-wider">Montant</th>
+                  <th className="px-4 py-2 text-center text-xs font-medium text-ink-soft uppercase tracking-wider">Statut</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-ink-soft uppercase tracking-wider">Echeance</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-ink-soft uppercase tracking-wider">Paye le</th>
+                  <th className="px-4 py-2 text-right text-xs font-medium text-ink-soft uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E8E0D4]">
+              <tbody className="divide-y divide-line">
                 {proposal.fees.map((fee) => (
-                  <tr key={fee.id} className="hover:bg-gray-50/50">
-                    <td className="px-4 py-2.5 text-[#2D2D2D]">
+                  <tr key={fee.id} className="hover:bg-stone-50/50">
+                    <td className="px-4 py-2.5 text-ink">
                       {FEE_TYPE_LABELS[fee.fee_type]}
                       {fee.meeting_number && (
-                        <span className="text-[#4B5563] ml-1">#{fee.meeting_number}</span>
+                        <span className="text-ink-soft ml-1">#{fee.meeting_number}</span>
                       )}
                     </td>
-                    <td className="px-4 py-2.5 text-right font-medium text-[#2D2D2D]">
+                    <td className="px-4 py-2.5 text-right font-medium text-ink">
                       {formatEuro(Number(fee.amount))}
                     </td>
                     <td className="px-4 py-2.5 text-center">
                       <FeeStatusBadge status={fee.status} />
                     </td>
-                    <td className="px-4 py-2.5 text-[#4B5563]">
+                    <td className="px-4 py-2.5 text-ink-soft">
                       {fee.due_date ? formatDate(fee.due_date) : '-'}
                     </td>
-                    <td className="px-4 py-2.5 text-[#4B5563]">
+                    <td className="px-4 py-2.5 text-ink-soft">
                       {fee.paid_date ? formatDate(fee.paid_date) : '-'}
                     </td>
                     <td className="px-4 py-2.5 text-right">
@@ -169,7 +169,7 @@ function ProposalFeesCard({
                             <button
                               onClick={() => handleMarkPaid(fee.id)}
                               title="Marquer paye"
-                              className="p-1 rounded hover:bg-[#87A878]/10 text-[#3D6B35] transition-colors"
+                              className="p-1 rounded hover:bg-sage/10 text-sage-deep transition-colors"
                             >
                               <CheckCircle className="h-4 w-4" />
                             </button>
@@ -178,7 +178,7 @@ function ProposalFeesCard({
                             <button
                               onClick={() => handleMarkOverdue(fee.id)}
                               title="Marquer en retard"
-                              className="p-1 rounded hover:bg-[#C5A55A]/10 text-[#6B5020] transition-colors"
+                              className="p-1 rounded hover:bg-gold/10 text-gold-deep transition-colors"
                             >
                               <AlertTriangle className="h-4 w-4" />
                             </button>
@@ -186,7 +186,7 @@ function ProposalFeesCard({
                           <button
                             onClick={() => handleDelete(fee.id)}
                             title="Supprimer"
-                            className="p-1 rounded hover:bg-[#C45B5B]/10 text-[#C45B5B] transition-colors"
+                            className="p-1 rounded hover:bg-danger/10 text-danger transition-colors"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -261,29 +261,29 @@ export default function ComptabilitePage() {
       label: 'Total facture',
       value: formatEuro(summary?.total_due ?? 0),
       icon: <Receipt className="h-6 w-6" />,
-      color: 'text-[#6B3A5B]',
-      bgColor: 'bg-[#6B3A5B]/10',
+      color: 'text-plum',
+      bgColor: 'bg-plum/10',
     },
     {
       label: 'Encaisse',
       value: formatEuro(summary?.total_paid ?? 0),
       icon: <TrendingUp className="h-6 w-6" />,
-      color: 'text-[#2E5A22]',
-      bgColor: 'bg-[#87A878]/10',
+      color: 'text-sage-deep',
+      bgColor: 'bg-sage/10',
     },
     {
       label: 'En attente',
       value: formatEuro(summary?.total_pending ?? 0),
       icon: <Clock className="h-6 w-6" />,
-      color: 'text-[#6B5020]',
-      bgColor: 'bg-[#C5A55A]/10',
+      color: 'text-gold-deep',
+      bgColor: 'bg-gold/10',
     },
     {
       label: 'Propositions suivies',
       value: String(summary?.proposals_count ?? 0),
       icon: <Heart className="h-6 w-6" />,
-      color: 'text-[#6B3A5B]',
-      bgColor: 'bg-[#6B3A5B]/10',
+      color: 'text-plum',
+      bgColor: 'bg-plum/10',
     },
   ]
 
@@ -292,8 +292,8 @@ export default function ComptabilitePage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#2D2D2D]">Comptabilite</h1>
-          <p className="text-sm text-[#4B5563] mt-1">
+          <h1 className="text-[30px] font-semibold text-ink">Comptabilite</h1>
+          <p className="text-sm text-ink-soft mt-1">
             Suivi des shadkhaniot et frais de rencontres
           </p>
         </div>
@@ -312,8 +312,8 @@ export default function ComptabilitePage() {
           <Card key={stat.label}>
             <div className="flex items-start justify-between">
               <div className="space-y-1">
-                <p className="text-sm text-[#4B5563]">{stat.label}</p>
-                <p className="text-2xl font-bold text-[#2D2D2D]">{stat.value}</p>
+                <p className="text-sm text-ink-soft">{stat.label}</p>
+                <p className="text-2xl font-bold text-ink">{stat.value}</p>
               </div>
               <div className={cn('rounded-xl p-2.5 shrink-0', stat.bgColor, stat.color)}>
                 {stat.icon}
@@ -327,19 +327,19 @@ export default function ComptabilitePage() {
       {showAddForm && (
         <Card>
           <div className="space-y-4">
-            <h3 className="text-base font-semibold text-[#2D2D2D]">
+            <h3 className="text-base font-semibold text-ink">
               Ajouter des frais
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-[#2D2D2D] mb-1">
+                <label className="block text-sm font-medium text-ink mb-1">
                   Proposition
                 </label>
                 <select
                   value={selectedProposal}
                   onChange={(e) => setSelectedProposal(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-[#E8E0D4] rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#87A878]/50 focus:border-[#87A878]"
+                  className="w-full px-3 py-2 text-sm border border-line rounded-lg bg-surface focus:outline-none focus:ring-2 focus:ring-sage/50 focus:border-sage"
                 >
                   <option value="">Selectionnez une proposition...</option>
                   {proposals.map((p) => (
@@ -351,7 +351,7 @@ export default function ComptabilitePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-[#2D2D2D] mb-1">
+                <label className="block text-sm font-medium text-ink mb-1">
                   Type de frais
                 </label>
                 <div className="flex gap-2">
@@ -361,8 +361,8 @@ export default function ComptabilitePage() {
                     className={cn(
                       'flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border transition-colors',
                       addType === 'rencontre'
-                        ? 'bg-[#6B3A5B]/10 border-[#6B3A5B]/30 text-[#6B3A5B]'
-                        : 'border-[#E8E0D4] text-[#4B5563] hover:bg-gray-50'
+                        ? 'bg-plum/10 border-plum/30 text-plum'
+                        : 'border-line text-ink-soft hover:bg-stone-50'
                     )}
                   >
                     <CalendarPlus className="h-4 w-4" />
@@ -374,8 +374,8 @@ export default function ComptabilitePage() {
                     className={cn(
                       'flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border transition-colors',
                       addType === 'shadkhaniot'
-                        ? 'bg-[#C5A55A]/10 border-[#C5A55A]/30 text-[#6B5020]'
-                        : 'border-[#E8E0D4] text-[#4B5563] hover:bg-gray-50'
+                        ? 'bg-gold/10 border-gold/30 text-gold-deep'
+                        : 'border-line text-ink-soft hover:bg-stone-50'
                     )}
                   >
                     <CircleDollarSign className="h-4 w-4" />
@@ -387,7 +387,7 @@ export default function ComptabilitePage() {
 
             {addType === 'rencontre' && (
               <div className="max-w-xs">
-                <label className="block text-sm font-medium text-[#2D2D2D] mb-1">
+                <label className="block text-sm font-medium text-ink mb-1">
                   Numero de la rencontre
                 </label>
                 <input
@@ -395,7 +395,7 @@ export default function ComptabilitePage() {
                   min={1}
                   value={meetingNumber}
                   onChange={(e) => setMeetingNumber(parseInt(e.target.value) || 1)}
-                  className="w-full px-3 py-2 text-sm border border-[#E8E0D4] rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#87A878]/50 focus:border-[#87A878]"
+                  className="w-full px-3 py-2 text-sm border border-line rounded-lg bg-surface focus:outline-none focus:ring-2 focus:ring-sage/50 focus:border-sage"
                 />
               </div>
             )}
@@ -429,7 +429,7 @@ export default function ComptabilitePage() {
         />
       ) : (
         <div className="space-y-3">
-          <h2 className="text-base font-semibold text-[#2D2D2D]">
+          <h2 className="text-base font-semibold text-ink">
             Detail par proposition
           </h2>
           {summary!.proposals.map((p) => (

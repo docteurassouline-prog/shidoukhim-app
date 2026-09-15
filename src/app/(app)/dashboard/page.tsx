@@ -122,7 +122,7 @@ export default async function DashboardPage() {
 
     // 7. Activite recente
     supabase
-      .from('audit_logs')
+      .from('audit_log')
       .select(`
         id,
         action,
@@ -130,7 +130,7 @@ export default async function DashboardPage() {
         entity_id,
         details,
         created_at,
-        user:user_profiles!audit_logs_user_id_fkey(full_name)
+        user:user_profiles!audit_log_user_id_fkey(full_name)
       `)
       .eq('organization_id', ORG_ID)
       .order('created_at', { ascending: false })
@@ -146,40 +146,40 @@ export default async function DashboardPage() {
       value: availableRes.count ?? 0,
       icon: <Users className="h-6 w-6" />,
       href: '/candidates?availability=disponible',
-      color: 'text-[#3D6B35]',
-      bgColor: 'bg-[#87A878]/10',
+      color: 'text-sage-deep',
+      bgColor: 'bg-sage/10',
     },
     {
       label: 'En frequentation actuellement',
       value: inDatingRes.count ?? 0,
       icon: <Heart className="h-6 w-6" />,
       href: '/candidates?availability=en_rencontre',
-      color: 'text-[#6B3A5B]',
-      bgColor: 'bg-[#6B3A5B]/10',
+      color: 'text-plum',
+      bgColor: 'bg-plum/10',
     },
     {
       label: 'Fiches actives',
       value: toValidateRes.count ?? 0,
       icon: <ClipboardCheck className="h-6 w-6" />,
       href: '/candidates?status=validee',
-      color: 'text-[#C5A55A]',
-      bgColor: 'bg-[#C5A55A]/10',
+      color: 'text-gold',
+      bgColor: 'bg-gold/10',
     },
     {
       label: 'A recontacter',
       value: tasksToDoRes.count ?? 0,
       icon: <PhoneCall className="h-6 w-6" />,
       href: '/agenda?filter=overdue',
-      color: 'text-[#C45B5B]',
-      bgColor: 'bg-[#C45B5B]/10',
+      color: 'text-danger',
+      bgColor: 'bg-danger/10',
     },
     {
       label: 'Propositions actives',
       value: activeProposalsRes.count ?? 0,
       icon: <Sparkles className="h-6 w-6" />,
       href: '/proposals',
-      color: 'text-[#6B3A5B]',
-      bgColor: 'bg-[#6B3A5B]/10',
+      color: 'text-plum',
+      bgColor: 'bg-plum/10',
     },
   ]
 
@@ -243,13 +243,13 @@ export default async function DashboardPage() {
   function getPriorityDot(priority: string): string {
     switch (priority) {
       case 'urgente':
-        return 'bg-[#C45B5B]'
+        return 'bg-danger'
       case 'haute':
-        return 'bg-[#C5A55A]'
+        return 'bg-gold'
       case 'normale':
-        return 'bg-[#87A878]'
+        return 'bg-sage'
       default:
-        return 'bg-gray-400'
+        return 'bg-stone-400'
     }
   }
 
@@ -257,23 +257,23 @@ export default async function DashboardPage() {
     <div className="space-y-8">
       {/* En-tete de bienvenue */}
       <div>
-        <h1 className="text-2xl font-bold text-[#2D2D2D]">
+        <h1 className="text-[30px] font-semibold text-ink">
           Bonjour, {profile?.full_name ?? 'Utilisateur'}
         </h1>
-        <p className="text-sm text-[#4B5563] mt-1 capitalize">{todayFormatted}</p>
+        <p className="text-sm text-ink-soft mt-1 capitalize">{todayFormatted}</p>
       </div>
 
       {/* Cartes de statistiques */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         {stats.map((stat) => (
           <Link key={stat.label} href={stat.href} className="group">
-            <Card className="hover:shadow-md transition-shadow h-full">
-              <div className="flex items-start justify-between">
-                <div className="space-y-2">
-                  <p className="text-sm text-[#4B5563] leading-tight">
+            <Card className="card-hover h-full" padding="sm">
+              <div className="flex items-start justify-between gap-3 p-1">
+                <div className="min-w-0">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted leading-snug">
                     {stat.label}
                   </p>
-                  <p className="text-3xl font-bold text-[#2D2D2D]">
+                  <p className="mt-2 text-[34px] leading-none font-semibold tracking-tight text-ink tabular-nums">
                     {stat.value}
                   </p>
                 </div>
@@ -283,7 +283,7 @@ export default async function DashboardPage() {
                   {stat.icon}
                 </div>
               </div>
-              <div className="mt-3 flex items-center text-xs text-[#4B5563] group-hover:text-[#3D6B35] transition-colors">
+              <div className="mt-4 flex items-center px-1 text-xs text-ink-muted group-hover:text-plum transition-colors">
                 <span>Voir le detail</span>
                 <ChevronRight className="h-3 w-3 ml-1" />
               </div>
@@ -295,13 +295,13 @@ export default async function DashboardPage() {
       {/* Suggestions de compatibilite */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-semibold text-[#2D2D2D] flex items-center gap-2">
-            <Heart className="h-5 w-5 text-[#6B3A5B]" />
+          <h2 className="text-base font-semibold text-ink flex items-center gap-2">
+            <Heart className="h-5 w-5 text-plum" />
             Meilleures compatibilites
           </h2>
           <Link
             href="/proposals/new"
-            className="text-sm text-[#3D6B35] hover:underline"
+            className="text-sm text-sage-deep hover:underline"
           >
             Nouvelle proposition
           </Link>
@@ -315,13 +315,13 @@ export default async function DashboardPage() {
         <Card
           header={
             <div className="flex items-center justify-between">
-              <h2 className="text-base font-semibold text-[#2D2D2D] flex items-center gap-2">
-                <Clock className="h-5 w-5 text-[#C5A55A]" />
+              <h2 className="text-base font-semibold text-ink flex items-center gap-2">
+                <Clock className="h-5 w-5 text-gold" />
                 Actions a faire
               </h2>
               <Link
                 href="/agenda"
-                className="text-sm text-[#3D6B35] hover:underline"
+                className="text-sm text-sage-deep hover:underline"
               >
                 Tout voir
               </Link>
@@ -330,15 +330,15 @@ export default async function DashboardPage() {
           padding="none"
         >
           {upcomingTasks.length === 0 ? (
-            <div className="py-8 text-center text-sm text-[#4B5563]">
+            <div className="py-8 text-center text-sm text-ink-soft">
               Aucune action prevue pour les 7 prochains jours
             </div>
           ) : (
-            <ul className="divide-y divide-[#E8E0D4]">
+            <ul className="divide-y divide-line">
               {upcomingTasks.map((task) => (
                 <li
                   key={task.id}
-                  className="px-4 py-3 sm:px-6 hover:bg-gray-50/50 transition-colors"
+                  className="px-4 py-3 sm:px-6 hover:bg-stone-50/50 transition-colors"
                 >
                   <div className="flex items-start gap-3">
                     <span
@@ -346,10 +346,10 @@ export default async function DashboardPage() {
                       aria-hidden="true"
                     />
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-[#2D2D2D] truncate">
+                      <p className="text-sm font-medium text-ink truncate">
                         {task.title}
                       </p>
-                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-[#4B5563]">
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-ink-soft">
                         {task.assignee && (
                           <span className="flex items-center gap-1">
                             <User className="h-3 w-3" />
@@ -374,19 +374,19 @@ export default async function DashboardPage() {
         {/* Activite recente */}
         <Card
           header={
-            <h2 className="text-base font-semibold text-[#2D2D2D] flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-[#6B3A5B]" />
+            <h2 className="text-base font-semibold text-ink flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-plum" />
               Activite recente
             </h2>
           }
           padding="none"
         >
           {recentActivity.length === 0 ? (
-            <div className="py-8 text-center text-sm text-[#4B5563]">
+            <div className="py-8 text-center text-sm text-ink-soft">
               Aucune activite recente
             </div>
           ) : (
-            <ul className="divide-y divide-[#E8E0D4]">
+            <ul className="divide-y divide-line">
               {recentActivity.map((log) => (
                 <li
                   key={log.id}
@@ -394,7 +394,7 @@ export default async function DashboardPage() {
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="text-sm text-[#2D2D2D]">
+                      <p className="text-sm text-ink">
                         <span className="font-medium">
                           {log.user?.full_name ?? 'Systeme'}
                         </span>{' '}
@@ -403,12 +403,12 @@ export default async function DashboardPage() {
                       {log.details &&
                         typeof log.details === 'object' &&
                         'name' in log.details && (
-                          <p className="text-xs text-[#4B5563] mt-0.5 truncate">
+                          <p className="text-xs text-ink-soft mt-0.5 truncate">
                             {String(log.details.name)}
                           </p>
                         )}
                     </div>
-                    <span className="text-xs text-[#4B5563] whitespace-nowrap shrink-0">
+                    <span className="text-xs text-ink-soft whitespace-nowrap shrink-0">
                       {formatDateTime(log.created_at)}
                     </span>
                   </div>

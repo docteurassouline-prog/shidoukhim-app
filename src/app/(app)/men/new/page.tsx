@@ -137,8 +137,8 @@ const initialFormData: FormData = {
 function SectionHeading({ title }: { title: string }) {
   return (
     <div className="mb-4 mt-8 first:mt-0">
-      <h2 className="text-lg font-semibold text-[#6B3A5B]">{title}</h2>
-      <div className="mt-1 h-px bg-[#E8E0D4]" />
+      <h2 className="font-display text-[22px] font-semibold text-plum">{title}</h2>
+      <div className="mt-1 h-px bg-line" />
     </div>
   )
 }
@@ -257,13 +257,13 @@ export default function NewManPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FFFBF0]">
+    <div className="min-h-screen bg-canvas">
       <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
         {/* Header */}
         <div className="mb-6">
           <Link
             href="/men"
-            className="inline-flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-[#2D2D2D] transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm text-ink-soft hover:text-ink transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
             Retour
@@ -271,25 +271,25 @@ export default function NewManPage() {
         </div>
 
         <div className="mb-8 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#87A878]/10">
-            <UserPlus className="h-5 w-5 text-[#87A878]" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-sage/10">
+            <UserPlus className="h-5 w-5 text-sage" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-[#2D2D2D]">Nouveau profil homme</h1>
-            <p className="text-sm text-[#6B7280]">
+            <h1 className="text-[30px] font-semibold text-ink">Nouveau profil homme</h1>
+            <p className="text-sm text-ink-soft">
               Remplissez les informations du candidat. Les champs marqués * sont obligatoires.
             </p>
           </div>
         </div>
 
         {submitError && (
-          <div className="mb-6 rounded-lg border border-[#C45B5B]/30 bg-[#C45B5B]/5 p-4">
-            <p className="text-sm text-[#C45B5B]">{submitError}</p>
+          <div className="mb-6 rounded-lg border border-danger/30 bg-danger/5 p-4">
+            <p className="text-sm text-danger">{submitError}</p>
           </div>
         )}
 
         <form onSubmit={handleSubmit}>
-          <div className="rounded-xl border border-[#E8E0D4] bg-white p-6 shadow-sm sm:p-8">
+          <div className="rounded-[14px] border border-line bg-surface p-6 shadow-card sm:p-8">
             {/* ── Identité ── */}
             <SectionHeading title="Identité & Contact" />
             <div className="grid gap-4 sm:grid-cols-2">

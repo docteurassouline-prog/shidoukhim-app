@@ -316,15 +316,15 @@ function Modal({
         onClick={onClose}
         aria-hidden="true"
       />
-      <div className="relative bg-white rounded-xl shadow-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#E8E0D4]">
-          <h2 className="text-lg font-semibold text-[#2D2D2D]">{title}</h2>
+      <div className="relative bg-surface rounded-xl shadow-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-line">
+          <h2 className="font-display text-[22px] font-semibold text-ink">{title}</h2>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg hover:bg-gray-100 transition-colors"
+            className="p-1 rounded-lg hover:bg-stone-100 transition-colors"
             aria-label="Fermer"
           >
-            <X className="h-5 w-5 text-[#6B7280]" />
+            <X className="h-5 w-5 text-ink-soft" />
           </button>
         </div>
         <div className="p-6">{children}</div>
@@ -351,7 +351,7 @@ function buildTimeline(proposal: Proposal): TimelineEvent[] {
     date: proposal.created_at,
     label: 'Proposition creee',
     detail: null,
-    color: 'bg-gray-400',
+    color: 'bg-stone-400',
   })
 
   if (proposal.proposed_at) {
@@ -359,7 +359,7 @@ function buildTimeline(proposal: Proposal): TimelineEvent[] {
       date: proposal.proposed_at,
       label: 'Proposition envoyee',
       detail: null,
-      color: 'bg-[#C5A55A]',
+      color: 'bg-gold',
     })
   }
 
@@ -369,7 +369,7 @@ function buildTimeline(proposal: Proposal): TimelineEvent[] {
       date: proposal.woman_response_at,
       label: accepted ? 'Elle a accepte' : `Elle a repondu : ${proposal.woman_response || 'inconnu'}`,
       detail: proposal.woman_notes,
-      color: accepted ? 'bg-[#87A878]' : 'bg-[#C45B5B]',
+      color: accepted ? 'bg-sage' : 'bg-danger',
     })
   }
 
@@ -379,7 +379,7 @@ function buildTimeline(proposal: Proposal): TimelineEvent[] {
       date: proposal.man_response_at,
       label: accepted ? 'Il a accepte' : `Il a repondu : ${proposal.man_response || 'inconnu'}`,
       detail: proposal.man_notes,
-      color: accepted ? 'bg-[#87A878]' : 'bg-[#C45B5B]',
+      color: accepted ? 'bg-sage' : 'bg-danger',
     })
   }
 
@@ -388,7 +388,7 @@ function buildTimeline(proposal: Proposal): TimelineEvent[] {
       date: proposal.updated_at,
       label: 'Notes du shadkhan',
       detail: proposal.matchmaker_notes,
-      color: 'bg-[#6B3A5B]',
+      color: 'bg-plum',
     })
   }
 
@@ -669,10 +669,10 @@ export default function ProposalDetailPage({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FFFBF0] flex items-center justify-center">
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin h-8 w-8 border-4 border-[#87A878] border-t-transparent rounded-full mx-auto mb-4" />
-          <p className="text-[#6B7280]">Chargement de la proposition...</p>
+          <div className="animate-spin h-8 w-8 border-4 border-sage border-t-transparent rounded-full mx-auto mb-4" />
+          <p className="text-ink-soft">Chargement de la proposition...</p>
         </div>
       </div>
     )
@@ -680,15 +680,15 @@ export default function ProposalDetailPage({
 
   if (error || !proposal) {
     return (
-      <div className="min-h-screen bg-[#FFFBF0] flex items-center justify-center">
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
         <div className="text-center max-w-md">
-          <div className="w-16 h-16 bg-[#C45B5B]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <AlertCircle className="h-8 w-8 text-[#C45B5B]" />
+          <div className="w-16 h-16 bg-danger/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="h-8 w-8 text-danger" />
           </div>
-          <h1 className="text-xl font-semibold text-[#2D2D2D] mb-2">
+          <h1 className="text-[26px] font-semibold text-ink mb-2">
             {error || 'Proposition introuvable'}
           </h1>
-          <p className="text-[#6B7280] mb-6">
+          <p className="text-ink-soft mb-6">
             Cette proposition n&apos;existe pas ou vous n&apos;y avez pas acces.
           </p>
           <Link href="/proposals">
@@ -709,7 +709,7 @@ export default function ProposalDetailPage({
   // ============================================================
 
   return (
-    <div className="min-h-screen bg-[#FFFBF0]">
+    <div className="min-h-screen bg-canvas">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {/* ============================== */}
@@ -720,7 +720,7 @@ export default function ProposalDetailPage({
           {/* Back link */}
           <Link
             href="/proposals"
-            className="inline-flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-[#2D2D2D] transition-colors mb-4"
+            className="inline-flex items-center gap-1.5 text-sm text-ink-soft hover:text-ink transition-colors mb-4"
           >
             <ArrowLeft className="h-4 w-4" />
             Retour aux propositions
@@ -729,7 +729,7 @@ export default function ProposalDetailPage({
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-2xl font-bold text-[#2D2D2D]">
+                <h1 className="text-[30px] font-semibold text-ink">
                   {woman ? `${woman.first_name} ${woman.last_name}` : '...'}
                   {' & '}
                   {man ? `${man.first_name} ${man.last_name}` : '...'}
@@ -741,7 +741,7 @@ export default function ProposalDetailPage({
                   {getStatusLabel(proposal.status)}
                 </Badge>
               </div>
-              <p className="text-sm text-[#6B7280]">
+              <p className="text-sm text-ink-soft">
                 Creee le {formatDate(proposal.created_at)}
                 {proposal.proposed_at && ` — Proposee le ${formatDate(proposal.proposed_at)}`}
               </p>
@@ -775,9 +775,9 @@ export default function ProposalDetailPage({
         <div className="grid grid-cols-1 lg:grid-cols-7 gap-6 mb-8">
           {/* LEFT - Elle */}
           <div className="lg:col-span-3">
-            <div className="bg-white rounded-xl border border-[#E8E0D4] shadow-sm overflow-hidden">
-              <div className="bg-[#6B3A5B]/5 px-6 py-3 border-b border-[#E8E0D4]">
-                <h2 className="font-semibold text-[#6B3A5B] flex items-center gap-2">
+            <div className="bg-surface rounded-[14px] border border-line shadow-card overflow-hidden">
+              <div className="bg-plum/5 px-6 py-3 border-b border-line">
+                <h2 className="font-semibold text-plum flex items-center gap-2">
                   <Heart className="h-4 w-4" />
                   Elle
                 </h2>
@@ -787,7 +787,7 @@ export default function ProposalDetailPage({
                 {/* Photo + basic info */}
                 <div className="flex items-start gap-4 mb-6">
                   {womanPhotos.length > 0 ? (
-                    <div className="w-20 h-20 rounded-xl overflow-hidden bg-gray-100 shrink-0">
+                    <div className="w-20 h-20 rounded-xl overflow-hidden bg-stone-100 shrink-0">
                       <img
                         src={womanPhotos[0].url}
                         alt={woman ? `${woman.first_name} ${woman.last_name}` : ''}
@@ -795,23 +795,23 @@ export default function ProposalDetailPage({
                       />
                     </div>
                   ) : (
-                    <div className="w-20 h-20 rounded-xl bg-[#6B3A5B]/10 flex items-center justify-center shrink-0">
-                      <span className="text-xl font-bold text-[#6B3A5B]">
+                    <div className="w-20 h-20 rounded-xl bg-plum/10 flex items-center justify-center shrink-0">
+                      <span className="text-xl font-bold text-plum">
                         {woman ? getInitials(woman.first_name, woman.last_name) : '?'}
                       </span>
                     </div>
                   )}
                   <div>
-                    <h3 className="text-lg font-semibold text-[#2D2D2D]">
+                    <h3 className="text-lg font-semibold text-ink">
                       {woman ? `${woman.first_name} ${woman.last_name}` : 'Inconnue'}
                     </h3>
                     {woman && (
                       <>
-                        <p className="text-sm text-[#6B7280]">
+                        <p className="text-sm text-ink-soft">
                           {calculateAge(woman.date_of_birth, woman.age_estimate, woman.is_age_estimate)}
                         </p>
                         {woman.city && (
-                          <p className="text-sm text-[#6B7280] flex items-center gap-1 mt-0.5">
+                          <p className="text-sm text-ink-soft flex items-center gap-1 mt-0.5">
                             <MapPin className="h-3 w-3" />
                             {woman.city}
                           </p>
@@ -848,15 +848,15 @@ export default function ProposalDetailPage({
                     </div>
 
                     {/* What she's looking for */}
-                    <div className="border-t border-[#E8E0D4] pt-4 mb-4">
-                      <h4 className="text-sm font-semibold text-[#2D2D2D] mb-3 flex items-center gap-1.5">
-                        <Target className="h-4 w-4 text-[#6B3A5B]" />
+                    <div className="border-t border-line pt-4 mb-4">
+                      <h4 className="text-sm font-semibold text-ink mb-3 flex items-center gap-1.5">
+                        <Target className="h-4 w-4 text-plum" />
                         Ce qu&apos;elle recherche
                       </h4>
                       {woman.ideal_husband && (
-                        <p className="text-sm text-[#6B7280] mb-2">{woman.ideal_husband}</p>
+                        <p className="text-sm text-ink-soft mb-2">{woman.ideal_husband}</p>
                       )}
-                      <div className="space-y-1.5 text-sm text-[#6B7280]">
+                      <div className="space-y-1.5 text-sm text-ink-soft">
                         {(woman.age_min || woman.age_max) && (
                           <p>
                             Âge : {woman.age_min || '?'} – {woman.age_max || '?'} ans
@@ -871,7 +871,7 @@ export default function ProposalDetailPage({
                     {/* Link to profile */}
                     <Link
                       href={`/candidates/${woman.id}`}
-                      className="inline-flex items-center gap-1.5 text-sm text-[#6B3A5B] hover:text-[#5A2E4D] font-medium transition-colors"
+                      className="inline-flex items-center gap-1.5 text-sm text-plum hover:text-plum-hover font-medium transition-colors"
                     >
                       Voir la fiche complete
                       <ChevronRight className="h-4 w-4" />
@@ -884,8 +884,8 @@ export default function ProposalDetailPage({
 
           {/* MIDDLE - Compatibility */}
           <div className="lg:col-span-1 flex items-center justify-center">
-            <div className="bg-white rounded-xl border border-[#E8E0D4] shadow-sm p-4 w-full">
-              <h3 className="text-xs font-semibold text-[#2D2D2D] text-center mb-3 uppercase tracking-wider">
+            <div className="bg-surface rounded-[14px] border border-line shadow-card p-4 w-full">
+              <h3 className="text-xs font-semibold text-ink text-center mb-3 uppercase tracking-wider">
                 Compatibilite
               </h3>
               <div className="space-y-3">
@@ -894,16 +894,16 @@ export default function ProposalDetailPage({
                     <div
                       className={cn(
                         'w-8 h-8 rounded-full flex items-center justify-center',
-                        item.level === 'green' && 'bg-[#87A878]/15 text-[#87A878]',
-                        item.level === 'orange' && 'bg-orange-100 text-orange-600',
-                        item.level === 'gray' && 'bg-gray-100 text-gray-400'
+                        item.level === 'green' && 'bg-sage/15 text-sage',
+                        item.level === 'orange' && 'bg-gold-light text-gold-deep',
+                        item.level === 'gray' && 'bg-stone-100 text-stone-400'
                       )}
                     >
                       {item.level === 'green' && <CheckCircle2 className="h-4 w-4" />}
                       {item.level === 'orange' && <AlertCircle className="h-4 w-4" />}
                       {item.level === 'gray' && <Minus className="h-4 w-4" />}
                     </div>
-                    <span className="text-[10px] text-[#6B7280] text-center leading-tight">
+                    <span className="text-[10px] text-ink-soft text-center leading-tight">
                       {item.label}
                     </span>
                   </div>
@@ -914,9 +914,9 @@ export default function ProposalDetailPage({
 
           {/* RIGHT - Lui */}
           <div className="lg:col-span-3">
-            <div className="bg-white rounded-xl border border-[#E8E0D4] shadow-sm overflow-hidden">
-              <div className="bg-[#87A878]/5 px-6 py-3 border-b border-[#E8E0D4]">
-                <h2 className="font-semibold text-[#5A7A4A] flex items-center gap-2">
+            <div className="bg-surface rounded-[14px] border border-line shadow-card overflow-hidden">
+              <div className="bg-sage/5 px-6 py-3 border-b border-line">
+                <h2 className="font-semibold text-sage-deep flex items-center gap-2">
                   <Heart className="h-4 w-4" />
                   Lui
                 </h2>
@@ -925,22 +925,22 @@ export default function ProposalDetailPage({
               <div className="p-6">
                 {/* Avatar + basic info */}
                 <div className="flex items-start gap-4 mb-6">
-                  <div className="w-20 h-20 rounded-xl bg-[#87A878]/10 flex items-center justify-center shrink-0">
-                    <span className="text-xl font-bold text-[#5A7A4A]">
+                  <div className="w-20 h-20 rounded-xl bg-sage/10 flex items-center justify-center shrink-0">
+                    <span className="text-xl font-bold text-sage-deep">
                       {man ? getInitials(man.first_name, man.last_name) : '?'}
                     </span>
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-[#2D2D2D]">
+                    <h3 className="text-lg font-semibold text-ink">
                       {man ? `${man.first_name} ${man.last_name}` : 'Inconnu'}
                     </h3>
                     {man && (
                       <>
-                        <p className="text-sm text-[#6B7280]">
+                        <p className="text-sm text-ink-soft">
                           {calculateAge(man.date_of_birth, man.age_estimate, man.is_age_estimate)}
                         </p>
                         {man.city && (
-                          <p className="text-sm text-[#6B7280] flex items-center gap-1 mt-0.5">
+                          <p className="text-sm text-ink-soft flex items-center gap-1 mt-0.5">
                             <MapPin className="h-3 w-3" />
                             {man.city}
                           </p>
@@ -977,15 +977,15 @@ export default function ProposalDetailPage({
                     </div>
 
                     {/* What he's looking for */}
-                    <div className="border-t border-[#E8E0D4] pt-4 mb-4">
-                      <h4 className="text-sm font-semibold text-[#2D2D2D] mb-3 flex items-center gap-1.5">
-                        <Target className="h-4 w-4 text-[#5A7A4A]" />
+                    <div className="border-t border-line pt-4 mb-4">
+                      <h4 className="text-sm font-semibold text-ink mb-3 flex items-center gap-1.5">
+                        <Target className="h-4 w-4 text-sage-deep" />
                         Ce qu&apos;il recherche
                       </h4>
                       {man.expected_qualities && (
-                        <p className="text-sm text-[#6B7280] mb-2">{man.expected_qualities}</p>
+                        <p className="text-sm text-ink-soft mb-2">{man.expected_qualities}</p>
                       )}
-                      <div className="space-y-1.5 text-sm text-[#6B7280]">
+                      <div className="space-y-1.5 text-sm text-ink-soft">
                         {(man.age_min || man.age_max) && (
                           <p>
                             Âge : {man.age_min || '?'} - {man.age_max || '?'} ans
@@ -1000,7 +1000,7 @@ export default function ProposalDetailPage({
                     {/* Link to profile */}
                     <Link
                       href={`/men/${man.id}`}
-                      className="inline-flex items-center gap-1.5 text-sm text-[#5A7A4A] hover:text-[#4A6A3A] font-medium transition-colors"
+                      className="inline-flex items-center gap-1.5 text-sm text-sage-deep hover:text-sage-hover font-medium transition-colors"
                     >
                       Voir la fiche complete
                       <ChevronRight className="h-4 w-4" />
@@ -1014,34 +1014,34 @@ export default function ProposalDetailPage({
 
         {/* Compatibility detail (full width below on mobile, hidden on desktop since shown in middle) */}
         <div className="lg:hidden mb-8">
-          <div className="bg-white rounded-xl border border-[#E8E0D4] shadow-sm p-6">
-            <h3 className="text-sm font-semibold text-[#2D2D2D] mb-4 uppercase tracking-wider">
+          <div className="bg-surface rounded-[14px] border border-line shadow-card p-6">
+            <h3 className="text-sm font-semibold text-ink mb-4 uppercase tracking-wider">
               Compatibilite
             </h3>
             <div className="space-y-3">
               {compatibility.map((item, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center gap-3 py-2 border-b border-[#E8E0D4] last:border-b-0"
+                  className="flex items-center gap-3 py-2 border-b border-line last:border-b-0"
                 >
                   <div
                     className={cn(
                       'w-8 h-8 rounded-full flex items-center justify-center shrink-0',
-                      item.level === 'green' && 'bg-[#87A878]/15 text-[#87A878]',
-                      item.level === 'orange' && 'bg-orange-100 text-orange-600',
-                      item.level === 'gray' && 'bg-gray-100 text-gray-400'
+                      item.level === 'green' && 'bg-sage/15 text-sage',
+                      item.level === 'orange' && 'bg-gold-light text-gold-deep',
+                      item.level === 'gray' && 'bg-stone-100 text-stone-400'
                     )}
                   >
                     {item.icon}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[#2D2D2D]">{item.label}</p>
-                    <p className="text-xs text-[#6B7280] truncate">{item.detail}</p>
+                    <p className="text-sm font-medium text-ink">{item.label}</p>
+                    <p className="text-xs text-ink-soft truncate">{item.detail}</p>
                   </div>
                   <div>
-                    {item.level === 'green' && <CheckCircle2 className="h-5 w-5 text-[#87A878]" />}
-                    {item.level === 'orange' && <AlertCircle className="h-5 w-5 text-orange-500" />}
-                    {item.level === 'gray' && <Minus className="h-5 w-5 text-gray-300" />}
+                    {item.level === 'green' && <CheckCircle2 className="h-5 w-5 text-sage" />}
+                    {item.level === 'orange' && <AlertCircle className="h-5 w-5 text-gold" />}
+                    {item.level === 'gray' && <Minus className="h-5 w-5 text-stone-300" />}
                   </div>
                 </div>
               ))}
@@ -1055,17 +1055,17 @@ export default function ProposalDetailPage({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
           {/* Woman response */}
-          <div className="bg-white rounded-xl border border-[#E8E0D4] shadow-sm p-4">
+          <div className="bg-surface rounded-[14px] border border-line shadow-card p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-[#2D2D2D]">Reponse d&apos;elle</p>
+                <p className="text-sm font-medium text-ink">Reponse d&apos;elle</p>
                 {proposal.woman_response ? (
-                  <p className="text-sm text-[#6B7280] mt-1">
+                  <p className="text-sm text-ink-soft mt-1">
                     {proposal.woman_response === 'accepted' ? 'Accepte' : proposal.woman_response}
                     {proposal.woman_response_at && ` — ${formatDate(proposal.woman_response_at)}`}
                   </p>
                 ) : (
-                  <p className="text-sm text-[#6B7280] mt-1">Pas encore de reponse</p>
+                  <p className="text-sm text-ink-soft mt-1">Pas encore de reponse</p>
                 )}
               </div>
               <Button
@@ -1082,17 +1082,17 @@ export default function ProposalDetailPage({
           </div>
 
           {/* Man response */}
-          <div className="bg-white rounded-xl border border-[#E8E0D4] shadow-sm p-4">
+          <div className="bg-surface rounded-[14px] border border-line shadow-card p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-[#2D2D2D]">Reponse de lui</p>
+                <p className="text-sm font-medium text-ink">Reponse de lui</p>
                 {proposal.man_response ? (
-                  <p className="text-sm text-[#6B7280] mt-1">
+                  <p className="text-sm text-ink-soft mt-1">
                     {proposal.man_response === 'accepted' ? 'Accepte' : proposal.man_response}
                     {proposal.man_response_at && ` — ${formatDate(proposal.man_response_at)}`}
                   </p>
                 ) : (
-                  <p className="text-sm text-[#6B7280] mt-1">Pas encore de reponse</p>
+                  <p className="text-sm text-ink-soft mt-1">Pas encore de reponse</p>
                 )}
               </div>
               <Button
@@ -1113,10 +1113,10 @@ export default function ProposalDetailPage({
         {/* F) NEXT ACTION */}
         {/* ============================== */}
 
-        <div className="bg-white rounded-xl border border-[#E8E0D4] shadow-sm p-6 mb-8">
+        <div className="bg-surface rounded-[14px] border border-line shadow-card p-6 mb-8">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold text-[#2D2D2D] flex items-center gap-2">
-              <Target className="h-5 w-5 text-[#C5A55A]" />
+            <h2 className="font-display text-[22px] font-semibold text-ink flex items-center gap-2">
+              <Target className="h-5 w-5 text-gold" />
               Prochaine action
             </h2>
             {!editingNextAction && (
@@ -1178,15 +1178,15 @@ export default function ProposalDetailPage({
             <div>
               {proposal.next_action ? (
                 <div>
-                  <p className="text-sm text-[#2D2D2D]">{proposal.next_action}</p>
+                  <p className="text-sm text-ink">{proposal.next_action}</p>
                   {proposal.next_action_date && (
-                    <p className="text-sm text-[#6B7280] mt-1">
+                    <p className="text-sm text-ink-soft mt-1">
                       Prevue le {formatDate(proposal.next_action_date)}
                     </p>
                   )}
                 </div>
               ) : (
-                <p className="text-sm text-[#6B7280] italic">Aucune action prevue</p>
+                <p className="text-sm text-ink-soft italic">Aucune action prevue</p>
               )}
             </div>
           )}
@@ -1196,18 +1196,18 @@ export default function ProposalDetailPage({
         {/* C) PROPOSAL TIMELINE */}
         {/* ============================== */}
 
-        <div className="bg-white rounded-xl border border-[#E8E0D4] shadow-sm p-6 mb-8">
-          <h2 className="text-lg font-semibold text-[#2D2D2D] mb-6 flex items-center gap-2">
-            <Clock className="h-5 w-5 text-[#6B3A5B]" />
+        <div className="bg-surface rounded-[14px] border border-line shadow-card p-6 mb-8">
+          <h2 className="font-display text-[22px] font-semibold text-ink mb-6 flex items-center gap-2">
+            <Clock className="h-5 w-5 text-plum" />
             Chronologie
           </h2>
 
           {timeline.length === 0 ? (
-            <p className="text-sm text-[#6B7280] italic">Aucun evenement</p>
+            <p className="text-sm text-ink-soft italic">Aucun evenement</p>
           ) : (
             <div className="relative">
               {/* Vertical line */}
-              <div className="absolute left-3 top-2 bottom-2 w-0.5 bg-[#E8E0D4]" />
+              <div className="absolute left-3 top-2 bottom-2 w-0.5 bg-line" />
 
               <div className="space-y-6">
                 {timeline.map((event, idx) => (
@@ -1218,12 +1218,12 @@ export default function ProposalDetailPage({
                     </div>
 
                     <div className="flex-1 pb-2">
-                      <p className="text-sm font-medium text-[#2D2D2D]">{event.label}</p>
-                      <p className="text-xs text-[#6B7280] mt-0.5">
+                      <p className="text-sm font-medium text-ink">{event.label}</p>
+                      <p className="text-xs text-ink-soft mt-0.5">
                         {formatDateTime(event.date)}
                       </p>
                       {event.detail && (
-                        <p className="text-sm text-[#6B7280] mt-1 bg-gray-50 rounded-lg p-3 border border-[#E8E0D4]">
+                        <p className="text-sm text-ink-soft mt-1 bg-stone-50 rounded-lg p-3 border border-line">
                           {event.detail}
                         </p>
                       )}
@@ -1239,13 +1239,13 @@ export default function ProposalDetailPage({
         {/* D) MEETINGS SECTION */}
         {/* ============================== */}
 
-        <div className="bg-white rounded-xl border border-[#E8E0D4] shadow-sm p-6 mb-8">
+        <div className="bg-surface rounded-[14px] border border-line shadow-card p-6 mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-[#2D2D2D] flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-[#87A878]" />
+            <h2 className="font-display text-[22px] font-semibold text-ink flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-sage" />
               Rencontres
               {meetings.length > 0 && (
-                <span className="text-sm font-normal text-[#6B7280]">
+                <span className="text-sm font-normal text-ink-soft">
                   ({meetings.length})
                 </span>
               )}
@@ -1277,10 +1277,10 @@ export default function ProposalDetailPage({
 
           {meetings.length === 0 ? (
             <div className="text-center py-12">
-              <div className="w-16 h-16 bg-[#87A878]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Calendar className="h-8 w-8 text-[#87A878]" />
+              <div className="w-16 h-16 bg-sage/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Calendar className="h-8 w-8 text-sage" />
               </div>
-              <p className="text-[#6B7280] mb-2">Aucune rencontre planifiee</p>
+              <p className="text-ink-soft mb-2">Aucune rencontre planifiee</p>
               <Button
                 variant="secondary"
                 size="sm"
@@ -1300,12 +1300,12 @@ export default function ProposalDetailPage({
                 return (
                   <div
                     key={meeting.id}
-                    className="border border-[#E8E0D4] rounded-lg overflow-hidden"
+                    className="border border-line rounded-lg overflow-hidden"
                   >
                     {/* Meeting header */}
-                    <div className="bg-gray-50 px-5 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <div className="bg-stone-50 px-5 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                       <div className="flex items-center gap-3">
-                        <span className="text-sm font-semibold text-[#2D2D2D]">
+                        <span className="text-sm font-semibold text-ink">
                           Rencontre n{'°'}{meeting.meeting_number}
                         </span>
                         <Badge
@@ -1315,7 +1315,7 @@ export default function ProposalDetailPage({
                           {getStatusLabel(meeting.status)}
                         </Badge>
                       </div>
-                      <div className="flex items-center gap-4 text-sm text-[#6B7280]">
+                      <div className="flex items-center gap-4 text-sm text-ink-soft">
                         {meeting.scheduled_at && (
                           <span className="flex items-center gap-1">
                             <Calendar className="h-3.5 w-3.5" />
@@ -1340,22 +1340,22 @@ export default function ProposalDetailPage({
 
                     {/* Meeting notes */}
                     {meeting.notes && (
-                      <div className="px-5 py-3 border-t border-[#E8E0D4] bg-white">
-                        <p className="text-sm text-[#6B7280]">{meeting.notes}</p>
+                      <div className="px-5 py-3 border-t border-line bg-surface">
+                        <p className="text-sm text-ink-soft">{meeting.notes}</p>
                       </div>
                     )}
 
                     {/* Feedback */}
                     {fb.length > 0 && (
-                      <div className="border-t border-[#E8E0D4]">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-[#E8E0D4]">
+                      <div className="border-t border-line">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-line">
                           {/* Woman feedback */}
                           <div className="p-5">
-                            <p className="text-xs font-semibold text-[#6B3A5B] uppercase tracking-wider mb-3">
+                            <p className="text-xs font-semibold text-plum uppercase tracking-wider mb-3">
                               Retour d&apos;elle
                             </p>
                             {womanFb.length === 0 ? (
-                              <p className="text-sm text-[#6B7280] italic">Aucun retour</p>
+                              <p className="text-sm text-ink-soft italic">Aucun retour</p>
                             ) : (
                               womanFb.map((f) => (
                                 <FeedbackCard key={f.id} feedback={f} />
@@ -1365,11 +1365,11 @@ export default function ProposalDetailPage({
 
                           {/* Man feedback */}
                           <div className="p-5">
-                            <p className="text-xs font-semibold text-[#5A7A4A] uppercase tracking-wider mb-3">
+                            <p className="text-xs font-semibold text-sage-deep uppercase tracking-wider mb-3">
                               Retour de lui
                             </p>
                             {manFb.length === 0 ? (
-                              <p className="text-sm text-[#6B7280] italic">Aucun retour</p>
+                              <p className="text-sm text-ink-soft italic">Aucun retour</p>
                             ) : (
                               manFb.map((f) => (
                                 <FeedbackCard key={f.id} feedback={f} />
@@ -1382,8 +1382,8 @@ export default function ProposalDetailPage({
 
                     {/* No feedback yet */}
                     {fb.length === 0 && (
-                      <div className="px-5 py-3 border-t border-[#E8E0D4] bg-white">
-                        <p className="text-sm text-[#6B7280] italic">Aucun retour enregistre pour cette rencontre</p>
+                      <div className="px-5 py-3 border-t border-line bg-surface">
+                        <p className="text-sm text-ink-soft italic">Aucun retour enregistre pour cette rencontre</p>
                       </div>
                     )}
                   </div>
@@ -1437,7 +1437,7 @@ export default function ProposalDetailPage({
           title="Planifier une rencontre"
         >
           <div className="space-y-4">
-            <div className="bg-[#87A878]/10 rounded-lg px-4 py-3 text-sm text-[#5A7A4A]">
+            <div className="bg-sage/10 rounded-lg px-4 py-3 text-sm text-sage-deep">
               Rencontre n{'°'}
               {meetings.length > 0
                 ? Math.max(...meetings.map((m) => m.meeting_number)) + 1
@@ -1551,9 +1551,9 @@ export default function ProposalDetailPage({
                       wants_next_meeting: e.target.checked,
                     }))
                   }
-                  className="h-4 w-4 rounded border-[#E8E0D4] text-[#87A878] focus:ring-[#87A878]"
+                  className="h-4 w-4 rounded border-line text-sage focus:ring-sage"
                 />
-                <span className="text-sm text-[#2D2D2D]">
+                <span className="text-sm text-ink">
                   Souhaite une prochaine rencontre
                 </span>
               </label>
@@ -1680,10 +1680,10 @@ function InfoRow({
 }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="text-[#6B7280] shrink-0">{icon}</div>
+      <div className="text-ink-soft shrink-0">{icon}</div>
       <div className="min-w-0">
-        <p className="text-xs text-[#6B7280]">{label}</p>
-        <p className="text-sm text-[#2D2D2D]">{value}</p>
+        <p className="text-xs text-ink-soft">{label}</p>
+        <p className="text-sm text-ink">{value}</p>
       </div>
     </div>
   )
@@ -1700,15 +1700,15 @@ function FeedbackCard({ feedback }: { feedback: MeetingFeedback }) {
           {getStatusLabel(feedback.sentiment)}
         </Badge>
         {feedback.wants_next_meeting !== null && (
-          <span className="text-xs text-[#6B7280] flex items-center gap-1">
+          <span className="text-xs text-ink-soft flex items-center gap-1">
             {feedback.wants_next_meeting ? (
               <>
-                <CheckCircle2 className="h-3.5 w-3.5 text-[#87A878]" />
+                <CheckCircle2 className="h-3.5 w-3.5 text-sage" />
                 Souhaite continuer
               </>
             ) : (
               <>
-                <XCircle className="h-3.5 w-3.5 text-[#C45B5B]" />
+                <XCircle className="h-3.5 w-3.5 text-danger" />
                 Ne souhaite pas continuer
               </>
             )}
@@ -1716,17 +1716,17 @@ function FeedbackCard({ feedback }: { feedback: MeetingFeedback }) {
         )}
       </div>
       {feedback.feedback_text && (
-        <p className="text-sm text-[#6B7280]">{feedback.feedback_text}</p>
+        <p className="text-sm text-ink-soft">{feedback.feedback_text}</p>
       )}
       {feedback.private_notes && (
-        <div className="bg-[#C5A55A]/5 rounded-lg p-2 border border-[#C5A55A]/20">
-          <p className="text-xs text-[#8B7030]">
+        <div className="bg-gold/5 rounded-lg p-2 border border-gold/20">
+          <p className="text-xs text-gold-deep">
             <span className="font-medium">Note privee :</span> {feedback.private_notes}
           </p>
         </div>
       )}
       {feedback.collected_at && (
-        <p className="text-xs text-[#6B7280]">
+        <p className="text-xs text-ink-soft">
           Recueilli le {formatDate(feedback.collected_at)}
         </p>
       )}

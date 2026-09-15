@@ -50,7 +50,6 @@ interface ProposalRow {
   man_response: string | null
   next_action: string | null
   next_action_date: string | null
-  priority: number
   created_at: string
   updated_at: string
   candidate_woman: {
@@ -108,13 +107,12 @@ export default function ProposalsPage() {
           `
           id,
           status,
-          proposed_at,
-          matchmaker_notes,
-          woman_response,
-          man_response,
+          proposed_at:created_at,
+          matchmaker_notes:notes,
+          woman_response:agreement_f,
+          man_response:agreement_m,
           next_action,
           next_action_date,
-          priority,
           created_at,
           updated_at,
           candidate_woman:candidates!proposals_candidate_woman_id_fkey(id, first_name, last_name, city, age_estimate),
@@ -172,10 +170,11 @@ export default function ProposalsPage() {
   const totalPages = Math.ceil(totalCount / PER_PAGE)
 
   function getResponseIcon(response: string | null): string {
-    if (!response) return '...'
-    if (response === 'oui' || response === 'accepte') return 'Oui'
-    if (response === 'non' || response === 'refuse') return 'Non'
-    return response
+    if (!response) return '…'
+    if (['oui', 'accepte', 'acceptee', 'accord'].includes(response)) return 'Oui'
+    if (['non', 'refuse', 'refusee'].includes(response)) return 'Non'
+    if (response === 'en_attente') return 'En attente'
+    return getStatusLabel(response)
   }
 
   return (
@@ -183,8 +182,8 @@ export default function ProposalsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#2D2D2D]">Propositions</h1>
-          <p className="text-sm text-[#6B7280] mt-1">
+          <h1 className="text-[30px] font-semibold text-ink">Propositions</h1>
+          <p className="text-sm text-ink-soft mt-1">
             {totalCount} proposition{totalCount !== 1 ? 's' : ''}
           </p>
         </div>
@@ -242,13 +241,13 @@ export default function ProposalsPage() {
               href={`/proposals/${proposal.id}`}
               className="group"
             >
-              <Card className="hover:shadow-md transition-shadow h-full">
+              <Card className="hover:shadow-card-hover transition-shadow h-full">
                 {/* Status badge + date */}
                 <div className="flex items-center justify-between mb-4">
                   <Badge variant={proposal.status as never}>
                     {getStatusLabel(proposal.status)}
                   </Badge>
-                  <span className="text-xs text-[#6B7280]">
+                  <span className="text-xs text-ink-soft">
                     {formatDate(proposal.updated_at)}
                   </span>
                 </div>
@@ -256,36 +255,36 @@ export default function ProposalsPage() {
                 {/* Woman / Man pair */}
                 <div className="flex items-center gap-3 mb-4">
                   {/* Woman */}
-                  <div className="flex-1 bg-pink-50 rounded-lg p-3 text-center">
-                    <p className="text-xs text-[#6B7280] uppercase tracking-wider mb-1">
+                  <div className="flex-1 bg-plum-light rounded-lg p-3 text-center">
+                    <p className="text-xs text-ink-soft uppercase tracking-wider mb-1">
                       Elle
                     </p>
-                    <p className="text-sm font-semibold text-[#2D2D2D]">
+                    <p className="text-sm font-semibold text-ink">
                       {proposal.candidate_woman
                         ? `${proposal.candidate_woman.first_name} ${proposal.candidate_woman.last_name}`
                         : '(supprimee)'}
                     </p>
                     {proposal.candidate_woman?.city && (
-                      <p className="text-xs text-[#6B7280] mt-0.5">
+                      <p className="text-xs text-ink-soft mt-0.5">
                         {proposal.candidate_woman.city}
                       </p>
                     )}
                   </div>
 
-                  <Heart className="h-5 w-5 text-[#6B3A5B] shrink-0" />
+                  <Heart className="h-5 w-5 text-plum shrink-0" />
 
                   {/* Man */}
-                  <div className="flex-1 bg-blue-50 rounded-lg p-3 text-center">
-                    <p className="text-xs text-[#6B7280] uppercase tracking-wider mb-1">
+                  <div className="flex-1 bg-plum-light rounded-lg p-3 text-center">
+                    <p className="text-xs text-ink-soft uppercase tracking-wider mb-1">
                       Lui
                     </p>
-                    <p className="text-sm font-semibold text-[#2D2D2D]">
+                    <p className="text-sm font-semibold text-ink">
                       {proposal.candidate_man
                         ? `${proposal.candidate_man.first_name} ${proposal.candidate_man.last_name}`
                         : '(supprime)'}
                     </p>
                     {proposal.candidate_man?.city && (
-                      <p className="text-xs text-[#6B7280] mt-0.5">
+                      <p className="text-xs text-ink-soft mt-0.5">
                         {proposal.candidate_man.city}
                       </p>
                     )}
@@ -293,16 +292,16 @@ export default function ProposalsPage() {
                 </div>
 
                 {/* Responses */}
-                <div className="flex items-center gap-4 text-xs text-[#6B7280] mb-3">
+                <div className="flex items-center gap-4 text-xs text-ink-soft mb-3">
                   <span>
                     Reponse elle :{' '}
-                    <span className="font-medium text-[#2D2D2D]">
+                    <span className="font-medium text-ink">
                       {getResponseIcon(proposal.woman_response)}
                     </span>
                   </span>
                   <span>
                     Reponse lui :{' '}
-                    <span className="font-medium text-[#2D2D2D]">
+                    <span className="font-medium text-ink">
                       {getResponseIcon(proposal.man_response)}
                     </span>
                   </span>
@@ -310,7 +309,7 @@ export default function ProposalsPage() {
 
                 {/* Coordinator */}
                 {proposal.creator && (
-                  <div className="flex items-center gap-1.5 text-xs text-[#6B7280] mb-2">
+                  <div className="flex items-center gap-1.5 text-xs text-ink-soft mb-2">
                     <User className="h-3.5 w-3.5" />
                     <span>{proposal.creator.full_name}</span>
                   </div>
@@ -318,14 +317,14 @@ export default function ProposalsPage() {
 
                 {/* Next action */}
                 {proposal.next_action && (
-                  <div className="flex items-start gap-1.5 text-xs bg-[#C5A55A]/5 border border-[#C5A55A]/20 rounded-md px-2.5 py-1.5 mt-2">
-                    <ArrowRight className="h-3.5 w-3.5 text-[#C5A55A] shrink-0 mt-0.5" />
+                  <div className="flex items-start gap-1.5 text-xs bg-gold/5 border border-gold/20 rounded-md px-2.5 py-1.5 mt-2">
+                    <ArrowRight className="h-3.5 w-3.5 text-gold shrink-0 mt-0.5" />
                     <div>
-                      <span className="text-[#2D2D2D] font-medium">
+                      <span className="text-ink font-medium">
                         {proposal.next_action}
                       </span>
                       {proposal.next_action_date && (
-                        <span className="text-[#6B7280] ml-1">
+                        <span className="text-ink-soft ml-1">
                           ({formatDate(proposal.next_action_date)})
                         </span>
                       )}
@@ -350,7 +349,7 @@ export default function ProposalsPage() {
           >
             Precedent
           </Button>
-          <span className="text-sm text-[#6B7280]">
+          <span className="text-sm text-ink-soft">
             Page {page} sur {totalPages}
           </span>
           <Button
