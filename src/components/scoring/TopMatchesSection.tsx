@@ -20,7 +20,7 @@ function DimensionMiniBar({ dim }: { dim: DimensionScore }) {
   if (dim.score < 0) return null
   return (
     <div className="flex items-center gap-2">
-      <span className="text-xs text-[#6B7280] w-28 truncate">{dim.label}</span>
+      <span className="text-xs text-[#4B5563] w-28 truncate">{dim.label}</span>
       <div className="flex-1 h-1 bg-gray-100 rounded-full overflow-hidden">
         <div
           className={`h-full rounded-full ${levelColors[dim.level]}`}
@@ -43,7 +43,7 @@ function MatchCard({ match }: { match: MatchResult }) {
       <div className="p-4">
         <div className="flex items-center gap-3 mb-3">
           <div className="flex-1 text-center">
-            <p className="text-xs text-[#6B7280] uppercase tracking-wider mb-0.5">Elle</p>
+            <p className="text-xs text-[#4B5563] uppercase tracking-wider mb-0.5">Elle</p>
             <Link
               href={`/candidates/${match.woman.id}`}
               className="text-sm font-semibold text-[#2D2D2D] hover:text-[#6B3A5B] transition-colors"
@@ -52,7 +52,7 @@ function MatchCard({ match }: { match: MatchResult }) {
             </Link>
             <div className="flex items-center justify-center gap-1 mt-0.5">
               {match.woman.city && (
-                <span className="text-xs text-[#6B7280] flex items-center gap-0.5">
+                <span className="text-xs text-[#4B5563] flex items-center gap-0.5">
                   <MapPin className="h-3 w-3" />
                   {match.woman.city}
                 </span>
@@ -66,7 +66,7 @@ function MatchCard({ match }: { match: MatchResult }) {
           </div>
 
           <div className="flex-1 text-center">
-            <p className="text-xs text-[#6B7280] uppercase tracking-wider mb-0.5">Lui</p>
+            <p className="text-xs text-[#4B5563] uppercase tracking-wider mb-0.5">Lui</p>
             <Link
               href={`/men/${match.man.id}`}
               className="text-sm font-semibold text-[#2D2D2D] hover:text-[#6B3A5B] transition-colors"
@@ -75,7 +75,7 @@ function MatchCard({ match }: { match: MatchResult }) {
             </Link>
             <div className="flex items-center justify-center gap-1 mt-0.5">
               {match.man.city && (
-                <span className="text-xs text-[#6B7280] flex items-center gap-0.5">
+                <span className="text-xs text-[#4B5563] flex items-center gap-0.5">
                   <MapPin className="h-3 w-3" />
                   {match.man.city}
                 </span>
@@ -94,7 +94,7 @@ function MatchCard({ match }: { match: MatchResult }) {
           <button
             type="button"
             onClick={() => setExpanded(!expanded)}
-            className="mt-2 text-xs text-[#87A878] hover:underline flex items-center gap-1 mx-auto"
+            className="mt-2 text-xs text-[#3D6B35] hover:underline flex items-center gap-1 mx-auto"
           >
             {expanded ? 'Masquer' : `${knownDims.length - 4} autres criteres`}
             {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
@@ -130,7 +130,7 @@ interface TopMatchesSectionProps {
 export default function TopMatchesSection({ matches }: TopMatchesSectionProps) {
   if (matches.length === 0) {
     return (
-      <div className="py-8 text-center text-sm text-[#6B7280]">
+      <div className="py-8 text-center text-sm text-[#4B5563]">
         Pas assez de candidats actifs pour calculer des suggestions.
       </div>
     )

@@ -146,7 +146,7 @@ export default async function DashboardPage() {
       value: availableRes.count ?? 0,
       icon: <Users className="h-6 w-6" />,
       href: '/candidates?availability=disponible',
-      color: 'text-[#87A878]',
+      color: 'text-[#3D6B35]',
       bgColor: 'bg-[#87A878]/10',
     },
     {
@@ -260,7 +260,7 @@ export default async function DashboardPage() {
         <h1 className="text-2xl font-bold text-[#2D2D2D]">
           Bonjour, {profile?.full_name ?? 'Utilisateur'}
         </h1>
-        <p className="text-sm text-[#6B7280] mt-1 capitalize">{todayFormatted}</p>
+        <p className="text-sm text-[#4B5563] mt-1 capitalize">{todayFormatted}</p>
       </div>
 
       {/* Cartes de statistiques */}
@@ -270,7 +270,7 @@ export default async function DashboardPage() {
             <Card className="hover:shadow-md transition-shadow h-full">
               <div className="flex items-start justify-between">
                 <div className="space-y-2">
-                  <p className="text-sm text-[#6B7280] leading-tight">
+                  <p className="text-sm text-[#4B5563] leading-tight">
                     {stat.label}
                   </p>
                   <p className="text-3xl font-bold text-[#2D2D2D]">
@@ -283,7 +283,7 @@ export default async function DashboardPage() {
                   {stat.icon}
                 </div>
               </div>
-              <div className="mt-3 flex items-center text-xs text-[#6B7280] group-hover:text-[#87A878] transition-colors">
+              <div className="mt-3 flex items-center text-xs text-[#4B5563] group-hover:text-[#3D6B35] transition-colors">
                 <span>Voir le detail</span>
                 <ChevronRight className="h-3 w-3 ml-1" />
               </div>
@@ -301,7 +301,7 @@ export default async function DashboardPage() {
           </h2>
           <Link
             href="/proposals/new"
-            className="text-sm text-[#87A878] hover:underline"
+            className="text-sm text-[#3D6B35] hover:underline"
           >
             Nouvelle proposition
           </Link>
@@ -321,7 +321,7 @@ export default async function DashboardPage() {
               </h2>
               <Link
                 href="/agenda"
-                className="text-sm text-[#87A878] hover:underline"
+                className="text-sm text-[#3D6B35] hover:underline"
               >
                 Tout voir
               </Link>
@@ -330,7 +330,7 @@ export default async function DashboardPage() {
           padding="none"
         >
           {upcomingTasks.length === 0 ? (
-            <div className="py-8 text-center text-sm text-[#6B7280]">
+            <div className="py-8 text-center text-sm text-[#4B5563]">
               Aucune action prevue pour les 7 prochains jours
             </div>
           ) : (
@@ -349,7 +349,7 @@ export default async function DashboardPage() {
                       <p className="text-sm font-medium text-[#2D2D2D] truncate">
                         {task.title}
                       </p>
-                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-[#6B7280]">
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-[#4B5563]">
                         {task.assignee && (
                           <span className="flex items-center gap-1">
                             <User className="h-3 w-3" />
@@ -382,7 +382,7 @@ export default async function DashboardPage() {
           padding="none"
         >
           {recentActivity.length === 0 ? (
-            <div className="py-8 text-center text-sm text-[#6B7280]">
+            <div className="py-8 text-center text-sm text-[#4B5563]">
               Aucune activite recente
             </div>
           ) : (
@@ -403,12 +403,12 @@ export default async function DashboardPage() {
                       {log.details &&
                         typeof log.details === 'object' &&
                         'name' in log.details && (
-                          <p className="text-xs text-[#6B7280] mt-0.5 truncate">
+                          <p className="text-xs text-[#4B5563] mt-0.5 truncate">
                             {String(log.details.name)}
                           </p>
                         )}
                     </div>
-                    <span className="text-xs text-[#6B7280] whitespace-nowrap shrink-0">
+                    <span className="text-xs text-[#4B5563] whitespace-nowrap shrink-0">
                       {formatDateTime(log.created_at)}
                     </span>
                   </div>

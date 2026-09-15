@@ -18,8 +18,8 @@ function DimensionBar({ dim }: { dim: DimensionScore }) {
   if (dim.score < 0) {
     return (
       <div className="flex items-center justify-between py-1.5">
-        <span className="text-xs text-[#6B7280]">{dim.label}</span>
-        <span className="text-xs text-gray-400 italic">Donnees manquantes</span>
+        <span className="text-xs text-[#4B5563]">{dim.label}</span>
+        <span className="text-xs text-gray-600 italic">Donnees manquantes</span>
       </div>
     )
   }
@@ -55,14 +55,14 @@ export default function ScoreDetails({ result, compact = false }: ScoreDetailsPr
     <div>
       <div className="flex items-center gap-3">
         <ScoreBadge score={result.total} level={result.level} size={compact ? 'sm' : 'md'} />
-        <span className="text-xs text-[#6B7280]">
+        <span className="text-xs text-[#4B5563]">
           {result.coveredDimensions}/{result.totalDimensions} criteres evalues
         </span>
         {!compact && (
           <button
             type="button"
             onClick={() => setExpanded(!expanded)}
-            className="ml-auto text-xs text-[#87A878] hover:underline flex items-center gap-1"
+            className="ml-auto text-xs text-[#3D6B35] hover:underline flex items-center gap-1"
           >
             {expanded ? 'Masquer' : 'Details'}
             {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
@@ -87,7 +87,7 @@ export default function ScoreDetails({ result, compact = false }: ScoreDetailsPr
           ))}
           {unknownDimensions.length > 0 && (
             <div className="pt-2 border-t border-dashed border-[#E8E0D4] mt-2">
-              <p className="text-xs text-gray-400 mb-1">Non evalues :</p>
+              <p className="text-xs text-gray-600 mb-1">Non evalues :</p>
               {unknownDimensions.map((dim) => (
                 <DimensionBar key={dim.key} dim={dim} />
               ))}

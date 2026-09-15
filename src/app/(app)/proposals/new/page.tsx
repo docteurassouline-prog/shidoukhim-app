@@ -214,11 +214,11 @@ export default function NewProposalPage() {
   ) {
     return (
       <div>
-        <h3 className="text-sm font-semibold text-[#6B7280] uppercase tracking-wider mb-2">
+        <h3 className="text-sm font-semibold text-[#4B5563] uppercase tracking-wider mb-2">
           {label}
         </h3>
         <div className="relative mb-3">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6B7280]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#4B5563]" />
           <input
             type="text"
             value={searchValue}
@@ -229,7 +229,7 @@ export default function NewProposalPage() {
         </div>
         <div className="max-h-64 overflow-y-auto border border-[#E8E0D4] rounded-lg divide-y divide-[#E8E0D4]">
           {candidates.length === 0 ? (
-            <div className="py-6 text-center text-sm text-[#6B7280]">
+            <div className="py-6 text-center text-sm text-[#4B5563]">
               Aucun resultat
             </div>
           ) : (
@@ -251,7 +251,7 @@ export default function NewProposalPage() {
                       <span className="font-medium text-[#2D2D2D]">
                         {c.first_name} {c.last_name}
                       </span>
-                      <span className="text-[#6B7280] ml-2">
+                      <span className="text-[#4B5563] ml-2">
                         {calculateAge(c.date_of_birth, c.age_estimate, c.is_age_estimate)}
                       </span>
                     </div>
@@ -259,7 +259,7 @@ export default function NewProposalPage() {
                       <Check className="h-4 w-4 text-[#87A878]" />
                     )}
                   </div>
-                  <div className="flex items-center gap-2 mt-0.5 text-xs text-[#6B7280]">
+                  <div className="flex items-center gap-2 mt-0.5 text-xs text-[#4B5563]">
                     {c.city && <span>{c.city}</span>}
                     {c.profession && <span>- {c.profession}</span>}
                   </div>
@@ -280,8 +280,8 @@ export default function NewProposalPage() {
     if (!candidate) {
       return (
         <div className={`${bgColor} rounded-lg p-4 text-center`}>
-          <User className="h-10 w-10 text-[#6B7280]/30 mx-auto mb-2" />
-          <p className="text-sm text-[#6B7280]">
+          <User className="h-10 w-10 text-[#4B5563]/30 mx-auto mb-2" />
+          <p className="text-sm text-[#4B5563]">
             Selectionnez {label.toLowerCase()}
           </p>
         </div>
@@ -295,25 +295,25 @@ export default function NewProposalPage() {
         </h4>
         <dl className="space-y-1.5 text-xs">
           <div className="flex justify-between">
-            <dt className="text-[#6B7280]">Age</dt>
+            <dt className="text-[#4B5563]">Age</dt>
             <dd className="font-medium text-[#2D2D2D]">
               {calculateAge(candidate.date_of_birth, candidate.age_estimate, candidate.is_age_estimate)}
             </dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-[#6B7280]">Ville</dt>
+            <dt className="text-[#4B5563]">Ville</dt>
             <dd className="font-medium text-[#2D2D2D]">
               {candidate.city || 'Non renseigne'}
             </dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-[#6B7280]">Profession</dt>
+            <dt className="text-[#4B5563]">Profession</dt>
             <dd className="font-medium text-[#2D2D2D]">
               {candidate.profession || 'Non renseigné'}
             </dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-[#6B7280]">Courant</dt>
+            <dt className="text-[#4B5563]">Courant</dt>
             <dd className="font-medium text-[#2D2D2D]">
               {candidate.courant
                 ? getCourantLabel(candidate.courant)
@@ -321,7 +321,7 @@ export default function NewProposalPage() {
             </dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-[#6B7280]">Communauté</dt>
+            <dt className="text-[#4B5563]">Communauté</dt>
             <dd className="font-medium text-[#2D2D2D]">
               {candidate.community
                 ? getCommunityEthnicLabel(candidate.community)
@@ -330,14 +330,14 @@ export default function NewProposalPage() {
           </div>
           {candidate.shabbat_practice && (
             <div className="flex justify-between">
-              <dt className="text-[#6B7280]">Chabbat</dt>
+              <dt className="text-[#4B5563]">Chabbat</dt>
               <dd className="font-medium text-[#2D2D2D]">
                 {getShabbatPracticeLabel(candidate.shabbat_practice)}
               </dd>
             </div>
           )}
           <div className="flex justify-between">
-            <dt className="text-[#6B7280]">Disponibilite</dt>
+            <dt className="text-[#4B5563]">Disponibilite</dt>
             <dd>
               <Badge variant={candidate.availability as 'disponible'}>
                 {getAvailabilityLabel(candidate.availability)}
@@ -348,13 +348,13 @@ export default function NewProposalPage() {
 
         {/* Partner preferences */}
         <div className="mt-3 pt-3 border-t border-black/5">
-          <p className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider mb-1.5">
+          <p className="text-xs font-semibold text-[#4B5563] uppercase tracking-wider mb-1.5">
             Recherche
           </p>
           <dl className="space-y-1 text-xs">
             {(candidate.age_min || candidate.age_max) && (
               <div className="flex justify-between">
-                <dt className="text-[#6B7280]">Âge souhaité</dt>
+                <dt className="text-[#4B5563]">Âge souhaité</dt>
                 <dd className="font-medium text-[#2D2D2D]">
                   {candidate.age_min || '?'} - {candidate.age_max || '?'} ans
                 </dd>
@@ -362,7 +362,7 @@ export default function NewProposalPage() {
             )}
             {candidate.preferred_cities && (
               <div className="flex justify-between">
-                <dt className="text-[#6B7280]">Villes</dt>
+                <dt className="text-[#4B5563]">Villes</dt>
                 <dd className="font-medium text-[#2D2D2D]">
                   {candidate.preferred_cities}
                 </dd>
@@ -387,7 +387,7 @@ export default function NewProposalPage() {
       {/* Back */}
       <Link
         href="/proposals"
-        className="inline-flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-[#2D2D2D] transition-colors"
+        className="inline-flex items-center gap-1.5 text-sm text-[#4B5563] hover:text-[#2D2D2D] transition-colors"
       >
         <ArrowLeft className="h-4 w-4" />
         Retour aux propositions
@@ -477,25 +477,25 @@ export default function NewProposalPage() {
           {/* Score de compatibilite */}
           {selectedWoman && selectedMan && (
             <Card>
-              <h3 className="text-sm font-semibold text-[#6B7280] uppercase tracking-wider mb-3">
+              <h3 className="text-sm font-semibold text-[#4B5563] uppercase tracking-wider mb-3">
                 Score de compatibilite
               </h3>
               {loadingScore ? (
                 <div className="flex items-center gap-2 py-3">
                   <LoadingSpinner size="sm" />
-                  <span className="text-xs text-[#6B7280]">Calcul en cours...</span>
+                  <span className="text-xs text-[#4B5563]">Calcul en cours...</span>
                 </div>
               ) : pairScore ? (
                 <ScoreDetails result={pairScore} />
               ) : (
-                <p className="text-xs text-[#6B7280]">Impossible de calculer le score.</p>
+                <p className="text-xs text-[#4B5563]">Impossible de calculer le score.</p>
               )}
             </Card>
           )}
 
           {/* Loading conflicts */}
           {checkingConflicts && (
-            <div className="flex items-center gap-2 text-xs text-[#6B7280]">
+            <div className="flex items-center gap-2 text-xs text-[#4B5563]">
               <LoadingSpinner size="sm" />
               Verification des conflits...
             </div>

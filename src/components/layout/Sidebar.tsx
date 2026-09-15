@@ -58,12 +58,12 @@ export default function Sidebar({ user }: SidebarProps) {
           <span className="text-lg font-bold text-[#6B3A5B] truncate">
             Hava Dahan
           </span>
-          <span className="text-xs text-[#6B7280] hidden sm:inline">Shidoukhim</span>
+          <span className="text-xs text-[#4B5563] hidden sm:inline">Shidoukhim</span>
         </Link>
         {/* Close button — mobile only */}
         <button
           onClick={() => setMobileOpen(false)}
-          className="lg:hidden rounded-lg p-1.5 text-[#6B7280] hover:bg-gray-100 transition-colors"
+          className="lg:hidden rounded-lg p-1.5 text-[#4B5563] hover:bg-gray-100 transition-colors"
           aria-label="Fermer le menu"
         >
           <X className="h-5 w-5" />
@@ -87,7 +87,7 @@ export default function Sidebar({ user }: SidebarProps) {
                     'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
                     isActive
                       ? 'bg-[#6B3A5B]/10 text-[#6B3A5B]'
-                      : 'text-[#6B7280] hover:bg-gray-50 hover:text-[#2D2D2D]',
+                      : 'text-[#4B5563] hover:bg-gray-50 hover:text-[#2D2D2D]',
                   ].join(' ')}
                   aria-current={isActive ? 'page' : undefined}
                 >
@@ -120,12 +120,12 @@ export default function Sidebar({ user }: SidebarProps) {
             <p className="text-sm font-medium text-[#2D2D2D] truncate">
               {user.full_name}
             </p>
-            <p className="text-xs text-[#6B7280] truncate">{user.role}</p>
+            <p className="text-xs text-[#4B5563] truncate">{user.role}</p>
           </div>
         </div>
         <button
           onClick={handleLogout}
-          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-[#6B7280] hover:text-[#C45B5B] hover:bg-[#C45B5B]/5 rounded-lg transition-colors"
+          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-[#4B5563] hover:text-[#C45B5B] hover:bg-[#C45B5B]/5 rounded-lg transition-colors"
         >
           <LogOut className="h-4 w-4" />
           Déconnexion
@@ -139,7 +139,7 @@ export default function Sidebar({ user }: SidebarProps) {
       {/* Mobile hamburger (visible below lg) */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="lg:hidden fixed top-3 left-3 z-40 rounded-lg p-2 bg-white border border-[#E8E0D4] shadow-sm text-[#6B7280] hover:bg-gray-50 transition-colors"
+        className="lg:hidden fixed top-3 left-3 z-40 rounded-lg p-2 bg-white border border-[#E8E0D4] shadow-sm text-[#4B5563] hover:bg-gray-50 transition-colors"
         aria-label="Ouvrir le menu"
       >
         <Menu className="h-5 w-5" />
