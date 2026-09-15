@@ -183,7 +183,7 @@ export default function EspaceCandidatePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FFFBF0] flex items-center justify-center">
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
         <LoadingSpinner text="Chargement de votre espace..." size="lg" />
       </div>
     )
@@ -195,15 +195,15 @@ export default function EspaceCandidatePage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#FFFBF0] flex items-center justify-center px-4">
-        <div className="bg-white rounded-2xl shadow-lg border border-[#E8E0D4] p-8 max-w-md text-center">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#C45B5B]/10 mb-4">
-            <Heart className="w-7 h-7 text-[#C45B5B]" />
+      <div className="min-h-screen bg-canvas flex items-center justify-center px-4">
+        <div className="bg-surface rounded-2xl shadow-lg border border-line p-8 max-w-md text-center">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-danger/10 mb-4">
+            <Heart className="w-7 h-7 text-danger" />
           </div>
-          <p className="text-[#2D2D2D] font-medium mb-2">{error}</p>
+          <p className="text-ink font-medium mb-2">{error}</p>
           <Link
             href="/candidate-login"
-            className="text-sm text-[#6B3A5B] hover:text-[#5A2E4D] underline underline-offset-2"
+            className="text-sm text-plum hover:text-plum-hover underline underline-offset-2"
           >
             Retour a la connexion
           </Link>
@@ -225,49 +225,49 @@ export default function EspaceCandidatePage() {
   // -----------------------------------------------------------------------
 
   return (
-    <div className="min-h-screen bg-[#FFFBF0]">
+    <div className="min-h-screen bg-canvas">
       <div className="max-w-3xl mx-auto px-4 py-8 sm:py-12">
-        {/* ── Accueil ─────────────────────────────────────── */}
+        {/* ── Accueil ──────────────────────────────────────────────── */}
         <section className="mb-10">
           <div className="flex items-center gap-3 mb-2">
-            <div className="inline-flex items-center justify-center w-11 h-11 rounded-full bg-[#6B3A5B]/10">
-              <Heart className="w-5 h-5 text-[#6B3A5B]" fill="#6B3A5B" />
+            <div className="inline-flex items-center justify-center w-11 h-11 rounded-full bg-plum/10">
+              <Heart className="w-5 h-5 text-plum" fill="currentColor" />
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#2D2D2D] tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold text-ink tracking-tight">
               Bonjour {firstName}
             </h1>
           </div>
-          <p className="text-[#6B7280] text-sm ml-14">
+          <p className="text-ink-soft text-sm ml-14">
             Bienvenue dans votre espace personnel. Vous y trouverez vos propositions de rencontres et les retours a donner.
           </p>
         </section>
 
-        {/* ── Statistiques ────────────────────────────────── */}
+        {/* ── Statistiques ────────────────────────────────────────────── */}
         <section className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
           <StatCard
-            icon={<Heart className="w-5 h-5 text-[#6B3A5B]" />}
+            icon={<Heart className="w-5 h-5 text-plum" />}
             value={proposals.length}
             label="Propositions"
-            bgIcon="bg-[#6B3A5B]/10"
+            bgIcon="bg-plum/10"
           />
           <StatCard
-            icon={<Calendar className="w-5 h-5 text-[#87A878]" />}
+            icon={<Calendar className="w-5 h-5 text-sage" />}
             value={meetings.length}
             label="Rencontres"
-            bgIcon="bg-[#87A878]/15"
+            bgIcon="bg-sage/15"
           />
           <StatCard
-            icon={<MessageCircle className="w-5 h-5 text-[#C5A55A]" />}
+            icon={<MessageCircle className="w-5 h-5 text-gold" />}
             value={meetingsPendingFeedback.length}
             label="Avis a donner"
-            bgIcon="bg-[#C5A55A]/15"
+            bgIcon="bg-gold/15"
           />
         </section>
 
-        {/* ── Propositions actives ─────────────────────────── */}
+        {/* ── Propositions actives ─────────────────────────────────────── */}
         <section className="mb-10">
-          <h2 className="text-lg font-semibold text-[#6B3A5B] mb-4 flex items-center gap-2">
-            <Star className="w-4 h-4 text-[#C5A55A]" />
+          <h2 className="font-display text-[22px] font-semibold text-plum mb-4 flex items-center gap-2">
+            <Star className="w-4 h-4 text-gold" />
             Propositions en cours
           </h2>
 
@@ -285,13 +285,13 @@ export default function EspaceCandidatePage() {
                 return (
                   <div
                     key={proposal.id}
-                    className="bg-white rounded-xl border border-[#E8E0D4] p-4 sm:p-5 flex items-center justify-between gap-4 hover:shadow-md transition-shadow"
+                    className="bg-surface rounded-[14px] border border-line p-4 sm:p-5 flex items-center justify-between gap-4 hover:shadow-card-hover transition-shadow"
                   >
                     <div className="min-w-0">
-                      <p className="font-medium text-[#2D2D2D] truncate">
+                      <p className="font-medium text-ink truncate">
                         {other?.first_name ?? pronoun}
                       </p>
-                      <p className="text-xs text-[#6B7280] mt-0.5">
+                      <p className="text-xs text-ink-soft mt-0.5">
                         {[
                           other?.city,
                           other?.age_estimate ? `~${other.age_estimate} ans` : null,
@@ -310,10 +310,10 @@ export default function EspaceCandidatePage() {
           )}
         </section>
 
-        {/* ── Rencontres recentes ──────────────────────────── */}
+        {/* ── Rencontres recentes ──────────────────────────────────────── */}
         <section>
-          <h2 className="text-lg font-semibold text-[#6B3A5B] mb-4 flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-[#87A878]" />
+          <h2 className="font-display text-[22px] font-semibold text-plum mb-4 flex items-center gap-2">
+            <Calendar className="w-4 h-4 text-sage" />
             Rencontres recentes
           </h2>
 
@@ -328,14 +328,14 @@ export default function EspaceCandidatePage() {
                 return (
                   <div
                     key={meeting.id}
-                    className="bg-white rounded-xl border border-[#E8E0D4] p-4 sm:p-5"
+                    className="bg-surface rounded-[14px] border border-line p-4 sm:p-5"
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="min-w-0">
-                        <p className="font-medium text-[#2D2D2D]">
+                        <p className="font-medium text-ink">
                           Rencontre n&deg;{meeting.meeting_number}
                         </p>
-                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-[#6B7280]">
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-ink-soft">
                           {meeting.scheduled_at && (
                             <span className="flex items-center gap-1">
                               <Calendar className="w-3.5 h-3.5" />
@@ -355,10 +355,10 @@ export default function EspaceCandidatePage() {
 
                     {/* Bouton feedback */}
                     {needsFeedback && (
-                      <div className="mt-3 pt-3 border-t border-[#E8E0D4]">
+                      <div className="mt-3 pt-3 border-t border-line">
                         <Link
                           href={`/espace-candidate/rencontres/${meeting.id}/feedback`}
-                          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white bg-[#87A878] hover:bg-[#769968] transition-colors"
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white bg-sage hover:bg-sage-hover transition-colors"
                         >
                           <MessageCircle className="w-4 h-4" />
                           Donner mon avis
@@ -367,8 +367,8 @@ export default function EspaceCandidatePage() {
                     )}
 
                     {meeting.status === 'effectuee' && hasFeedback && (
-                      <div className="mt-3 pt-3 border-t border-[#E8E0D4]">
-                        <span className="inline-flex items-center gap-1.5 text-sm text-[#87A878] font-medium">
+                      <div className="mt-3 pt-3 border-t border-line">
+                        <span className="inline-flex items-center gap-1.5 text-sm text-sage font-medium">
                           <svg
                             className="w-4 h-4"
                             fill="none"
@@ -409,15 +409,15 @@ function StatCard({
   bgIcon: string
 }) {
   return (
-    <div className="bg-white rounded-xl border border-[#E8E0D4] p-4 flex items-center gap-4">
+    <div className="bg-surface rounded-[14px] border border-line p-4 flex items-center gap-4">
       <div
         className={`shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-full ${bgIcon}`}
       >
         {icon}
       </div>
       <div>
-        <p className="text-2xl font-bold text-[#2D2D2D] leading-none">{value}</p>
-        <p className="text-xs text-[#6B7280] mt-0.5">{label}</p>
+        <p className="text-2xl font-bold text-ink leading-none">{value}</p>
+        <p className="text-xs text-ink-soft mt-0.5">{label}</p>
       </div>
     </div>
   )
@@ -425,11 +425,11 @@ function StatCard({
 
 function EmptyCard({ message }: { message: string }) {
   return (
-    <div className="bg-white rounded-xl border border-dashed border-[#E8E0D4] p-6 text-center">
-      <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-[#C5A55A]/10 mb-3">
-        <Heart className="w-5 h-5 text-[#C5A55A]" />
+    <div className="bg-surface rounded-xl border border-dashed border-line p-6 text-center">
+      <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gold/10 mb-3">
+        <Heart className="w-5 h-5 text-gold" />
       </div>
-      <p className="text-sm text-[#6B7280] leading-relaxed max-w-sm mx-auto">{message}</p>
+      <p className="text-sm text-ink-soft leading-relaxed max-w-sm mx-auto">{message}</p>
     </div>
   )
 }

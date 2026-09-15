@@ -214,22 +214,22 @@ export default function NewProposalPage() {
   ) {
     return (
       <div>
-        <h3 className="text-sm font-semibold text-[#4B5563] uppercase tracking-wider mb-2">
+        <h3 className="text-sm font-semibold text-ink-soft uppercase tracking-wider mb-2">
           {label}
         </h3>
         <div className="relative mb-3">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#4B5563]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-soft" />
           <input
             type="text"
             value={searchValue}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Rechercher..."
-            className="w-full pl-9 pr-3 py-2 text-sm border border-[#E8E0D4] rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#87A878]/50 focus:border-[#87A878]"
+            className="w-full pl-9 pr-3 py-2 text-sm border border-line rounded-lg bg-surface focus:outline-none focus:ring-2 focus:ring-sage/50 focus:border-sage"
           />
         </div>
-        <div className="max-h-64 overflow-y-auto border border-[#E8E0D4] rounded-lg divide-y divide-[#E8E0D4]">
+        <div className="max-h-64 overflow-y-auto border border-line rounded-lg divide-y divide-line">
           {candidates.length === 0 ? (
-            <div className="py-6 text-center text-sm text-[#4B5563]">
+            <div className="py-6 text-center text-sm text-ink-soft">
               Aucun resultat
             </div>
           ) : (
@@ -243,23 +243,23 @@ export default function NewProposalPage() {
                     'w-full text-left px-3 py-2.5 transition-colors text-sm',
                     isSelected
                       ? `${color} ring-1 ring-inset ring-current/20`
-                      : 'hover:bg-gray-50'
+                      : 'hover:bg-stone-50'
                   )}
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="font-medium text-[#2D2D2D]">
+                      <span className="font-medium text-ink">
                         {c.first_name} {c.last_name}
                       </span>
-                      <span className="text-[#4B5563] ml-2">
+                      <span className="text-ink-soft ml-2">
                         {calculateAge(c.date_of_birth, c.age_estimate, c.is_age_estimate)}
                       </span>
                     </div>
                     {isSelected && (
-                      <Check className="h-4 w-4 text-[#87A878]" />
+                      <Check className="h-4 w-4 text-sage" />
                     )}
                   </div>
-                  <div className="flex items-center gap-2 mt-0.5 text-xs text-[#4B5563]">
+                  <div className="flex items-center gap-2 mt-0.5 text-xs text-ink-soft">
                     {c.city && <span>{c.city}</span>}
                     {c.profession && <span>- {c.profession}</span>}
                   </div>
@@ -280,8 +280,8 @@ export default function NewProposalPage() {
     if (!candidate) {
       return (
         <div className={`${bgColor} rounded-lg p-4 text-center`}>
-          <User className="h-10 w-10 text-[#4B5563]/30 mx-auto mb-2" />
-          <p className="text-sm text-[#4B5563]">
+          <User className="h-10 w-10 text-ink-soft/30 mx-auto mb-2" />
+          <p className="text-sm text-ink-soft">
             Selectionnez {label.toLowerCase()}
           </p>
         </div>
@@ -290,39 +290,39 @@ export default function NewProposalPage() {
 
     return (
       <div className={`${bgColor} rounded-lg p-4`}>
-        <h4 className="text-sm font-semibold text-[#2D2D2D] mb-3">
+        <h4 className="text-sm font-semibold text-ink mb-3">
           {candidate.first_name} {candidate.last_name}
         </h4>
         <dl className="space-y-1.5 text-xs">
           <div className="flex justify-between">
-            <dt className="text-[#4B5563]">Age</dt>
-            <dd className="font-medium text-[#2D2D2D]">
+            <dt className="text-ink-soft">Age</dt>
+            <dd className="font-medium text-ink">
               {calculateAge(candidate.date_of_birth, candidate.age_estimate, candidate.is_age_estimate)}
             </dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-[#4B5563]">Ville</dt>
-            <dd className="font-medium text-[#2D2D2D]">
+            <dt className="text-ink-soft">Ville</dt>
+            <dd className="font-medium text-ink">
               {candidate.city || 'Non renseigne'}
             </dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-[#4B5563]">Profession</dt>
-            <dd className="font-medium text-[#2D2D2D]">
+            <dt className="text-ink-soft">Profession</dt>
+            <dd className="font-medium text-ink">
               {candidate.profession || 'Non renseigné'}
             </dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-[#4B5563]">Courant</dt>
-            <dd className="font-medium text-[#2D2D2D]">
+            <dt className="text-ink-soft">Courant</dt>
+            <dd className="font-medium text-ink">
               {candidate.courant
                 ? getCourantLabel(candidate.courant)
                 : 'Non renseigné'}
             </dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-[#4B5563]">Communauté</dt>
-            <dd className="font-medium text-[#2D2D2D]">
+            <dt className="text-ink-soft">Communauté</dt>
+            <dd className="font-medium text-ink">
               {candidate.community
                 ? getCommunityEthnicLabel(candidate.community)
                 : 'Non renseigné'}
@@ -330,14 +330,14 @@ export default function NewProposalPage() {
           </div>
           {candidate.shabbat_practice && (
             <div className="flex justify-between">
-              <dt className="text-[#4B5563]">Chabbat</dt>
-              <dd className="font-medium text-[#2D2D2D]">
+              <dt className="text-ink-soft">Chabbat</dt>
+              <dd className="font-medium text-ink">
                 {getShabbatPracticeLabel(candidate.shabbat_practice)}
               </dd>
             </div>
           )}
           <div className="flex justify-between">
-            <dt className="text-[#4B5563]">Disponibilite</dt>
+            <dt className="text-ink-soft">Disponibilite</dt>
             <dd>
               <Badge variant={candidate.availability as 'disponible'}>
                 {getAvailabilityLabel(candidate.availability)}
@@ -348,22 +348,22 @@ export default function NewProposalPage() {
 
         {/* Partner preferences */}
         <div className="mt-3 pt-3 border-t border-black/5">
-          <p className="text-xs font-semibold text-[#4B5563] uppercase tracking-wider mb-1.5">
+          <p className="text-xs font-semibold text-ink-soft uppercase tracking-wider mb-1.5">
             Recherche
           </p>
           <dl className="space-y-1 text-xs">
             {(candidate.age_min || candidate.age_max) && (
               <div className="flex justify-between">
-                <dt className="text-[#4B5563]">Âge souhaité</dt>
-                <dd className="font-medium text-[#2D2D2D]">
+                <dt className="text-ink-soft">Âge souhaité</dt>
+                <dd className="font-medium text-ink">
                   {candidate.age_min || '?'} - {candidate.age_max || '?'} ans
                 </dd>
               </div>
             )}
             {candidate.preferred_cities && (
               <div className="flex justify-between">
-                <dt className="text-[#4B5563]">Villes</dt>
-                <dd className="font-medium text-[#2D2D2D]">
+                <dt className="text-ink-soft">Villes</dt>
+                <dd className="font-medium text-ink">
                   {candidate.preferred_cities}
                 </dd>
               </div>
@@ -387,25 +387,25 @@ export default function NewProposalPage() {
       {/* Back */}
       <Link
         href="/proposals"
-        className="inline-flex items-center gap-1.5 text-sm text-[#4B5563] hover:text-[#2D2D2D] transition-colors"
+        className="inline-flex items-center gap-1.5 text-sm text-ink-soft hover:text-ink transition-colors"
       >
         <ArrowLeft className="h-4 w-4" />
         Retour aux propositions
       </Link>
 
-      <h1 className="text-2xl font-bold text-[#2D2D2D]">
+      <h1 className="text-[30px] font-semibold text-ink">
         Nouvelle proposition
       </h1>
 
       {/* Conflict warning */}
       {conflicts.length > 0 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
-          <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+        <div className="bg-gold-light border border-gold/30 rounded-lg p-4 flex items-start gap-3">
+          <AlertTriangle className="h-5 w-5 text-gold-deep shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-medium text-amber-800">
+            <p className="text-sm font-medium text-gold-deep">
               Attention : proposition(s) existante(s) detectee(s)
             </p>
-            <p className="text-xs text-amber-700 mt-1">
+            <p className="text-xs text-gold-deep mt-1">
               {conflicts.length} proposition(s) active(s) impliquant l'un de ces
               candidats. Verifiez qu'il n'y a pas de conflit d'exclusivite.
             </p>
@@ -414,7 +414,7 @@ export default function NewProposalPage() {
                 <Link
                   key={c.id}
                   href={`/proposals/${c.id}`}
-                  className="text-xs text-amber-700 underline block"
+                  className="text-xs text-gold-deep underline block"
                 >
                   Proposition {c.id.slice(0, 8)}... ({getStatusLabel(c.status)})
                 </Link>
@@ -436,7 +436,7 @@ export default function NewProposalPage() {
               womanSearch,
               setWomanSearch,
               'Candidate (elle)',
-              'bg-pink-50'
+              'bg-plum-light'
             )}
           </Card>
 
@@ -448,7 +448,7 @@ export default function NewProposalPage() {
               manSearch,
               setManSearch,
               'Candidat (lui)',
-              'bg-blue-50'
+              'bg-plum-light'
             )}
           </Card>
 
@@ -465,37 +465,37 @@ export default function NewProposalPage() {
 
         {/* Right: Side-by-side preview */}
         <div className="space-y-4">
-          <h2 className="text-base font-semibold text-[#2D2D2D]">
+          <h2 className="text-base font-semibold text-ink">
             Apercu de la proposition
           </h2>
 
           <div className="grid grid-cols-2 gap-4">
-            {renderProfileSummary(selectedWoman, 'une candidate', 'bg-pink-50/50')}
-            {renderProfileSummary(selectedMan, 'un candidat', 'bg-blue-50/50')}
+            {renderProfileSummary(selectedWoman, 'une candidate', 'bg-plum-light/50')}
+            {renderProfileSummary(selectedMan, 'un candidat', 'bg-plum-light/50')}
           </div>
 
           {/* Score de compatibilite */}
           {selectedWoman && selectedMan && (
             <Card>
-              <h3 className="text-sm font-semibold text-[#4B5563] uppercase tracking-wider mb-3">
+              <h3 className="text-sm font-semibold text-ink-soft uppercase tracking-wider mb-3">
                 Score de compatibilite
               </h3>
               {loadingScore ? (
                 <div className="flex items-center gap-2 py-3">
                   <LoadingSpinner size="sm" />
-                  <span className="text-xs text-[#4B5563]">Calcul en cours...</span>
+                  <span className="text-xs text-ink-soft">Calcul en cours...</span>
                 </div>
               ) : pairScore ? (
                 <ScoreDetails result={pairScore} />
               ) : (
-                <p className="text-xs text-[#4B5563]">Impossible de calculer le score.</p>
+                <p className="text-xs text-ink-soft">Impossible de calculer le score.</p>
               )}
             </Card>
           )}
 
           {/* Loading conflicts */}
           {checkingConflicts && (
-            <div className="flex items-center gap-2 text-xs text-[#4B5563]">
+            <div className="flex items-center gap-2 text-xs text-ink-soft">
               <LoadingSpinner size="sm" />
               Verification des conflits...
             </div>

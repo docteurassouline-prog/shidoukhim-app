@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
-import { Eye, EyeOff, Loader2, Heart, Sparkles } from 'lucide-react'
+import { Eye, EyeOff, Loader2 } from 'lucide-react'
 
 type Mode = 'login' | 'signup' | 'forgot'
 
@@ -139,479 +139,279 @@ export default function LoginPage() {
     setLoading(false)
   }
 
-  return (
-    <div
-      className="min-h-screen flex items-center justify-center px-4 py-12"
-      style={{ backgroundColor: '#FFFBF0' }}
-    >
-      {/* Background decoration */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div
-          className="absolute -top-24 -right-24 w-96 h-96 rounded-full opacity-10"
-          style={{ backgroundColor: '#C5A55A' }}
-        />
-        <div
-          className="absolute -bottom-32 -left-32 w-[500px] h-[500px] rounded-full opacity-10"
-          style={{ backgroundColor: '#87A878' }}
-        />
-        <div
-          className="absolute top-1/3 left-1/4 w-64 h-64 rounded-full opacity-5"
-          style={{ backgroundColor: '#6B3A5B' }}
-        />
-      </div>
+  const inputClass =
+    'w-full h-11 rounded-[10px] border border-line bg-surface px-3.5 text-sm text-ink placeholder:text-ink-muted/80 transition-colors hover:border-line-strong focus:border-plum focus:outline-none'
+  const labelClass = 'block text-[13px] font-medium text-ink-soft mb-1.5'
 
-      <div className="w-full max-w-md relative z-10">
-        {/* Header / Branding */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <Heart
-              className="w-6 h-6"
-              style={{ color: '#6B3A5B' }}
-              fill="#6B3A5B"
-            />
-            <Sparkles className="w-5 h-5" style={{ color: '#C5A55A' }} />
-          </div>
-          <h1
-            className="text-3xl font-bold tracking-tight"
-            style={{ color: '#2D2D2D' }}
-          >
-            Hava Dahan
-          </h1>
-          <p
-            className="text-lg font-medium mt-1"
-            style={{ color: '#6B3A5B', fontStyle: 'italic' }}
-          >
-            Shidoukhim
-          </p>
-          <div
-            className="mt-3 w-16 h-0.5 mx-auto rounded-full"
-            style={{ backgroundColor: '#C5A55A' }}
-          />
-          <p className="mt-4 text-sm" style={{ color: '#6B7280' }}>
-            Gestion des mises en relation
-          </p>
+  function switchMode(next: Mode) {
+    setMode(next)
+    setError(null)
+    setSuccess(null)
+  }
+
+  return (
+    <div className="min-h-screen grid lg:grid-cols-[1.05fr_1fr] bg-canvas">
+      {/* Panneau de marque */}
+      <aside className="relative hidden lg:flex flex-col justify-between overflow-hidden bg-plum-deep px-14 py-12 text-white">
+        <div
+          className="pointer-events-none absolute -top-40 -right-40 h-[520px] w-[520px] rounded-full opacity-30"
+          style={{ background: 'radial-gradient(closest-side, #B8974E 0%, transparent 70%)' }}
+          aria-hidden="true"
+        />
+        <div
+          className="pointer-events-none absolute -bottom-52 -left-32 h-[560px] w-[560px] rounded-full opacity-25"
+          style={{ background: 'radial-gradient(closest-side, #7A9A6C 0%, transparent 70%)' }}
+          aria-hidden="true"
+        />
+
+        <div className="relative">
+          <p className="text-[11px] uppercase tracking-[0.28em] text-white/50">Shidoukhim</p>
+          <p className="mt-2 font-display text-[40px] font-semibold leading-none">Hava Dahan</p>
         </div>
 
-        {/* Card */}
-        <div
-          className="bg-white rounded-2xl shadow-lg p-8"
-          style={{ borderTop: '3px solid #C5A55A' }}
-        >
-          {/* Tab switcher (visual only — controlled by mode state) */}
-          <div className="flex items-center gap-1 mb-6 p-1 rounded-xl bg-gray-50">
-            <button
-              type="button"
-              onClick={() => {
-                setMode('login')
-                setError(null)
-                setSuccess(null)
-              }}
-              className={cn(
-                'flex-1 py-2.5 rounded-lg text-sm font-medium transition-all duration-200',
-                mode === 'login'
-                  ? 'bg-white shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
-              )}
-              style={
-                mode === 'login' ? { color: '#2D2D2D' } : undefined
-              }
-            >
-              Connexion
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setMode('signup')
-                setError(null)
-                setSuccess(null)
-              }}
-              className={cn(
-                'flex-1 py-2.5 rounded-lg text-sm font-medium transition-all duration-200',
-                mode === 'signup'
-                  ? 'bg-white shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
-              )}
-              style={
-                mode === 'signup' ? { color: '#2D2D2D' } : undefined
-              }
-            >
-              Inscription
-            </button>
+        <div className="relative max-w-md">
+          <p className="font-display text-[34px] italic leading-[1.15] text-white/90">
+            « Celui qui trouve une épouse a trouvé le bonheur. »
+          </p>
+          <p className="mt-4 text-[12.5px] uppercase tracking-[0.2em] text-gold">Michlé 18, 22</p>
+        </div>
+
+        <div className="relative flex items-center gap-6 text-[12px] text-white/45">
+          <span>Fiches</span>
+          <span className="h-1 w-1 rounded-full bg-white/25" />
+          <span>Propositions</span>
+          <span className="h-1 w-1 rounded-full bg-white/25" />
+          <span>Rencontres</span>
+          <span className="h-1 w-1 rounded-full bg-white/25" />
+          <span>Suivi</span>
+        </div>
+      </aside>
+
+      {/* Formulaire */}
+      <main className="flex items-center justify-center px-6 py-12">
+        <div className="w-full max-w-[400px]">
+          <div className="mb-8 lg:hidden">
+            <p className="text-[11px] uppercase tracking-[0.28em] text-ink-muted">Shidoukhim</p>
+            <p className="font-display text-[34px] font-semibold leading-none text-plum">Hava Dahan</p>
           </div>
 
-          {/* Error */}
+          <h1 className="text-[32px] text-ink">
+            {mode === 'login' && 'Bienvenue'}
+            {mode === 'signup' && 'Créer un compte'}
+            {mode === 'forgot' && 'Mot de passe oublié'}
+          </h1>
+          <p className="mt-2 text-sm text-ink-soft">
+            {mode === 'login' && 'Connectez-vous pour accéder à vos dossiers.'}
+            {mode === 'signup' && 'Votre compte sera rattaché au cabinet Hava Dahan.'}
+            {mode === 'forgot' && 'Nous vous enverrons un lien de réinitialisation.'}
+          </p>
+
           {error && (
             <div
-              className="mb-4 p-3 rounded-lg text-sm"
-              style={{
-                backgroundColor: '#FEF2F2',
-                color: '#C45B5B',
-                border: '1px solid #FECACA',
-              }}
+              className="mt-6 rounded-[10px] border border-danger/25 bg-danger-light px-4 py-3 text-sm text-danger-deep"
+              role="alert"
             >
               {error}
             </div>
           )}
-
-          {/* Success */}
           {success && (
             <div
-              className="mb-4 p-3 rounded-lg text-sm"
-              style={{
-                backgroundColor: '#F0FDF4',
-                color: '#166534',
-                border: '1px solid #BBF7D0',
-              }}
+              className="mt-6 rounded-[10px] border border-sage/30 bg-sage-light px-4 py-3 text-sm text-sage-deep"
+              role="status"
             >
               {success}
             </div>
           )}
 
-          {/* Login form */}
           {mode === 'login' && (
-            <form onSubmit={handleLogin} className="space-y-4">
+            <form onSubmit={handleLogin} className="mt-8 space-y-5">
               <div>
-                <label
-                  htmlFor="login-email"
-                  className="block text-sm font-medium mb-1.5"
-                  style={{ color: '#2D2D2D' }}
-                >
-                  Adresse email
-                </label>
+                <label htmlFor="email" className={labelClass}>Adresse email</label>
                 <input
-                  id="login-email"
+                  id="email"
                   type="email"
+                  autoComplete="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="votre@email.com"
-                  autoComplete="email"
-                  className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all duration-200 focus:ring-2"
-                  style={{
-                    border: '1px solid #E8E0D4',
-                    color: '#2D2D2D',
-                    backgroundColor: '#FAFAF8',
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = '#87A878'
-                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(135,168,120,0.15)'
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = '#E8E0D4'
-                    e.currentTarget.style.boxShadow = 'none'
-                  }}
+                  className={inputClass}
                 />
               </div>
-
               <div>
-                <label
-                  htmlFor="login-password"
-                  className="block text-sm font-medium mb-1.5"
-                  style={{ color: '#2D2D2D' }}
-                >
-                  Mot de passe
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label htmlFor="password" className="text-[13px] font-medium text-ink-soft">
+                    Mot de passe
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => switchMode('forgot')}
+                    className="text-[12.5px] font-medium text-plum hover:text-plum-hover"
+                  >
+                    Oublié ?
+                  </button>
+                </div>
                 <div className="relative">
                   <input
-                    id="login-password"
+                    id="password"
                     type={showPassword ? 'text' : 'password'}
+                    autoComplete="current-password"
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Votre mot de passe"
-                    autoComplete="current-password"
-                    className="w-full px-4 py-3 pr-12 rounded-xl text-sm outline-none transition-all duration-200"
-                    style={{
-                      border: '1px solid #E8E0D4',
-                      color: '#2D2D2D',
-                      backgroundColor: '#FAFAF8',
-                    }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = '#87A878'
-                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(135,168,120,0.15)'
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.borderColor = '#E8E0D4'
-                      e.currentTarget.style.boxShadow = 'none'
-                    }}
+                    className={cn(inputClass, 'pr-11')}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-lg hover:bg-gray-100 transition-colors"
-                    tabIndex={-1}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-ink-muted hover:text-ink"
+                    aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
                   >
-                    {showPassword ? (
-                      <EyeOff className="w-4 h-4 text-gray-400" />
-                    ) : (
-                      <Eye className="w-4 h-4 text-gray-400" />
-                    )}
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
               </div>
-
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-60"
-                style={{ backgroundColor: '#87A878' }}
-                onMouseEnter={(e) => {
-                  if (!loading) e.currentTarget.style.backgroundColor = '#6B8C5E'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#87A878'
-                }}
+                className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[10px] bg-plum text-sm font-medium text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_1px_2px_rgba(31,27,30,0.18)] transition-colors hover:bg-plum-hover disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Connexion en cours...
-                  </>
-                ) : (
-                  'Se connecter'
-                )}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setMode('forgot')
-                  setError(null)
-                  setSuccess(null)
-                }}
-                className="w-full text-center text-sm mt-3 transition-colors hover:underline"
-                style={{ color: '#6B3A5B' }}
-              >
-                Mot de passe oublié ?
+                {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+                Se connecter
               </button>
             </form>
           )}
 
-          {/* Forgot password form */}
           {mode === 'forgot' && (
-            <form onSubmit={handleForgotPassword} className="space-y-4">
-              <p className="text-sm mb-2" style={{ color: '#6B7280' }}>
-                Saisissez votre adresse email pour recevoir un lien de réinitialisation.
-              </p>
+            <form onSubmit={handleForgotPassword} className="mt-8 space-y-5">
               <div>
-                <label
-                  htmlFor="forgot-email"
-                  className="block text-sm font-medium mb-1.5"
-                  style={{ color: '#2D2D2D' }}
-                >
-                  Adresse email
-                </label>
+                <label htmlFor="email" className={labelClass}>Adresse email</label>
                 <input
-                  id="forgot-email"
+                  id="email"
                   type="email"
+                  autoComplete="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="votre@email.com"
-                  autoComplete="email"
-                  className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all duration-200 focus:ring-2"
-                  style={{
-                    border: '1px solid #E8E0D4',
-                    color: '#2D2D2D',
-                    backgroundColor: '#FAFAF8',
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = '#87A878'
-                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(135,168,120,0.15)'
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = '#E8E0D4'
-                    e.currentTarget.style.boxShadow = 'none'
-                  }}
+                  className={inputClass}
                 />
               </div>
-
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-60"
-                style={{ backgroundColor: '#C5A55A' }}
-                onMouseEnter={(e) => {
-                  if (!loading) e.currentTarget.style.backgroundColor = '#B0903E'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#C5A55A'
-                }}
+                className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[10px] bg-plum text-sm font-medium text-white transition-colors hover:bg-plum-hover disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Envoi en cours...
-                  </>
-                ) : (
-                  'Envoyer le lien'
-                )}
+                {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+                Envoyer le lien
               </button>
-
               <button
                 type="button"
-                onClick={() => {
-                  setMode('login')
-                  setError(null)
-                  setSuccess(null)
-                }}
-                className="w-full text-center text-sm mt-1 transition-colors hover:underline"
-                style={{ color: '#6B7280' }}
+                onClick={() => switchMode('login')}
+                className="block w-full text-center text-[13px] font-medium text-ink-soft hover:text-ink"
               >
                 Retour à la connexion
               </button>
             </form>
           )}
 
-          {/* Signup form */}
           {mode === 'signup' && (
-            <form onSubmit={handleSignup} className="space-y-4">
+            <form onSubmit={handleSignup} className="mt-8 space-y-5">
               <div>
-                <label
-                  htmlFor="signup-name"
-                  className="block text-sm font-medium mb-1.5"
-                  style={{ color: '#2D2D2D' }}
-                >
-                  Nom complet
-                </label>
+                <label htmlFor="fullName" className={labelClass}>Nom complet</label>
                 <input
-                  id="signup-name"
+                  id="fullName"
                   type="text"
+                  autoComplete="name"
                   required
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Prenom Nom"
-                  autoComplete="name"
-                  className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all duration-200"
-                  style={{
-                    border: '1px solid #E8E0D4',
-                    color: '#2D2D2D',
-                    backgroundColor: '#FAFAF8',
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = '#87A878'
-                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(135,168,120,0.15)'
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = '#E8E0D4'
-                    e.currentTarget.style.boxShadow = 'none'
-                  }}
+                  placeholder="Prénom Nom"
+                  className={inputClass}
                 />
               </div>
-
               <div>
-                <label
-                  htmlFor="signup-email"
-                  className="block text-sm font-medium mb-1.5"
-                  style={{ color: '#2D2D2D' }}
-                >
-                  Adresse email
-                </label>
+                <label htmlFor="email" className={labelClass}>Adresse email</label>
                 <input
-                  id="signup-email"
+                  id="email"
                   type="email"
+                  autoComplete="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="votre@email.com"
-                  autoComplete="email"
-                  className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all duration-200"
-                  style={{
-                    border: '1px solid #E8E0D4',
-                    color: '#2D2D2D',
-                    backgroundColor: '#FAFAF8',
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = '#87A878'
-                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(135,168,120,0.15)'
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = '#E8E0D4'
-                    e.currentTarget.style.boxShadow = 'none'
-                  }}
+                  className={inputClass}
                 />
               </div>
-
               <div>
-                <label
-                  htmlFor="signup-password"
-                  className="block text-sm font-medium mb-1.5"
-                  style={{ color: '#2D2D2D' }}
-                >
-                  Mot de passe
-                </label>
+                <label htmlFor="password" className={labelClass}>Mot de passe</label>
                 <div className="relative">
                   <input
-                    id="signup-password"
+                    id="password"
                     type={showPassword ? 'text' : 'password'}
+                    autoComplete="new-password"
                     required
+                    minLength={6}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="6 caracteres minimum"
-                    autoComplete="new-password"
-                    className="w-full px-4 py-3 pr-12 rounded-xl text-sm outline-none transition-all duration-200"
-                    style={{
-                      border: '1px solid #E8E0D4',
-                      color: '#2D2D2D',
-                      backgroundColor: '#FAFAF8',
-                    }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = '#87A878'
-                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(135,168,120,0.15)'
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.borderColor = '#E8E0D4'
-                      e.currentTarget.style.boxShadow = 'none'
-                    }}
+                    placeholder="6 caractères minimum"
+                    className={cn(inputClass, 'pr-11')}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-lg hover:bg-gray-100 transition-colors"
-                    tabIndex={-1}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-ink-muted hover:text-ink"
+                    aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
                   >
-                    {showPassword ? (
-                      <EyeOff className="w-4 h-4 text-gray-400" />
-                    ) : (
-                      <Eye className="w-4 h-4 text-gray-400" />
-                    )}
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
               </div>
-
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-60"
-                style={{ backgroundColor: '#6B3A5B' }}
-                onMouseEnter={(e) => {
-                  if (!loading) e.currentTarget.style.backgroundColor = '#5A2D4A'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#6B3A5B'
-                }}
+                className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[10px] bg-plum text-sm font-medium text-white transition-colors hover:bg-plum-hover disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Creation du compte...
-                  </>
-                ) : (
-                  'Creer mon compte'
-                )}
+                {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+                Créer mon compte
               </button>
             </form>
           )}
-        </div>
 
-        {/* Footer */}
-        <p
-          className="text-center text-xs mt-6"
-          style={{ color: '#6B7280' }}
-        >
-          Plateforme securisee de gestion des shidoukhim
-        </p>
-      </div>
+          {mode !== 'forgot' && (
+            <p className="mt-8 text-center text-[13px] text-ink-soft">
+              {mode === 'login' ? (
+                <>
+                  Pas encore de compte ?{' '}
+                  <button
+                    type="button"
+                    onClick={() => switchMode('signup')}
+                    className="font-medium text-plum hover:text-plum-hover"
+                  >
+                    Créer un compte
+                  </button>
+                </>
+              ) : (
+                <>
+                  Déjà un compte ?{' '}
+                  <button
+                    type="button"
+                    onClick={() => switchMode('login')}
+                    className="font-medium text-plum hover:text-plum-hover"
+                  >
+                    Se connecter
+                  </button>
+                </>
+              )}
+            </p>
+          )}
+
+          <p className="mt-10 text-center text-[11px] uppercase tracking-[0.18em] text-ink-muted">
+            Espace réservé au cabinet
+          </p>
+        </div>
+      </main>
     </div>
   )
 }
