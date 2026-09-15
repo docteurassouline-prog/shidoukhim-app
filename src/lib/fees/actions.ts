@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 const ORG_ID = '00000000-0000-0000-0000-000000000001'
 
@@ -40,7 +40,7 @@ export interface FeesSummary {
 }
 
 export async function getFeesSummary(): Promise<FeesSummary> {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
 
   const { data: fees } = await supabase
     .from('shadkhaniot_fees')
@@ -133,7 +133,7 @@ export async function getFeesSummary(): Promise<FeesSummary> {
 export async function getProposalsForFees(): Promise<
   { id: string; woman_name: string; man_name: string; status: string }[]
 > {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
 
   const { data } = await supabase
     .from('proposals')
@@ -162,7 +162,7 @@ export async function getProposalsForFees(): Promise<
 }
 
 export async function addMeetingFees(proposalId: string, meetingNumber: number): Promise<{ success: boolean; error?: string }> {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const today = new Date().toISOString().split('T')[0]
 
   const { error } = await supabase.from('shadkhaniot_fees').insert([
@@ -191,7 +191,7 @@ export async function addMeetingFees(proposalId: string, meetingNumber: number):
 }
 
 export async function addShadkhaniotFees(proposalId: string): Promise<{ success: boolean; error?: string }> {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const today = new Date().toISOString().split('T')[0]
 
   const { error } = await supabase.from('shadkhaniot_fees').insert([
@@ -218,7 +218,7 @@ export async function addShadkhaniotFees(proposalId: string): Promise<{ success:
 }
 
 export async function markFeePaid(feeId: string): Promise<{ success: boolean; error?: string }> {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const today = new Date().toISOString().split('T')[0]
 
   const { error } = await supabase
@@ -232,7 +232,7 @@ export async function markFeePaid(feeId: string): Promise<{ success: boolean; er
 }
 
 export async function markFeeOverdue(feeId: string): Promise<{ success: boolean; error?: string }> {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
 
   const { error } = await supabase
     .from('shadkhaniot_fees')
@@ -245,7 +245,7 @@ export async function markFeeOverdue(feeId: string): Promise<{ success: boolean;
 }
 
 export async function deleteFee(feeId: string): Promise<{ success: boolean; error?: string }> {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
 
   const { error } = await supabase
     .from('shadkhaniot_fees')

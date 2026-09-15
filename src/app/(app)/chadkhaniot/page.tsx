@@ -18,23 +18,16 @@ import {
   Eye,
   Handshake,
 } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
 import type { UserProfile, UserRole } from '@/lib/types'
 import { cn, formatDate } from '@/lib/utils'
+import { getTeamData, inviteUser, changeUserRole } from '@/lib/team/actions'
+import type { UserWithStats } from '@/lib/team/actions'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import Badge from '@/components/ui/Badge'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import EmptyState from '@/components/ui/EmptyState'
-
-const ORG_ID = '00000000-0000-0000-0000-000000000001'
-
-interface UserWithStats extends UserProfile {
-  candidatesWomenCount: number
-  candidatesMenCount: number
-  activeProposalsCount: number
-}
 
 const ROLE_CONFIG: Record<UserRole, { label: string; bg: string; text: string; icon: typeof Crown }> = {
   admin: {
@@ -99,8 +92,6 @@ export default function ChadkhaniotPage() {
   const [roleChangeValue, setRoleChangeValue] = useState<string>('')
   const [roleChangeLoading, setRoleChangeLoading] = useState(false)
 
-  const supabase = createClient()
-
   const isAdmin = currentUser?.role === 'admin'
 
   const fetchData = useCallback(async () => {
@@ -108,113 +99,19 @@ export default function ChadkhaniotPage() {
       setLoading(true)
       setError(null)
 
-      // Get authenticated user (fallback for auth bypass)
-      const { data: authData } = await supabase.auth.getUser()
-
-      let resolvedProfile: UserProfile | null = null
-
-      if (authData?.user) {
-        const { data: currentProfile } = await supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('auth_user_id', authData.user.id)
-          .eq('organization_id', ORG_ID)
-          .single()
-        resolvedProfile = currentProfile as UserProfile | null
-      }
-
-      if (!resolvedProfile) {
-        // Auth bypass: use first admin profile as fallback
-        const { data: fallbackProfile } = await supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('organization_id', ORG_ID)
-          .eq('role', 'admin')
-          .limit(1)
-          .single()
-        resolvedProfile = (fallbackProfile as UserProfile) ?? null
-      }
-
-      if (!resolvedProfile) {
-        setError('Aucun profil trouve pour cette organisation.')
-        setLoading(false)
-        return
-      }
-
-      setCurrentUser(resolvedProfile)
-
-      // Fetch all active users in the organization
-      const { data: allUsers, error: usersError } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('organization_id', ORG_ID)
-        .eq('is_active', true)
-        .order('full_name', { ascending: true })
-
-      if (usersError) {
-        setError('Erreur lors du chargement de l\'equipe.')
-        setLoading(false)
-        return
-      }
-
-      if (!allUsers || allUsers.length === 0) {
-        setUsers([])
-        setLoading(false)
-        return
-      }
-
-      // Fetch stats for each user
-      const usersWithStats: UserWithStats[] = await Promise.all(
-        (allUsers as UserProfile[]).map(async (user) => {
-          // Count active women candidates
-          const { count: womenCount } = await supabase
-            .from('candidates')
-            .select('*', { count: 'exact', head: true })
-            .eq('created_by', user.id)
-            .eq('status', 'active')
-
-          // Count active men candidates
-          const { count: menCount } = await supabase
-            .from('candidates_men')
-            .select('*', { count: 'exact', head: true })
-            .eq('created_by', user.id)
-            .eq('status', 'active')
-
-          // Count active proposals (not in terminal statuses)
-          const terminalStatuses = [
-            'cancelled',
-            'declined_woman',
-            'declined_man',
-            'declined_both',
-            'married',
-          ]
-          const { count: proposalsCount } = await supabase
-            .from('proposals')
-            .select('*', { count: 'exact', head: true })
-            .eq('created_by', user.id)
-            .not('status', 'in', `(${terminalStatuses.join(',')})`)
-
-          return {
-            ...user,
-            candidatesWomenCount: womenCount ?? 0,
-            candidatesMenCount: menCount ?? 0,
-            activeProposalsCount: proposalsCount ?? 0,
-          }
-        })
-      )
-
-      setUsers(usersWithStats)
+      const data = await getTeamData()
+      setCurrentUser(data.currentUser)
+      setUsers(data.users)
     } catch {
       setError('Une erreur inattendue est survenue.')
     } finally {
       setLoading(false)
     }
-  }, [supabase])
+  }, [])
 
   useEffect(() => {
     fetchData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [fetchData])
 
   const handleInvite = async () => {
     if (!inviteEmail.trim()) {
@@ -229,26 +126,18 @@ export default function ChadkhaniotPage() {
     setInviteSuccess(null)
 
     try {
-      const token = crypto.randomUUID()
-      const expiresAt = new Date()
-      expiresAt.setDate(expiresAt.getDate() + 7)
+      const result = await inviteUser(
+        inviteEmail,
+        inviteRole as UserRole,
+        currentUser.id
+      )
 
-      const { error: insertError } = await supabase.from('invitations').insert({
-        organization_id: ORG_ID,
-        invited_by: currentUser.id,
-        email: inviteEmail.trim().toLowerCase(),
-        role: inviteRole as UserRole,
-        status: 'pending',
-        token,
-        expires_at: expiresAt.toISOString(),
-      })
-
-      if (insertError) {
-        setInviteError(`Erreur lors de l'envoi : ${insertError.message}`)
+      if (!result.success) {
+        setInviteError(`Erreur lors de l'envoi : ${result.error}`)
         return
       }
 
-      const inviteLink = `${window.location.origin}/invite/${token}`
+      const inviteLink = `${window.location.origin}/invite/${result.token}`
       setInviteSuccess(inviteLink)
       setInviteEmail('')
       setInviteRole('chadkhanit')
@@ -265,18 +154,13 @@ export default function ChadkhaniotPage() {
     setRoleChangeLoading(true)
 
     try {
-      const { error: updateError } = await supabase
-        .from('user_profiles')
-        .update({ role: roleChangeValue as UserRole })
-        .eq('id', userId)
-        .eq('organization_id', ORG_ID)
+      const result = await changeUserRole(userId, roleChangeValue as UserRole)
 
-      if (updateError) {
-        setError(`Erreur lors du changement de role : ${updateError.message}`)
+      if (!result.success) {
+        setError(`Erreur lors du changement de role : ${result.error}`)
         return
       }
 
-      // Update local state
       setUsers((prev) =>
         prev.map((u) =>
           u.id === userId ? { ...u, role: roleChangeValue as UserRole } : u
@@ -308,7 +192,7 @@ export default function ChadkhaniotPage() {
           <div className="bg-white rounded-xl border border-[#E8E0D4] p-8 text-center">
             <AlertCircle className="h-12 w-12 text-[#C45B5B] mx-auto mb-4" />
             <h2 className="text-lg font-semibold text-[#2D2D2D] mb-2">Erreur</h2>
-            <p className="text-sm text-[#6B7280] mb-4">{error}</p>
+            <p className="text-sm text-[#4B5563] mb-4">{error}</p>
             <Button variant="primary" onClick={fetchData}>
               Reessayer
             </Button>
@@ -329,7 +213,7 @@ export default function ChadkhaniotPage() {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-[#2D2D2D]">Equipe Chadkhaniot</h1>
-              <p className="text-sm text-[#6B7280]">
+              <p className="text-sm text-[#4B5563]">
                 {users.length} membre{users.length !== 1 ? 's' : ''} actif{users.length !== 1 ? 's' : ''}
               </p>
             </div>
@@ -377,7 +261,6 @@ export default function ChadkhaniotPage() {
                 >
                   {/* Top: Avatar + Name + Role */}
                   <div className="flex items-start gap-4 mb-4">
-                    {/* Avatar circle with initials */}
                     <div
                       className={cn(
                         'flex items-center justify-center h-14 w-14 rounded-full text-lg font-semibold shrink-0',
@@ -394,11 +277,10 @@ export default function ChadkhaniotPage() {
                       <h3 className="text-base font-semibold text-[#2D2D2D] truncate">
                         {user.full_name}
                         {isCurrentUser && (
-                          <span className="text-xs font-normal text-[#6B7280] ml-2">(vous)</span>
+                          <span className="text-xs font-normal text-[#4B5563] ml-2">(vous)</span>
                         )}
                       </h3>
 
-                      {/* Role badge */}
                       <Badge
                         variant="default"
                         className={cn(
@@ -416,13 +298,13 @@ export default function ChadkhaniotPage() {
 
                   {/* Contact info */}
                   <div className="space-y-2 mb-4">
-                    <div className="flex items-center gap-2 text-sm text-[#6B7280]">
-                      <Mail className="h-4 w-4 shrink-0 text-[#6B7280]/60" />
+                    <div className="flex items-center gap-2 text-sm text-[#4B5563]">
+                      <Mail className="h-4 w-4 shrink-0 text-[#4B5563]/60" />
                       <span className="truncate">{user.email}</span>
                     </div>
                     {user.phone && (
-                      <div className="flex items-center gap-2 text-sm text-[#6B7280]">
-                        <Phone className="h-4 w-4 shrink-0 text-[#6B7280]/60" />
+                      <div className="flex items-center gap-2 text-sm text-[#4B5563]">
+                        <Phone className="h-4 w-4 shrink-0 text-[#4B5563]/60" />
                         <span>{user.phone}</span>
                       </div>
                     )}
@@ -435,19 +317,19 @@ export default function ChadkhaniotPage() {
                         <p className="text-lg font-semibold text-[#6B3A5B]">
                           {user.candidatesWomenCount}
                         </p>
-                        <p className="text-xs text-[#6B7280]">Fiches femmes</p>
+                        <p className="text-xs text-[#4B5563]">Fiches femmes</p>
                       </div>
                       <div>
                         <p className="text-lg font-semibold text-[#87A878]">
                           {user.candidatesMenCount}
                         </p>
-                        <p className="text-xs text-[#6B7280]">Fiches hommes</p>
+                        <p className="text-xs text-[#4B5563]">Fiches hommes</p>
                       </div>
                       <div>
                         <p className="text-lg font-semibold text-[#C5A55A]">
                           {user.activeProposalsCount}
                         </p>
-                        <p className="text-xs text-[#6B7280]">Propositions</p>
+                        <p className="text-xs text-[#4B5563]">Propositions</p>
                       </div>
                     </div>
                   </div>
@@ -462,7 +344,6 @@ export default function ChadkhaniotPage() {
                       Voir ses fiches
                     </Link>
 
-                    {/* Role change (admin only, not for self) */}
                     {isAdmin && !isCurrentUser && (
                       <>
                         {!showingRoleChange ? (
@@ -514,7 +395,7 @@ export default function ChadkhaniotPage() {
 
                   {/* Last login */}
                   {user.last_login_at && (
-                    <p className="text-xs text-[#6B7280]/60 mt-3 pt-3 border-t border-[#E8E0D4]">
+                    <p className="text-xs text-[#4B5563]/60 mt-3 pt-3 border-t border-[#E8E0D4]">
                       Derniere connexion : {formatDate(user.last_login_at)}
                     </p>
                   )}
@@ -535,7 +416,7 @@ export default function ChadkhaniotPage() {
                 <h2 className="text-lg font-semibold text-[#2D2D2D]">
                   Inviter une nouvelle chadkhanit
                 </h2>
-                <p className="text-sm text-[#6B7280]">
+                <p className="text-sm text-[#4B5563]">
                   L&apos;invitation sera valable 7 jours.
                 </p>
               </div>
@@ -586,7 +467,7 @@ export default function ChadkhaniotPage() {
                     <p className="text-sm font-medium text-[#5A7A4A] mb-1">
                       Invitation creee avec succes !
                     </p>
-                    <p className="text-sm text-[#6B7280] mb-2">
+                    <p className="text-sm text-[#4B5563] mb-2">
                       Partagez ce lien avec la personne invitee :
                     </p>
                     <div className="bg-white rounded-lg border border-[#E8E0D4] p-3 flex items-center gap-2">
