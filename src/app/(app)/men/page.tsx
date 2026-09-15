@@ -70,13 +70,13 @@ export default function MenPage() {
   }, [men, searchQuery, statusFilter])
 
   return (
-    <div className="min-h-screen bg-[#FFFBF0]">
+    <div className="min-h-screen bg-canvas">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-[#2D2D2D]">Fiches hommes</h1>
-            <p className="mt-1 text-sm text-[#6B7280]">
+            <h1 className="text-[30px] font-semibold text-ink">Fiches hommes</h1>
+            <p className="mt-1 text-sm text-ink-soft">
               {loading
                 ? 'Chargement...'
                 : `${filteredMen.length} fiche${filteredMen.length !== 1 ? 's' : ''}`}
@@ -112,7 +112,7 @@ export default function MenPage() {
         {loading && (
           <div className="flex flex-col items-center justify-center py-20">
             <svg
-              className="animate-spin h-8 w-8 text-[#87A878] mb-4"
+              className="animate-spin h-8 w-8 text-sage mb-4"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -132,26 +132,26 @@ export default function MenPage() {
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               />
             </svg>
-            <p className="text-[#6B7280] text-sm">Chargement des fiches...</p>
+            <p className="text-ink-soft text-sm">Chargement des fiches...</p>
           </div>
         )}
 
         {/* Error state */}
         {error && !loading && (
-          <div className="rounded-lg border border-[#C45B5B]/30 bg-[#C45B5B]/5 p-6 text-center">
-            <p className="text-[#C45B5B] font-medium mb-1">Erreur</p>
-            <p className="text-sm text-[#6B7280]">{error}</p>
+          <div className="rounded-lg border border-danger/30 bg-danger/5 p-6 text-center">
+            <p className="text-danger font-medium mb-1">Erreur</p>
+            <p className="text-sm text-ink-soft">{error}</p>
           </div>
         )}
 
         {/* Empty state */}
         {!loading && !error && filteredMen.length === 0 && (
-          <div className="rounded-lg border border-[#E8E0D4] bg-white p-12 text-center">
-            <Users className="h-12 w-12 text-[#E8E0D4] mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-[#2D2D2D] mb-1">
+          <div className="rounded-lg border border-line bg-surface p-12 text-center">
+            <Users className="h-12 w-12 text-line mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-ink mb-1">
               Aucune fiche trouvee
             </h3>
-            <p className="text-sm text-[#6B7280] mb-6">
+            <p className="text-sm text-ink-soft mb-6">
               {searchQuery || statusFilter
                 ? 'Aucun resultat ne correspond a vos criteres de recherche.'
                 : 'Commencez par creer un premier profil.'}
@@ -177,15 +177,15 @@ export default function MenPage() {
               >
                 <div
                   className={cn(
-                    'bg-white rounded-xl border border-[#E8E0D4] p-5',
+                    'bg-surface rounded-[14px] border border-line p-5',
                     'transition-all duration-150',
-                    'hover:shadow-md hover:border-[#87A878]/40',
+                    'hover:shadow-card-hover hover:border-sage/40',
                     'cursor-pointer'
                   )}
                 >
                   {/* Name + status */}
                   <div className="flex items-start justify-between gap-3 mb-3">
-                    <h3 className="text-base font-semibold text-[#2D2D2D] group-hover:text-[#6B3A5B] transition-colors">
+                    <h3 className="text-base font-semibold text-ink group-hover:text-plum transition-colors">
                       {man.first_name} {man.last_name}
                     </h3>
                     <Badge className={getStatusColor(man.status)} dot>
@@ -194,10 +194,10 @@ export default function MenPage() {
                   </div>
 
                   {/* Details */}
-                  <div className="space-y-1.5 text-sm text-[#6B7280]">
+                  <div className="space-y-1.5 text-sm text-ink-soft">
                     {/* Age */}
                     <div className="flex items-center gap-2">
-                      <Users className="h-3.5 w-3.5 shrink-0 text-[#C5A55A]" />
+                      <Users className="h-3.5 w-3.5 shrink-0 text-gold" />
                       <span>
                         {calculateAge(
                           man.date_of_birth,
@@ -210,7 +210,7 @@ export default function MenPage() {
                     {/* City */}
                     {man.city && (
                       <div className="flex items-center gap-2">
-                        <MapPin className="h-3.5 w-3.5 shrink-0 text-[#C5A55A]" />
+                        <MapPin className="h-3.5 w-3.5 shrink-0 text-gold" />
                         <span>{man.city}</span>
                       </div>
                     )}
@@ -218,7 +218,7 @@ export default function MenPage() {
                     {/* Profession */}
                     {man.profession && (
                       <div className="flex items-center gap-2">
-                        <Briefcase className="h-3.5 w-3.5 shrink-0 text-[#C5A55A]" />
+                        <Briefcase className="h-3.5 w-3.5 shrink-0 text-gold" />
                         <span>{man.profession}</span>
                       </div>
                     )}
@@ -226,7 +226,7 @@ export default function MenPage() {
                     {/* Community */}
                     {man.community && (
                       <div className="flex items-center gap-2">
-                        <BookOpen className="h-3.5 w-3.5 shrink-0 text-[#C5A55A]" />
+                        <BookOpen className="h-3.5 w-3.5 shrink-0 text-gold" />
                         <span>{man.community}</span>
                       </div>
                     )}

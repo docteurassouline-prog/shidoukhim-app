@@ -107,7 +107,7 @@ export default function CandidateProfilePage() {
   if (!candidate) {
     return (
       <div className="text-center py-16">
-        <p className="text-[#6B7280]">Profil introuvable.</p>
+        <p className="text-ink-soft">Profil introuvable.</p>
       </div>
     )
   }
@@ -115,17 +115,17 @@ export default function CandidateProfilePage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#6B3A5B]">Mon profil</h1>
-        <p className="text-sm text-[#6B7280] mt-1">
+        <h1 className="text-[30px] font-semibold text-plum">Mon profil</h1>
+        <p className="text-sm text-ink-soft mt-1">
           Les informations que votre chadkhanit utilise pour vous trouver la bonne personne.
           Pour toute modification, contactez Hava directement.
         </p>
       </div>
 
       {/* Identité */}
-      <section className="bg-white rounded-xl border border-[#E8E0D4] p-6 space-y-4">
-        <h2 className="text-lg font-semibold text-[#2D2D2D] flex items-center gap-2">
-          <User className="h-5 w-5 text-[#6B3A5B]" />
+      <section className="bg-surface rounded-[14px] border border-line p-6 space-y-4">
+        <h2 className="font-display text-[22px] font-semibold text-ink flex items-center gap-2">
+          <User className="h-5 w-5 text-plum" />
           Identité
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -138,27 +138,27 @@ export default function CandidateProfilePage() {
       </section>
 
       {/* Contact */}
-      <section className="bg-white rounded-xl border border-[#E8E0D4] p-6 space-y-4">
-        <h2 className="text-lg font-semibold text-[#2D2D2D] flex items-center gap-2">
-          <Mail className="h-5 w-5 text-[#6B3A5B]" />
+      <section className="bg-surface rounded-[14px] border border-line p-6 space-y-4">
+        <h2 className="font-display text-[22px] font-semibold text-ink flex items-center gap-2">
+          <Mail className="h-5 w-5 text-plum" />
           Contact
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {candidate.email && (
             <div className="flex items-center gap-2 text-sm">
-              <Mail className="h-4 w-4 text-[#6B7280]" />
+              <Mail className="h-4 w-4 text-ink-soft" />
               <span>{candidate.email}</span>
             </div>
           )}
           {candidate.phone && (
             <div className="flex items-center gap-2 text-sm">
-              <Phone className="h-4 w-4 text-[#6B7280]" />
+              <Phone className="h-4 w-4 text-ink-soft" />
               <span>{candidate.phone}</span>
             </div>
           )}
           {candidate.city && (
             <div className="flex items-center gap-2 text-sm">
-              <MapPin className="h-4 w-4 text-[#6B7280]" />
+              <MapPin className="h-4 w-4 text-ink-soft" />
               <span>{candidate.city}{candidate.country ? `, ${candidate.country}` : ''}</span>
             </div>
           )}
@@ -166,9 +166,9 @@ export default function CandidateProfilePage() {
       </section>
 
       {/* Vie religieuse */}
-      <section className="bg-white rounded-xl border border-[#E8E0D4] p-6 space-y-4">
-        <h2 className="text-lg font-semibold text-[#2D2D2D] flex items-center gap-2">
-          <BookOpen className="h-5 w-5 text-[#6B3A5B]" />
+      <section className="bg-surface rounded-[14px] border border-line p-6 space-y-4">
+        <h2 className="font-display text-[22px] font-semibold text-ink flex items-center gap-2">
+          <BookOpen className="h-5 w-5 text-plum" />
           Vie religieuse
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -187,28 +187,28 @@ export default function CandidateProfilePage() {
         </div>
         {candidate.traditions_minhaguim && (
           <div className="mt-2">
-            <p className="text-xs text-[#6B7280] uppercase tracking-wider mb-1">Traditions & Minhaguim</p>
-            <p className="text-sm text-[#2D2D2D]">{candidate.traditions_minhaguim}</p>
+            <p className="text-xs text-ink-soft uppercase tracking-wider mb-1">Traditions & Minhaguim</p>
+            <p className="text-sm text-ink">{candidate.traditions_minhaguim}</p>
           </div>
         )}
         {candidate.prayer_study && (
           <div className="mt-2">
-            <p className="text-xs text-[#6B7280] uppercase tracking-wider mb-1">Prière / Étude</p>
-            <p className="text-sm text-[#2D2D2D]">{candidate.prayer_study}</p>
+            <p className="text-xs text-ink-soft uppercase tracking-wider mb-1">Prière / Étude</p>
+            <p className="text-sm text-ink">{candidate.prayer_study}</p>
           </div>
         )}
         {candidateType === 'man' && candidate.torah_study && (
           <div className="mt-2">
-            <p className="text-xs text-[#6B7280] uppercase tracking-wider mb-1">Étude de Torah</p>
-            <p className="text-sm text-[#2D2D2D]">{candidate.torah_study}</p>
+            <p className="text-xs text-ink-soft uppercase tracking-wider mb-1">Étude de Torah</p>
+            <p className="text-sm text-ink">{candidate.torah_study}</p>
           </div>
         )}
       </section>
 
       {/* Parcours */}
-      <section className="bg-white rounded-xl border border-[#E8E0D4] p-6 space-y-4">
-        <h2 className="text-lg font-semibold text-[#2D2D2D] flex items-center gap-2">
-          <Briefcase className="h-5 w-5 text-[#6B3A5B]" />
+      <section className="bg-surface rounded-[14px] border border-line p-6 space-y-4">
+        <h2 className="font-display text-[22px] font-semibold text-ink flex items-center gap-2">
+          <Briefcase className="h-5 w-5 text-plum" />
           Parcours
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -217,22 +217,22 @@ export default function CandidateProfilePage() {
         </div>
         {candidate.interests && (
           <div className="mt-2">
-            <p className="text-xs text-[#6B7280] uppercase tracking-wider mb-1">Centres d'intérêt</p>
-            <p className="text-sm text-[#2D2D2D]">{candidate.interests}</p>
+            <p className="text-xs text-ink-soft uppercase tracking-wider mb-1">Centres d'intérêt</p>
+            <p className="text-sm text-ink">{candidate.interests}</p>
           </div>
         )}
         {candidate.temperament && (
           <div className="mt-2">
-            <p className="text-xs text-[#6B7280] uppercase tracking-wider mb-1">Tempérament</p>
-            <p className="text-sm text-[#2D2D2D]">{candidate.temperament}</p>
+            <p className="text-xs text-ink-soft uppercase tracking-wider mb-1">Tempérament</p>
+            <p className="text-sm text-ink">{candidate.temperament}</p>
           </div>
         )}
       </section>
 
       {/* Attentes */}
-      <section className="bg-white rounded-xl border border-[#E8E0D4] p-6 space-y-4">
-        <h2 className="text-lg font-semibold text-[#2D2D2D] flex items-center gap-2">
-          <Heart className="h-5 w-5 text-[#6B3A5B]" />
+      <section className="bg-surface rounded-[14px] border border-line p-6 space-y-4">
+        <h2 className="font-display text-[22px] font-semibold text-ink flex items-center gap-2">
+          <Heart className="h-5 w-5 text-plum" />
           Ce que je recherche
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -246,33 +246,33 @@ export default function CandidateProfilePage() {
           {candidate.children_education && <InfoField label="Éducation des enfants" value={getChildrenEducationLabel(candidate.children_education)} />}
         </div>
         {candidate.religious_home_project && (
-          <div className="mt-2 p-4 bg-[#FFFBF0] rounded-lg border border-[#E8E0D4]">
-            <p className="text-xs text-[#6B7280] uppercase tracking-wider mb-1">Projet religieux du foyer</p>
-            <p className="text-sm text-[#2D2D2D]">{candidate.religious_home_project}</p>
+          <div className="mt-2 p-4 bg-canvas rounded-lg border border-line">
+            <p className="text-xs text-ink-soft uppercase tracking-wider mb-1">Projet religieux du foyer</p>
+            <p className="text-sm text-ink">{candidate.religious_home_project}</p>
           </div>
         )}
         {candidate.expected_qualities && (
           <div className="mt-2">
-            <p className="text-xs text-[#6B7280] uppercase tracking-wider mb-1">Qualités recherchées</p>
-            <p className="text-sm text-[#2D2D2D]">{candidate.expected_qualities}</p>
+            <p className="text-xs text-ink-soft uppercase tracking-wider mb-1">Qualités recherchées</p>
+            <p className="text-sm text-ink">{candidate.expected_qualities}</p>
           </div>
         )}
         {candidate.expected_values && (
           <div className="mt-2">
-            <p className="text-xs text-[#6B7280] uppercase tracking-wider mb-1">Valeurs attendues</p>
-            <p className="text-sm text-[#2D2D2D]">{candidate.expected_values}</p>
+            <p className="text-xs text-ink-soft uppercase tracking-wider mb-1">Valeurs attendues</p>
+            <p className="text-sm text-ink">{candidate.expected_values}</p>
           </div>
         )}
         {candidateType === 'woman' && candidate.ideal_husband && (
-          <div className="mt-2 p-4 bg-[#FFFBF0] rounded-lg border border-[#E8E0D4]">
-            <p className="text-xs text-[#6B7280] uppercase tracking-wider mb-1">Description du mari idéal</p>
-            <p className="text-sm text-[#2D2D2D]">{candidate.ideal_husband}</p>
+          <div className="mt-2 p-4 bg-canvas rounded-lg border border-line">
+            <p className="text-xs text-ink-soft uppercase tracking-wider mb-1">Description du mari idéal</p>
+            <p className="text-sm text-ink">{candidate.ideal_husband}</p>
           </div>
         )}
         {candidate.incompatibilities && (
-          <div className="mt-2 p-4 bg-red-50 rounded-lg border border-red-100">
-            <p className="text-xs text-red-400 uppercase tracking-wider mb-1">Points rédhibitoires</p>
-            <p className="text-sm text-[#2D2D2D]">{candidate.incompatibilities}</p>
+          <div className="mt-2 p-4 bg-danger-light rounded-lg border border-danger/20">
+            <p className="text-xs text-danger uppercase tracking-wider mb-1">Points rédhibitoires</p>
+            <p className="text-sm text-ink">{candidate.incompatibilities}</p>
           </div>
         )}
       </section>
@@ -283,8 +283,8 @@ export default function CandidateProfilePage() {
 function InfoField({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-xs text-[#6B7280] uppercase tracking-wider">{label}</p>
-      <p className="text-sm font-medium text-[#2D2D2D] mt-0.5">{value}</p>
+      <p className="text-xs text-ink-soft uppercase tracking-wider">{label}</p>
+      <p className="text-sm font-medium text-ink mt-0.5">{value}</p>
     </div>
   )
 }

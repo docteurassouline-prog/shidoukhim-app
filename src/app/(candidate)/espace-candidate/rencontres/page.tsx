@@ -198,13 +198,13 @@ export default function RencontresPage() {
   if (meetings.length === 0) {
     return (
       <div className="text-center py-20 space-y-4">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#6B3A5B]/10">
-          <Heart className="w-8 h-8 text-[#6B3A5B]" />
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-plum/10">
+          <Heart className="w-8 h-8 text-plum" />
         </div>
-        <h2 className="text-xl font-semibold text-[#2D2D2D]">
+        <h2 className="font-display text-[24px] font-semibold text-ink">
           Aucune rencontre pour le moment
         </h2>
-        <p className="text-[#6B7280] text-sm max-w-md mx-auto">
+        <p className="text-ink-soft text-sm max-w-md mx-auto">
           Votre chadkhanit travaille pour vous ! Vous serez informee des
           que des rencontres seront organisees.
         </p>
@@ -216,8 +216,8 @@ export default function RencontresPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#6B3A5B]">Mes rencontres</h1>
-        <p className="text-sm text-[#6B7280] mt-1">
+        <h1 className="text-[30px] font-semibold text-plum">Mes rencontres</h1>
+        <p className="text-sm text-ink-soft mt-1">
           Retrouvez ici l&apos;historique de vos rencontres et partagez votre ressenti.
         </p>
       </div>
@@ -259,11 +259,11 @@ function MeetingCard({
   const hasFeedback = !!feedback
 
   return (
-    <div className="bg-white rounded-xl border border-[#E8E0D4] overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+    <div className="bg-surface rounded-[14px] border border-line overflow-hidden shadow-card hover:shadow-card-hover transition-shadow">
       {/* Header strip */}
-      <div className="px-5 py-3 bg-gradient-to-r from-[#6B3A5B]/5 to-[#C5A55A]/5 border-b border-[#E8E0D4] flex items-center justify-between">
+      <div className="px-5 py-3 bg-gradient-to-r from-plum/5 to-gold/5 border-b border-line flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="text-sm font-semibold text-[#6B3A5B]">
+          <span className="text-sm font-semibold text-plum">
             Rencontre n&deg;{meeting.meeting_number}
           </span>
           <span
@@ -283,19 +283,19 @@ function MeetingCard({
       <div className="p-5 space-y-3">
         {/* Other candidate info */}
         {otherCandidate && (
-          <div className="flex items-center gap-2 text-sm text-[#2D2D2D]">
-            <div className="w-8 h-8 rounded-full bg-[#87A878]/15 flex items-center justify-center flex-shrink-0">
-              <span className="text-xs font-bold text-[#87A878]">
+          <div className="flex items-center gap-2 text-sm text-ink">
+            <div className="w-8 h-8 rounded-full bg-sage/15 flex items-center justify-center flex-shrink-0">
+              <span className="text-xs font-bold text-sage">
                 {otherCandidate.first_name.charAt(0).toUpperCase()}
               </span>
             </div>
             <div>
-              <span className="text-[#9CA3AF] text-xs mr-1">{otherLabel} :</span>
+              <span className="text-ink-muted text-xs mr-1">{otherLabel} :</span>
               <span className="font-medium">{otherCandidate.first_name}</span>
               {otherCandidate.city && (
-                <span className="text-[#6B7280]"> &middot; {otherCandidate.city}</span>
+                <span className="text-ink-soft"> &middot; {otherCandidate.city}</span>
               )}
-              <span className="text-[#6B7280]">
+              <span className="text-ink-soft">
                 {' '}
                 &middot; {calculateAge(otherCandidate.date_of_birth, otherCandidate.age_estimate, otherCandidate.is_age_estimate)}
               </span>
@@ -304,7 +304,7 @@ function MeetingCard({
         )}
 
         {/* Date & location */}
-        <div className="flex flex-wrap gap-4 text-sm text-[#6B7280]">
+        <div className="flex flex-wrap gap-4 text-sm text-ink-soft">
           {meeting.scheduled_at && (
             <div className="flex items-center gap-1.5">
               <Calendar className="h-4 w-4" />
@@ -324,8 +324,8 @@ function MeetingCard({
           <Link
             href={`/espace-candidate/rencontres/${meeting.id}/feedback`}
             className="mt-2 inline-flex items-center gap-2 px-4 py-2 rounded-lg
-                       bg-[#C5A55A] text-white text-sm font-medium
-                       hover:bg-[#B8993F] transition-colors shadow-sm"
+                       bg-gold text-white text-sm font-medium
+                       hover:bg-gold-deep transition-colors shadow-card"
           >
             <MessageCircleHeart className="h-4 w-4" />
             Donner mon avis
@@ -334,8 +334,8 @@ function MeetingCard({
         )}
 
         {hasFeedback && (
-          <div className="mt-2 p-4 bg-[#FFFBF0] rounded-lg border border-[#E8E0D4] space-y-2">
-            <p className="text-xs font-semibold text-[#6B3A5B] uppercase tracking-wider">
+          <div className="mt-2 p-4 bg-canvas rounded-lg border border-line space-y-2">
+            <p className="text-xs font-semibold text-plum uppercase tracking-wider">
               Mon retour
             </p>
 
@@ -347,14 +347,14 @@ function MeetingCard({
 
             {/* Overall impression */}
             {feedback!.overall_impression && (
-              <p className="text-sm text-[#2D2D2D] italic">
+              <p className="text-sm text-ink italic">
                 &laquo; {feedback!.overall_impression} &raquo;
               </p>
             )}
 
             {/* Wants next */}
             {feedback!.wants_next_meeting && (
-              <p className="text-xs text-[#6B7280]">
+              <p className="text-xs text-ink-soft">
                 Prochaine rencontre :{' '}
                 <span className="font-medium">
                   {feedback!.wants_next_meeting === 'oui'
@@ -390,12 +390,12 @@ function FeedbackLikedSummary({ feedback }: { feedback: FeedbackRow }) {
 
   return (
     <div>
-      <p className="text-xs text-[#87A878] font-medium mb-1">Ce qui m&apos;a plu :</p>
+      <p className="text-xs text-sage font-medium mb-1">Ce qui m&apos;a plu :</p>
       <div className="flex flex-wrap gap-1.5">
         {items.map((item) => (
           <span
             key={item}
-            className="inline-block px-2 py-0.5 rounded-full bg-[#87A878]/15 text-[#4A7A3B] text-xs"
+            className="inline-block px-2 py-0.5 rounded-full bg-sage/15 text-sage-deep text-xs"
           >
             {item}
           </span>
@@ -418,12 +418,12 @@ function FeedbackIssuesSummary({ feedback }: { feedback: FeedbackRow }) {
 
   return (
     <div>
-      <p className="text-xs text-[#C45B5B] font-medium mb-1">Reservations :</p>
+      <p className="text-xs text-danger font-medium mb-1">Reservations :</p>
       <div className="flex flex-wrap gap-1.5">
         {items.map((item) => (
           <span
             key={item}
-            className="inline-block px-2 py-0.5 rounded-full bg-red-50 text-[#C45B5B] text-xs"
+            className="inline-block px-2 py-0.5 rounded-full bg-danger-light text-danger text-xs"
           >
             {item}
           </span>
