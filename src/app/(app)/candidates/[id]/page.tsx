@@ -25,6 +25,7 @@ import {
 import Card from '@/components/ui/Card'
 import Avatar from '@/components/ui/Avatar'
 import Button from '@/components/ui/Button'
+import DeleteCandidateButton from '@/components/ui/DeleteCandidateButton'
 import {
   ArrowLeft,
   Edit,
@@ -588,6 +589,12 @@ export default async function CandidateDetailPage({
               Proposer
             </Button>
           </Link>
+          <DeleteCandidateButton
+            id={id}
+            name={`${candidate.first_name} ${candidate.last_name}`}
+            type="woman"
+            redirectTo="/candidates"
+          />
         </div>
       </div>
 

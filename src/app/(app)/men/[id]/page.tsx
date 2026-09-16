@@ -24,6 +24,7 @@ import {
   ExternalLink,
   Loader2,
   AlertCircle,
+  Trash2,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type {
@@ -62,6 +63,7 @@ import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import Badge from '@/components/ui/Badge'
+import { deleteCandidateMan } from '@/lib/candidates-men/actions'
 
 const ORG_ID = '00000000-0000-0000-0000-000000000001'
 
@@ -203,6 +205,8 @@ export default function ManDetailPage({
   const [error, setError] = useState<string | null>(null)
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   // ── Fetch man ──────────────────────────────────────────────
   const fetchMan = useCallback(async () => {
@@ -309,6 +313,24 @@ export default function ManDetailPage({
 
     setMan((prev) => (prev ? { ...prev, status: newStatus } : prev))
     setFormData((prev) => ({ ...prev, status: newStatus }))
+  }
+
+  // ── Delete ─────────────────────────────────────────────────
+  async function handleDelete() {
+    if (!man) return
+    setDeleting(true)
+    setError(null)
+
+    const result = await deleteCandidateMan(man.id)
+
+    if (!result.success) {
+      setError(result.error ?? 'Erreur lors de la suppression')
+      setDeleting(false)
+      setShowDeleteConfirm(false)
+      return
+    }
+
+    router.push('/men')
   }
 
   // ── Cancel edit ────────────────────────────────────────────
@@ -467,6 +489,15 @@ export default function ManDetailPage({
                         Propositions
                       </Button>
                     </Link>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowDeleteConfirm(true)}
+                      icon={<Trash2 className="h-4 w-4" />}
+                      className="text-danger hover:text-danger-deep hover:bg-danger-light"
+                    >
+                      Supprimer
+                    </Button>
                   </>
                 )}
               </div>
@@ -481,6 +512,35 @@ export default function ManDetailPage({
             {saveSuccess && (
               <div className="mt-3 rounded-lg bg-sage-light border border-sage/30 px-3 py-2 text-sm text-sage-deep">
                 Profil mis a jour avec succes
+              </div>
+            )}
+
+            {showDeleteConfirm && (
+              <div className="mt-3 rounded-lg bg-danger-light border border-danger/25 px-4 py-3">
+                <p className="text-sm text-danger-deep font-medium mb-1">
+                  Supprimer {man.first_name} {man.last_name} ?
+                </p>
+                <p className="text-xs text-danger-deep/70 mb-3">
+                  Cette action est irreversible. Toutes les propositions et references liees seront aussi supprimees.
+                </p>
+                <div className="flex gap-2 justify-end">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowDeleteConfirm(false)}
+                    disabled={deleting}
+                  >
+                    Annuler
+                  </Button>
+                  <button
+                    onClick={handleDelete}
+                    disabled={deleting}
+                    className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium bg-danger text-white hover:bg-danger-deep transition-colors disabled:opacity-60"
+                  >
+                    {deleting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                    Confirmer la suppression
+                  </button>
+                </div>
               </div>
             )}
           </div>

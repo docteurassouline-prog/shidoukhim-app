@@ -66,6 +66,30 @@ export async function getCandidates(filter: CandidatesFilter): Promise<Candidate
   }
 }
 
+export async function deleteCandidate(id: string): Promise<{ success: boolean; error?: string }> {
+  const supabase = createAdminClient()
+
+  // Supprimer les enregistrements liés avant la candidate
+  await supabase.from('proposals').delete().eq('candidate_woman_id', id).eq('organization_id', ORG_ID)
+  await supabase.from('candidate_assignments').delete().eq('candidate_id', id)
+  await supabase.from('candidate_references').delete().eq('candidate_id', id).eq('candidate_type', 'woman')
+  await supabase.from('candidate_photos').delete().eq('candidate_id', id)
+  await supabase.from('audit_log').delete().eq('entity_id', id).eq('organization_id', ORG_ID)
+
+  const { error } = await supabase
+    .from('candidates')
+    .delete()
+    .eq('id', id)
+    .eq('organization_id', ORG_ID)
+
+  if (error) {
+    console.error('Erreur suppression candidate:', error)
+    return { success: false, error: error.message }
+  }
+
+  return { success: true }
+}
+
 export async function getMatchmakers(): Promise<{ id: string; full_name: string }[]> {
   const supabase = createAdminClient()
 
