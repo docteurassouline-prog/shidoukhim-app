@@ -3,10 +3,14 @@
 import { useEffect, useState, useMemo } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Plus, Search, Users, MapPin, Briefcase, BookOpen } from 'lucide-react'
+import { Plus, Search, Users, MapPin, Briefcase, BookOpen, LayoutGrid, Table, ArrowUpDown } from 'lucide-react'
 import { getMenCandidates } from '@/lib/candidates-men/actions'
-import type { CandidateMan, CandidateStatus } from '@/lib/types'
+import type { CandidateMan, CandidateManStatus } from '@/lib/types'
 import { calculateAge, getStatusLabel, getStatusColor, cn } from '@/lib/utils'
+import {
+  getCourantLabel,
+  getCommunityEthnicLabel,
+} from '@/lib/constants/orthodox'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
@@ -31,6 +35,7 @@ export default function MenPage() {
   const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('')
+  const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards')
 
   useEffect(() => {
     async function fetchMen() {
@@ -82,9 +87,33 @@ export default function MenPage() {
                 : `${filteredMen.length} fiche${filteredMen.length !== 1 ? 's' : ''}`}
             </p>
           </div>
-          <Link href="/men/new">
-            <Button icon={<Plus className="h-4 w-4" />}>Nouveau profil</Button>
-          </Link>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center bg-surface border border-line rounded-lg p-0.5">
+              <button
+                onClick={() => setViewMode('cards')}
+                className={cn(
+                  'p-2 rounded-md transition-colors',
+                  viewMode === 'cards' ? 'bg-sage/10 text-sage' : 'text-ink-soft hover:bg-stone-100'
+                )}
+                title="Cartes"
+              >
+                <LayoutGrid className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => setViewMode('table')}
+                className={cn(
+                  'p-2 rounded-md transition-colors',
+                  viewMode === 'table' ? 'bg-sage/10 text-sage' : 'text-ink-soft hover:bg-stone-100'
+                )}
+                title="Tableau"
+              >
+                <Table className="h-4 w-4" />
+              </button>
+            </div>
+            <Link href="/men/new">
+              <Button icon={<Plus className="h-4 w-4" />}>Nouveau profil</Button>
+            </Link>
+          </div>
         </div>
 
         {/* Filters */}
@@ -166,8 +195,8 @@ export default function MenPage() {
           </div>
         )}
 
-        {/* Card grid */}
-        {!loading && !error && filteredMen.length > 0 && (
+        {/* Content */}
+        {!loading && !error && filteredMen.length > 0 && viewMode === 'cards' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredMen.map((man) => (
               <Link
@@ -183,7 +212,6 @@ export default function MenPage() {
                     'cursor-pointer'
                   )}
                 >
-                  {/* Name + status */}
                   <div className="flex items-start justify-between gap-3 mb-3">
                     <h3 className="text-base font-semibold text-ink group-hover:text-plum transition-colors">
                       {man.first_name} {man.last_name}
@@ -192,38 +220,23 @@ export default function MenPage() {
                       {getStatusLabel(man.status)}
                     </Badge>
                   </div>
-
-                  {/* Details */}
                   <div className="space-y-1.5 text-sm text-ink-soft">
-                    {/* Age */}
                     <div className="flex items-center gap-2">
                       <Users className="h-3.5 w-3.5 shrink-0 text-gold" />
-                      <span>
-                        {calculateAge(
-                          man.date_of_birth,
-                          man.age_estimate,
-                          man.is_age_estimate
-                        )}
-                      </span>
+                      <span>{calculateAge(man.date_of_birth, man.age_estimate, man.is_age_estimate)}</span>
                     </div>
-
-                    {/* City */}
                     {man.city && (
                       <div className="flex items-center gap-2">
                         <MapPin className="h-3.5 w-3.5 shrink-0 text-gold" />
                         <span>{man.city}</span>
                       </div>
                     )}
-
-                    {/* Profession */}
                     {man.profession && (
                       <div className="flex items-center gap-2">
                         <Briefcase className="h-3.5 w-3.5 shrink-0 text-gold" />
                         <span>{man.profession}</span>
                       </div>
                     )}
-
-                    {/* Community */}
                     {man.community && (
                       <div className="flex items-center gap-2">
                         <BookOpen className="h-3.5 w-3.5 shrink-0 text-gold" />
@@ -234,6 +247,69 @@ export default function MenPage() {
                 </div>
               </Link>
             ))}
+          </div>
+        )}
+
+        {/* Table view */}
+        {!loading && !error && filteredMen.length > 0 && viewMode === 'table' && (
+          <div className="bg-surface rounded-[14px] border border-line overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-line">
+                    {['Nom', 'Age', 'Ville', 'Profession', 'Courant', 'Communaute', 'Situation', 'Statut'].map((label) => (
+                      <th key={label} className="text-left py-3 px-3 text-xs font-medium text-ink-soft uppercase tracking-wider whitespace-nowrap">
+                        {label}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-line">
+                  {filteredMen.map((man) => {
+                    const dash = <span className="text-ink-soft/40">--</span>
+                    return (
+                      <tr
+                        key={man.id}
+                        onClick={() => router.push(`/men/${man.id}`)}
+                        className="hover:bg-stone-50/50 cursor-pointer transition-colors"
+                      >
+                        <td className="py-2.5 px-3">
+                          <span className="font-medium text-ink whitespace-nowrap">
+                            {man.first_name} {man.last_name}
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-3 text-ink-soft whitespace-nowrap">
+                          {calculateAge(man.date_of_birth, man.age_estimate, man.is_age_estimate)}
+                        </td>
+                        <td className="py-2.5 px-3 text-ink-soft whitespace-nowrap">
+                          {man.city || dash}
+                        </td>
+                        <td className="py-2.5 px-3 text-ink-soft whitespace-nowrap">
+                          {man.profession || dash}
+                        </td>
+                        <td className="py-2.5 px-3 text-ink-soft whitespace-nowrap">
+                          {man.courant ? getCourantLabel(man.courant) : dash}
+                        </td>
+                        <td className="py-2.5 px-3 text-ink-soft whitespace-nowrap">
+                          {man.community ? getCommunityEthnicLabel(man.community) : dash}
+                        </td>
+                        <td className="py-2.5 px-3 text-ink-soft whitespace-nowrap">
+                          {man.marital_status || dash}
+                        </td>
+                        <td className="py-2.5 px-3">
+                          <span className={cn(
+                            'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium',
+                            getStatusColor(man.status)
+                          )}>
+                            {getStatusLabel(man.status)}
+                          </span>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>

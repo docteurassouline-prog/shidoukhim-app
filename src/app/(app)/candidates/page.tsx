@@ -33,6 +33,10 @@ import {
   cn,
   truncate,
 } from '@/lib/utils'
+import {
+  getCourantLabel,
+  getCommunityEthnicLabel,
+} from '@/lib/constants/orthodox'
 import Button from '@/components/ui/Button'
 import SearchInput from '@/components/ui/SearchInput'
 import Select from '@/components/ui/Select'
@@ -333,24 +337,25 @@ export default function CandidatesPage() {
   }
 
   function renderTableView() {
-    const columns: { key: SortField; label: string }[] = [
+    const sortableColumns: { key: SortField; label: string }[] = [
       { key: 'last_name', label: 'Nom' },
       { key: 'date_of_birth', label: 'Age' },
       { key: 'city', label: 'Ville' },
-      { key: 'availability', label: 'Disponibilite' },
-      { key: 'status', label: 'Statut' },
-      { key: 'updated_at', label: 'Mise a jour' },
     ]
+
+    const fixedColumns = ['Profession', 'Courant', 'Communaute', 'Situation', 'Disponibilite', 'Statut']
+
+    const dash = <span className="text-ink-soft/40">--</span>
 
     return (
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-line">
-              {columns.map((col) => (
+              {sortableColumns.map((col) => (
                 <th
                   key={col.key}
-                  className="text-left py-3 px-4 text-xs font-medium text-ink-soft uppercase tracking-wider"
+                  className="text-left py-3 px-3 text-xs font-medium text-ink-soft uppercase tracking-wider whitespace-nowrap"
                 >
                   <button
                     onClick={() => handleSort(col.key)}
@@ -364,64 +369,71 @@ export default function CandidatesPage() {
                   </button>
                 </th>
               ))}
-              <th className="text-left py-3 px-4 text-xs font-medium text-ink-soft uppercase tracking-wider">
-                Chadkhanit
-              </th>
+              {fixedColumns.map((label) => (
+                <th key={label} className="text-left py-3 px-3 text-xs font-medium text-ink-soft uppercase tracking-wider whitespace-nowrap">
+                  {label}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody className="divide-y divide-line">
-            {candidates.map((c) => (
-              <tr
-                key={c.id}
-                onClick={() => router.push(`/candidates/${c.id}`)}
-                className="hover:bg-stone-50/50 cursor-pointer transition-colors"
-              >
-                <td className="py-3 px-4">
-                  <div className="flex items-center gap-3">
-                    <Avatar
-                      src={null}
-                      name={`${c.first_name} ${c.last_name}`}
-                      size="sm"
-                    />
-                    <span className="font-medium text-ink">
-                      {c.first_name} {c.last_name}
-                    </span>
-                  </div>
-                </td>
-                <td className="py-3 px-4 text-ink-soft">
-                  {calculateAge(c.date_of_birth, c.age_estimate, c.is_age_estimate)}
-                </td>
-                <td className="py-3 px-4 text-ink-soft">
-                  {c.city ?? <span className="italic text-ink-soft/50">--</span>}
-                </td>
-                <td className="py-3 px-4">
-                  <span
-                    className={cn(
+            {candidates.map((c) => {
+              const raw = c as unknown as Record<string, unknown>
+              return (
+                <tr
+                  key={c.id}
+                  onClick={() => router.push(`/candidates/${c.id}`)}
+                  className="hover:bg-stone-50/50 cursor-pointer transition-colors"
+                >
+                  <td className="py-2.5 px-3">
+                    <div className="flex items-center gap-2.5">
+                      <Avatar src={null} name={`${c.first_name} ${c.last_name}`} size="sm" />
+                      <span className="font-medium text-ink whitespace-nowrap">
+                        {c.first_name} {c.last_name}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="py-2.5 px-3 text-ink-soft whitespace-nowrap">
+                    {calculateAge(c.date_of_birth, c.age_estimate, c.is_age_estimate)}
+                  </td>
+                  <td className="py-2.5 px-3 text-ink-soft whitespace-nowrap">
+                    {c.city || dash}
+                  </td>
+                  <td className="py-2.5 px-3 text-ink-soft whitespace-nowrap">
+                    {(raw.profession as string) || dash}
+                  </td>
+                  <td className="py-2.5 px-3 text-ink-soft whitespace-nowrap">
+                    {getCourantLabel(raw.courant as string | null) !== (raw.courant as string | null)
+                      ? getCourantLabel(raw.courant as string | null)
+                      : (raw.courant as string) || dash}
+                  </td>
+                  <td className="py-2.5 px-3 text-ink-soft whitespace-nowrap">
+                    {getCommunityEthnicLabel(raw.community as string | null) !== (raw.community as string | null)
+                      ? getCommunityEthnicLabel(raw.community as string | null)
+                      : (raw.community as string) || dash}
+                  </td>
+                  <td className="py-2.5 px-3 text-ink-soft whitespace-nowrap">
+                    {(raw.marital_status as string) || dash}
+                  </td>
+                  <td className="py-2.5 px-3">
+                    <span className={cn(
                       'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium',
                       getAvailabilityColor(c.availability)
-                    )}
-                  >
-                    {getAvailabilityLabel(c.availability)}
-                  </span>
-                </td>
-                <td className="py-3 px-4">
-                  <span
-                    className={cn(
+                    )}>
+                      {getAvailabilityLabel(c.availability)}
+                    </span>
+                  </td>
+                  <td className="py-2.5 px-3">
+                    <span className={cn(
                       'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium',
                       getStatusColor(c.status)
-                    )}
-                  >
-                    {getStatusLabel(c.status)}
-                  </span>
-                </td>
-                <td className="py-3 px-4 text-ink-soft text-xs">
-                  {formatDate(c.updated_at)}
-                </td>
-                <td className="py-3 px-4 text-ink-soft text-xs">
-                  {getAssigneeName(c) ?? <span className="italic">--</span>}
-                </td>
-              </tr>
-            ))}
+                    )}>
+                      {getStatusLabel(c.status)}
+                    </span>
+                  </td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </div>
