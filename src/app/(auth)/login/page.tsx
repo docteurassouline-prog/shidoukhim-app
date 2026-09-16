@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
+import Image from 'next/image'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 
 type Mode = 'login' | 'signup' | 'forgot'
@@ -164,9 +165,18 @@ export default function LoginPage() {
           aria-hidden="true"
         />
 
-        <div className="relative">
-          <p className="text-[11px] uppercase tracking-[0.28em] text-white/50">Shidoukhim</p>
-          <p className="mt-2 font-display text-[40px] font-semibold leading-none">Hava Dahan</p>
+        <div className="relative flex items-center gap-4">
+          <Image
+            src="/logo-baita.png"
+            alt="BAITA"
+            width={64}
+            height={64}
+            className="shrink-0"
+          />
+          <div>
+            <p className="font-display text-[36px] font-semibold leading-none">BAITA</p>
+            <p className="mt-1 text-[12px] text-white/60">by Hava Dahan</p>
+          </div>
         </div>
 
         <div className="relative max-w-md">
@@ -190,9 +200,18 @@ export default function LoginPage() {
       {/* Formulaire */}
       <main className="flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-[400px]">
-          <div className="mb-8 lg:hidden">
-            <p className="text-[11px] uppercase tracking-[0.28em] text-ink-muted">Shidoukhim</p>
-            <p className="font-display text-[34px] font-semibold leading-none text-plum">Hava Dahan</p>
+          <div className="mb-8 lg:hidden flex items-center gap-3">
+            <Image
+              src="/logo-baita.png"
+              alt="BAITA"
+              width={48}
+              height={48}
+              className="shrink-0"
+            />
+            <div>
+              <p className="font-display text-[28px] font-semibold leading-none text-plum">BAITA</p>
+              <p className="text-[11px] text-ink-muted">by Hava Dahan</p>
+            </div>
           </div>
 
           <h1 className="text-[32px] text-ink">
@@ -202,7 +221,7 @@ export default function LoginPage() {
           </h1>
           <p className="mt-2 text-sm text-ink-soft">
             {mode === 'login' && 'Connectez-vous pour accéder à vos dossiers.'}
-            {mode === 'signup' && 'Votre compte sera rattaché au cabinet Hava Dahan.'}
+            {mode === 'signup' && 'Votre compte sera rattaché au cabinet BAITA.'}
             {mode === 'forgot' && 'Nous vous enverrons un lien de réinitialisation.'}
           </p>
 

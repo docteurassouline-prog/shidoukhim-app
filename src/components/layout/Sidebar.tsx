@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
+import Image from 'next/image'
 import {
   LayoutDashboard,
   Users,
@@ -89,13 +90,22 @@ export default function Sidebar({ user }: SidebarProps) {
     <div className="flex flex-col h-full bg-plum-deep text-white">
       {/* Marque */}
       <div className="flex items-center justify-between px-6 pt-7 pb-6">
-        <Link href="/dashboard" className="min-w-0 group">
-          <span className="block font-display text-[26px] leading-none font-semibold tracking-tight text-white truncate">
-            Hava Dahan
-          </span>
-          <span className="mt-1.5 block text-[10.5px] uppercase tracking-[0.22em] text-white/50">
-            Shidoukhim
-          </span>
+        <Link href="/dashboard" className="flex items-center gap-3 min-w-0 group">
+          <Image
+            src="/logo-baita.png"
+            alt="BAITA"
+            width={40}
+            height={40}
+            className="shrink-0"
+          />
+          <div className="min-w-0">
+            <span className="block font-display text-[22px] leading-none font-semibold tracking-tight text-white truncate">
+              BAITA
+            </span>
+            <span className="mt-1 block text-[10.5px] text-white/50">
+              by Hava Dahan
+            </span>
+          </div>
         </Link>
         <button
           onClick={() => setMobileOpen(false)}

@@ -17,7 +17,7 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: "Hava Dahan · Shidoukhim",
+  title: "BAITA · by Hava Dahan",
   description: "Application de gestion de shidoukhim",
 };
 
