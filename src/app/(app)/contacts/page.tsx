@@ -16,8 +16,15 @@ import {
   Pencil,
   BookUser,
 } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
 import type { Contact, ContactCreateInput } from '@/lib/types'
+import {
+  getContacts as fetchContactsAction,
+  createContact as createContactAction,
+  updateContact as updateContactAction,
+  deleteContact as deleteContactAction,
+  getContactRelatedCandidates,
+} from '@/lib/contacts/actions'
+import type { RelatedCandidate } from '@/lib/contacts/actions'
 import { cn, formatDate } from '@/lib/utils'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
@@ -26,8 +33,6 @@ import Badge from '@/components/ui/Badge'
 import SearchInput from '@/components/ui/SearchInput'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import EmptyState from '@/components/ui/EmptyState'
-
-const ORG_ID = '00000000-0000-0000-0000-000000000001'
 
 const roleOptions = [
   { value: '', label: 'Tous les roles' },
@@ -69,18 +74,7 @@ function getRoleBadgeClass(role: string | null): string {
   }
 }
 
-interface RelatedCandidate {
-  id: string
-  reference_name: string
-  candidate_type: 'woman' | 'man'
-  relationship: string | null
-  candidate_id: string
-  candidate_first_name: string | null
-  candidate_last_name: string | null
-}
-
 export default function ContactsPage() {
-  const supabase = createClient()
 
   // Data
   const [contacts, setContacts] = useState<Contact[]>([])
@@ -126,21 +120,15 @@ export default function ContactsPage() {
     setLoading(true)
     setError(null)
     try {
-      const { data, error: fetchErr } = await supabase
-        .from('contacts')
-        .select('*')
-        .eq('organization_id', ORG_ID)
-        .order('last_name', { ascending: true })
-
-      if (fetchErr) throw fetchErr
-      setContacts(data ?? [])
+      const data = await fetchContactsAction()
+      setContacts(data)
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Erreur lors du chargement des contacts'
       setError(message)
     } finally {
       setLoading(false)
     }
-  }, [supabase])
+  }, [])
 
   useEffect(() => {
     fetchContacts()
@@ -217,59 +205,7 @@ export default function ContactsPage() {
     async (contactId: string) => {
       setLoadingRelated(true)
       try {
-        // Fetch references where this contact is referenced
-        const { data: refs } = await supabase
-          .from('candidate_references')
-          .select('id, candidate_id, candidate_man_id, role, relationship_context')
-          .eq('contact_id', contactId)
-
-        if (!refs || refs.length === 0) {
-          setRelatedCandidates([])
-          setLoadingRelated(false)
-          return
-        }
-
-        const results: RelatedCandidate[] = []
-
-        for (const ref of refs) {
-          let candidateFirstName: string | null = null
-          let candidateLastName: string | null = null
-          const candidateType: 'woman' | 'man' = ref.candidate_man_id ? 'man' : 'woman'
-          const candidateId: string = ref.candidate_man_id ?? ref.candidate_id
-
-          if (candidateType === 'woman') {
-            const { data: cand } = await supabase
-              .from('candidates')
-              .select('first_name, last_name')
-              .eq('id', candidateId)
-              .single()
-            if (cand) {
-              candidateFirstName = cand.first_name
-              candidateLastName = cand.last_name
-            }
-          } else {
-            const { data: cand } = await supabase
-              .from('candidates_men')
-              .select('first_name, last_name')
-              .eq('id', candidateId)
-              .single()
-            if (cand) {
-              candidateFirstName = cand.first_name
-              candidateLastName = cand.last_name
-            }
-          }
-
-          results.push({
-            id: ref.id,
-            reference_name: ref.role ?? 'Référence',
-            candidate_type: candidateType,
-            relationship: ref.relationship_context,
-            candidate_id: candidateId,
-            candidate_first_name: candidateFirstName,
-            candidate_last_name: candidateLastName,
-          })
-        }
-
+        const results = await getContactRelatedCandidates(contactId)
         setRelatedCandidates(results)
       } catch {
         setRelatedCandidates([])
@@ -277,7 +213,7 @@ export default function ContactsPage() {
         setLoadingRelated(false)
       }
     },
-    [supabase]
+    []
   )
 
   // ----------------------------------------------------------------
@@ -349,25 +285,7 @@ export default function ContactsPage() {
     try {
       if (editingContact) {
         // Update existing
-        const { error: updateErr } = await supabase
-          .from('contacts')
-          .update({
-            first_name: form.first_name.trim(),
-            last_name: form.last_name.trim(),
-            email: form.email?.trim() || null,
-            phone: form.phone?.trim() || null,
-            role: form.role || null,
-            relationship_to: form.relationship_to?.trim() || null,
-            notes: form.notes?.trim() || null,
-            is_reference: form.is_reference,
-          })
-          .eq('id', editingContact.id)
-
-        if (updateErr) throw updateErr
-      } else {
-        // Create new
-        const { error: insertErr } = await supabase.from('contacts').insert({
-          organization_id: ORG_ID,
+        const result = await updateContactAction(editingContact.id, {
           first_name: form.first_name.trim(),
           last_name: form.last_name.trim(),
           email: form.email?.trim() || null,
@@ -378,7 +296,21 @@ export default function ContactsPage() {
           is_reference: form.is_reference,
         })
 
-        if (insertErr) throw insertErr
+        if (!result.success) throw new Error(result.error)
+      } else {
+        // Create new
+        const result = await createContactAction({
+          first_name: form.first_name.trim(),
+          last_name: form.last_name.trim(),
+          email: form.email?.trim() || null,
+          phone: form.phone?.trim() || null,
+          role: form.role || null,
+          relationship_to: form.relationship_to?.trim() || null,
+          notes: form.notes?.trim() || null,
+          is_reference: form.is_reference,
+        })
+
+        if (!result.success) throw new Error(result.error)
       }
 
       setShowModal(false)
@@ -399,12 +331,9 @@ export default function ContactsPage() {
     if (!confirm('Supprimer ce contact ? Cette action est irreversible.')) return
 
     try {
-      const { error: delErr } = await supabase
-        .from('contacts')
-        .delete()
-        .eq('id', contactId)
+      const result = await deleteContactAction(contactId)
 
-      if (delErr) throw delErr
+      if (!result.success) throw new Error(result.error)
 
       if (expandedId === contactId) {
         setExpandedId(null)

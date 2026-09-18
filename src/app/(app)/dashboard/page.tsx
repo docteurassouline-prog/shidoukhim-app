@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { formatDate, formatDateTime, getStatusLabel, getAvailabilityLabel } from '@/lib/utils'
 import { getTopMatches } from '@/lib/scoring/actions'
 import Card from '@/components/ui/Card'
@@ -31,11 +32,12 @@ interface StatCard {
 }
 
 export default async function DashboardPage() {
-  const supabase = await createClient()
+  const supabaseAuth = await createClient()
+  const supabase = createAdminClient()
 
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await supabaseAuth.auth.getUser()
 
   // Fetch user profile
   const { data: profile } = await supabase

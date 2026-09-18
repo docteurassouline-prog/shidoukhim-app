@@ -2,7 +2,19 @@
 
 import { use, useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
+import {
+  getProposalById,
+  getProposalWoman,
+  getProposalMan,
+  getWomanPhotos,
+  getProposalMeetings,
+  getMeetingFeedback,
+  updateProposalStatus,
+  updateProposalResponse,
+  createMeeting,
+  createMeetingFeedback,
+  updateProposalNextAction,
+} from '@/lib/proposals/actions'
 import type {
   Proposal,
   ProposalStatus,
@@ -58,8 +70,6 @@ import {
   getKashrutLevelLabel,
   getCommunityEthnicLabel,
 } from '@/lib/constants/orthodox'
-
-const ORG_ID = '00000000-0000-0000-0000-000000000001'
 
 // ============================================================
 // Labels
@@ -408,7 +418,6 @@ export default function ProposalDetailPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = use(params)
-  const supabase = createClient()
 
   // --- State ---
   const [loading, setLoading] = useState(true)
@@ -459,66 +468,42 @@ export default function ProposalDetailPage({
     setError(null)
     try {
       // Fetch proposal
-      const { data: proposalData, error: proposalError } = await supabase
-        .from('proposals')
-        .select('*')
-        .eq('id', id)
-        .eq('organization_id', ORG_ID)
-        .single()
+      const proposalData = await getProposalById(id)
 
-      if (proposalError || !proposalData) {
+      if (!proposalData) {
         setError('Proposition introuvable')
         setLoading(false)
         return
       }
-      setProposal(proposalData as Proposal)
-      setStatusForm(proposalData.status)
+      setProposal(proposalData as unknown as Proposal)
+      setStatusForm(proposalData.status as ProposalStatus)
       setNextActionForm({
-        next_action: proposalData.next_action || '',
-        next_action_date: proposalData.next_action_date || '',
+        next_action: (proposalData.next_action as string) || '',
+        next_action_date: (proposalData.next_action_date as string) || '',
       })
 
       // Parallel fetches
-      const [womanRes, manRes, photosRes, meetingsRes] = await Promise.all([
-        supabase
-          .from('candidates')
-          .select('*')
-          .eq('id', proposalData.candidate_woman_id)
-          .single(),
-        supabase
-          .from('candidates_men')
-          .select('*')
-          .eq('id', proposalData.candidate_man_id)
-          .single(),
-        supabase
-          .from('candidate_photos')
-          .select('*')
-          .eq('candidate_id', proposalData.candidate_woman_id)
-          .order('order_index', { ascending: true }),
-        supabase
-          .from('meetings')
-          .select('*')
-          .eq('proposal_id', id)
-          .order('meeting_number', { ascending: true }),
+      const [womanData, manData, photosData, meetingsData] = await Promise.all([
+        getProposalWoman(proposalData.candidate_woman_id as string),
+        getProposalMan(proposalData.candidate_man_id as string),
+        getWomanPhotos(proposalData.candidate_woman_id as string),
+        getProposalMeetings(id),
       ])
 
-      if (womanRes.data) setWoman(womanRes.data as Candidate)
-      if (manRes.data) setMan(manRes.data as CandidateMan)
-      if (photosRes.data) setWomanPhotos(photosRes.data as CandidatePhoto[])
+      if (womanData) setWoman(womanData as unknown as Candidate)
+      if (manData) setMan(manData as unknown as CandidateMan)
+      setWomanPhotos((photosData || []) as unknown as CandidatePhoto[])
 
-      const meetingsList = (meetingsRes.data || []) as Meeting[]
+      const meetingsList = (meetingsData || []) as unknown as Meeting[]
       setMeetings(meetingsList)
 
       // Fetch feedback for all meetings
       if (meetingsList.length > 0) {
         const meetingIds = meetingsList.map((m) => m.id)
-        const { data: feedbackData } = await supabase
-          .from('meeting_feedback')
-          .select('*')
-          .in('meeting_id', meetingIds)
+        const feedbackData = await getMeetingFeedback(meetingIds)
 
         const fbMap: Record<string, MeetingFeedback[]> = {}
-        for (const fb of (feedbackData || []) as MeetingFeedback[]) {
+        for (const fb of (feedbackData || []) as unknown as MeetingFeedback[]) {
           if (!fbMap[fb.meeting_id]) fbMap[fb.meeting_id] = []
           fbMap[fb.meeting_id].push(fb)
         }
@@ -549,10 +534,7 @@ export default function ProposalDetailPage({
         updates.proposed_at = new Date().toISOString()
       }
 
-      await supabase
-        .from('proposals')
-        .update(updates)
-        .eq('id', proposal.id)
+      await updateProposalStatus(proposal.id, updates)
 
       setShowStatusModal(false)
       await fetchData()
@@ -565,21 +547,7 @@ export default function ProposalDetailPage({
     if (!proposal) return
     setSaving(true)
     try {
-      const updates: Record<string, unknown> = {}
-      if (side === 'woman') {
-        updates.woman_response = responseForm.response
-        updates.woman_response_at = new Date().toISOString()
-        updates.woman_notes = responseForm.notes || null
-      } else {
-        updates.man_response = responseForm.response
-        updates.man_response_at = new Date().toISOString()
-        updates.man_notes = responseForm.notes || null
-      }
-
-      await supabase
-        .from('proposals')
-        .update(updates)
-        .eq('id', proposal.id)
+      await updateProposalResponse(proposal.id, side, responseForm.response, responseForm.notes || null)
 
       setShowResponseModal(null)
       setResponseForm({ response: 'accepted', notes: '' })
@@ -597,15 +565,12 @@ export default function ProposalDetailPage({
         ? Math.max(...meetings.map((m) => m.meeting_number)) + 1
         : 1
 
-      await supabase.from('meetings').insert({
+      await createMeeting({
         proposal_id: proposal.id,
         meeting_number: nextNumber,
         scheduled_at: meetingForm.scheduled_at || null,
         location: meetingForm.location || null,
         location_type: meetingForm.location_type || null,
-        status: 'planifiee' as MeetingStatus,
-        duration_minutes: null,
-        notes: null,
       })
 
       setShowMeetingModal(false)
@@ -620,15 +585,13 @@ export default function ProposalDetailPage({
     if (!feedbackForm.meeting_id) return
     setSaving(true)
     try {
-      await supabase.from('meeting_feedback').insert({
+      await createMeetingFeedback({
         meeting_id: feedbackForm.meeting_id,
         from_side: feedbackForm.from_side,
         sentiment: feedbackForm.sentiment,
         wants_next_meeting: feedbackForm.wants_next_meeting,
         feedback_text: feedbackForm.feedback_text || null,
         private_notes: feedbackForm.private_notes || null,
-        collected_at: new Date().toISOString(),
-        collected_by: null,
       })
 
       setShowFeedbackModal(false)
@@ -650,13 +613,7 @@ export default function ProposalDetailPage({
     if (!proposal) return
     setSaving(true)
     try {
-      await supabase
-        .from('proposals')
-        .update({
-          next_action: nextActionForm.next_action || null,
-          next_action_date: nextActionForm.next_action_date || null,
-        })
-        .eq('id', proposal.id)
+      await updateProposalNextAction(proposal.id, nextActionForm.next_action || null, nextActionForm.next_action_date || null)
 
       setEditingNextAction(false)
       await fetchData()

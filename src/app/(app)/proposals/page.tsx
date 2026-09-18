@@ -14,7 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
+import { getProposals } from '@/lib/proposals/actions'
 import { getStatusLabel, getStatusColor, formatDate, cn } from '@/lib/utils'
 import Button from '@/components/ui/Button'
 import Card from '@/components/ui/Card'
@@ -24,7 +24,6 @@ import SearchInput from '@/components/ui/SearchInput'
 import EmptyState from '@/components/ui/EmptyState'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 
-const ORG_ID = '00000000-0000-0000-0000-000000000001'
 const PER_PAGE = 20
 
 const statusOptions = [
@@ -99,68 +98,30 @@ export default function ProposalsPage() {
   useEffect(() => {
     async function fetchProposals() {
       setLoading(true)
-      const supabase = createClient()
 
-      let query = supabase
-        .from('proposals')
-        .select(
-          `
-          id,
-          status,
-          proposed_at:created_at,
-          matchmaker_notes:notes,
-          woman_response:agreement_f,
-          man_response:agreement_m,
-          next_action,
-          next_action_date,
-          created_at,
-          updated_at,
-          candidate_woman:candidates!proposals_candidate_woman_id_fkey(id, first_name, last_name, city, age_estimate),
-          candidate_man:candidates_men!proposals_candidate_man_id_fkey(id, first_name, last_name, city, age_estimate),
-          creator:user_profiles!proposals_created_by_fkey(full_name)
-        `,
-          { count: 'exact' }
-        )
-        .eq('organization_id', ORG_ID)
+      const { data, count } = await getProposals({ status: statusFilter, page, perPage: PER_PAGE })
 
-      if (statusFilter) {
-        query = query.eq('status', statusFilter)
+      // Unwrap arrays for joined relations + client-side search filtering
+      let filtered = (data ?? []).map((row: Record<string, unknown>) => ({
+        ...row,
+        candidate_woman: Array.isArray(row.candidate_woman) ? row.candidate_woman[0] ?? null : row.candidate_woman,
+        candidate_man: Array.isArray(row.candidate_man) ? row.candidate_man[0] ?? null : row.candidate_man,
+        creator: Array.isArray(row.creator) ? row.creator[0] ?? null : row.creator,
+      })) as ProposalRow[]
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase()
+        filtered = filtered.filter((p) => {
+          const wName = p.candidate_woman
+            ? `${p.candidate_woman.first_name} ${p.candidate_woman.last_name}`.toLowerCase()
+            : ''
+          const mName = p.candidate_man
+            ? `${p.candidate_man.first_name} ${p.candidate_man.last_name}`.toLowerCase()
+            : ''
+          return wName.includes(q) || mName.includes(q)
+        })
       }
-
-      // Sort by updated_at desc
-      query = query.order('updated_at', { ascending: false })
-
-      // Pagination
-      const from = (page - 1) * PER_PAGE
-      query = query.range(from, from + PER_PAGE - 1)
-
-      const { data, count, error } = await query
-
-      if (error) {
-        console.error('Erreur chargement propositions:', error)
-      } else {
-        // Filter by search if needed (client-side since it spans joined tables)
-        let filtered = (data ?? []).map((row: Record<string, unknown>) => ({
-          ...row,
-          candidate_woman: Array.isArray(row.candidate_woman) ? row.candidate_woman[0] ?? null : row.candidate_woman,
-          candidate_man: Array.isArray(row.candidate_man) ? row.candidate_man[0] ?? null : row.candidate_man,
-          creator: Array.isArray(row.creator) ? row.creator[0] ?? null : row.creator,
-        })) as ProposalRow[]
-        if (searchQuery) {
-          const q = searchQuery.toLowerCase()
-          filtered = filtered.filter((p) => {
-            const wName = p.candidate_woman
-              ? `${p.candidate_woman.first_name} ${p.candidate_woman.last_name}`.toLowerCase()
-              : ''
-            const mName = p.candidate_man
-              ? `${p.candidate_man.first_name} ${p.candidate_man.last_name}`.toLowerCase()
-              : ''
-            return wName.includes(q) || mName.includes(q)
-          })
-        }
-        setProposals(filtered)
-        setTotalCount(count ?? 0)
-      }
+      setProposals(filtered)
+      setTotalCount(count ?? 0)
       setLoading(false)
     }
 

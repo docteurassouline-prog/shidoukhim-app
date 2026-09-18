@@ -11,7 +11,7 @@ import {
   User,
   Search,
 } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
+import { getCandidatesForProposal, checkProposalConflicts, createProposal } from '@/lib/proposals/actions'
 import { computePairScore } from '@/lib/scoring/actions'
 import type { CompatibilityResult } from '@/lib/scoring/types'
 import ScoreDetails from '@/components/scoring/ScoreDetails'
@@ -31,8 +31,6 @@ import Input from '@/components/ui/Input'
 import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
-
-const ORG_ID = '00000000-0000-0000-0000-000000000001'
 
 interface CandidateOption {
   id: string
@@ -82,31 +80,11 @@ export default function NewProposalPage() {
   useEffect(() => {
     async function fetchCandidates() {
       setLoadingCandidates(true)
-      const supabase = createClient()
 
-      const selectFields = `
-        id, first_name, last_name, date_of_birth, age_estimate, is_age_estimate,
-        city, status, availability, courant, community, profession,
-        shabbat_practice, kashrut_level, age_min, age_max, preferred_cities
-      `
+      const { women, men } = await getCandidatesForProposal()
 
-      const [womenRes, menRes] = await Promise.all([
-        supabase
-          .from('candidates')
-          .select(selectFields)
-          .eq('organization_id', ORG_ID)
-          .in('status', ['validee', 'a_valider'])
-          .order('last_name', { ascending: true }),
-        supabase
-          .from('candidates_men')
-          .select(selectFields)
-          .eq('organization_id', ORG_ID)
-          .in('status', ['actif', 'en_rencontre'])
-          .order('last_name', { ascending: true }),
-      ])
-
-      setWomen((womenRes.data ?? []) as CandidateOption[])
-      setMen((menRes.data ?? []) as CandidateOption[])
+      setWomen(women as unknown as CandidateOption[])
+      setMen(men as unknown as CandidateOption[])
       setLoadingCandidates(false)
     }
 
@@ -122,19 +100,10 @@ export default function NewProposalPage() {
 
     async function checkConflicts() {
       setCheckingConflicts(true)
-      const supabase = createClient()
 
-      // Check for active proposals involving either candidate
-      const { data } = await supabase
-        .from('proposals')
-        .select('id, status, candidate_woman_id, candidate_man_id')
-        .eq('organization_id', ORG_ID)
-        .not('status', 'in', '("refusee","interrompue","aboutie")')
-        .or(
-          `candidate_woman_id.eq.${selectedWoman!.id},candidate_man_id.eq.${selectedMan!.id}`
-        )
+      const data = await checkProposalConflicts(selectedWoman!.id, selectedMan!.id)
 
-      setConflicts((data ?? []) as ActiveProposal[])
+      setConflicts(data as unknown as ActiveProposal[])
       setCheckingConflicts(false)
     }
 
@@ -164,27 +133,18 @@ export default function NewProposalPage() {
     if (!selectedWoman || !selectedMan) return
 
     setSubmitting(true)
-    const supabase = createClient()
 
-    const { data, error } = await supabase
-      .from('proposals')
-      .insert({
-        organization_id: ORG_ID,
-        candidate_woman_id: selectedWoman.id,
-        candidate_man_id: selectedMan.id,
-        status: 'envisagee' as const,
-        matchmaker_notes: notes || null,
-        priority: 0,
-        tags: [],
-      })
-      .select('id')
-      .single()
+    const result = await createProposal({
+      candidate_woman_id: selectedWoman.id,
+      candidate_man_id: selectedMan.id,
+      matchmaker_notes: notes || null,
+    })
 
-    if (error) {
-      console.error('Erreur creation proposition:', error)
+    if (!result.success) {
+      console.error('Erreur creation proposition:', result.error)
       alert('Erreur lors de la creation. Veuillez reessayer.')
-    } else if (data) {
-      router.push(`/proposals/${data.id}`)
+    } else if (result.id) {
+      router.push(`/proposals/${result.id}`)
     }
     setSubmitting(false)
   }

@@ -1,17 +1,27 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { formatDate, getStatusLabel } from '@/lib/utils'
 import type {
-  Task,
-  TaskCreateInput,
-  TaskStatus,
   TaskPriority,
-  Candidate,
-  CandidateMan,
-  Proposal,
 } from '@/lib/types'
+import type {
+  TaskWithCandidate,
+  StaleCandidateRow,
+  ProposalWithNames,
+  CandidateListItem,
+} from '@/lib/agenda/actions'
+import {
+  getTodayTasks,
+  getWeekTasks,
+  getStaleCandidates,
+  getDanglingProposals,
+  getCandidateLists,
+  completeTask as completeTaskAction,
+  createTask,
+  createRelanceTask,
+  createActionTask,
+} from '@/lib/agenda/actions'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
@@ -35,8 +45,6 @@ import {
   PhoneForwarded,
   Target,
 } from 'lucide-react'
-
-const ORG_ID = '00000000-0000-0000-0000-000000000001'
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -91,37 +99,11 @@ function proposalStatusLabel(s: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// Types for enriched data
-// ---------------------------------------------------------------------------
-
-interface TaskWithCandidate extends Task {
-  candidateName?: string
-}
-
-interface StaleCandidateRow {
-  id: string
-  first_name: string
-  last_name: string
-  status: string
-  updated_at: string
-  type: 'woman' | 'man'
-}
-
-interface ProposalWithNames extends Proposal {
-  woman_name: string
-  man_name: string
-}
-
-// ---------------------------------------------------------------------------
 // Main page
 // ---------------------------------------------------------------------------
 
 export default function AgendaPage() {
-  const supabase = createClient()
   const today = toISODate(new Date())
-  const tomorrow = toISODate(new Date(Date.now() + 86_400_000))
-  const in7Days = toISODate(new Date(Date.now() + 7 * 86_400_000))
-  const thirtyDaysAgo = toISODate(new Date(Date.now() - 30 * 86_400_000))
 
   // Section 1 – actions du jour
   const [todayTasks, setTodayTasks] = useState<TaskWithCandidate[]>([])
@@ -151,8 +133,8 @@ export default function AgendaPage() {
   const [completingId, setCompletingId] = useState<string | null>(null)
 
   // Candidate lists for the modal candidate selector
-  const [allWomen, setAllWomen] = useState<Pick<Candidate, 'id' | 'first_name' | 'last_name'>[]>([])
-  const [allMen, setAllMen] = useState<Pick<CandidateMan, 'id' | 'first_name' | 'last_name'>[]>([])
+  const [allWomen, setAllWomen] = useState<CandidateListItem[]>([])
+  const [allMen, setAllMen] = useState<CandidateListItem[]>([])
 
   // New task form state
   const [newTitle, setNewTitle] = useState('')
@@ -164,192 +146,69 @@ export default function AgendaPage() {
   const [formError, setFormError] = useState<string | null>(null)
 
   // -----------------------------------------------------------------------
-  // Enrichment: resolve candidate names for tasks
-  // -----------------------------------------------------------------------
-  const enrichTasks = useCallback(
-    async (tasks: Task[]): Promise<TaskWithCandidate[]> => {
-      const womanIds = tasks
-        .filter((t) => t.related_candidate_type === 'woman' && t.related_candidate_id)
-        .map((t) => t.related_candidate_id!)
-      const manIds = tasks
-        .filter((t) => t.related_candidate_type === 'man' && t.related_candidate_id)
-        .map((t) => t.related_candidate_id!)
-
-      const nameMap = new Map<string, string>()
-
-      if (womanIds.length > 0) {
-        const { data } = await supabase
-          .from('candidates')
-          .select('id, first_name, last_name')
-          .in('id', womanIds)
-        data?.forEach((c) => nameMap.set(c.id, `${c.first_name} ${c.last_name}`))
-      }
-      if (manIds.length > 0) {
-        const { data } = await supabase
-          .from('candidates_men')
-          .select('id, first_name, last_name')
-          .in('id', manIds)
-        data?.forEach((c) => nameMap.set(c.id, `${c.first_name} ${c.last_name}`))
-      }
-
-      return tasks.map((t) => ({
-        ...t,
-        candidateName: t.related_candidate_id
-          ? nameMap.get(t.related_candidate_id)
-          : undefined,
-      }))
-    },
-    [supabase]
-  )
-
-  // -----------------------------------------------------------------------
   // Fetchers
   // -----------------------------------------------------------------------
   const fetchTodayTasks = useCallback(async () => {
     setTodayLoading(true)
     setTodayError(null)
     try {
-      const { data, error } = await supabase
-        .from('tasks')
-        .select('*')
-        .eq('organization_id', ORG_ID)
-        .in('status', ['a_faire', 'en_cours'])
-        .lte('due_date', today)
-        .order('priority', { ascending: false })
-        .order('due_date', { ascending: true })
-
-      if (error) throw error
-      const enriched = await enrichTasks(data ?? [])
-      setTodayTasks(enriched)
+      const data = await getTodayTasks()
+      setTodayTasks(data)
     } catch (err: unknown) {
       setTodayError(errorMessage(err))
     } finally {
       setTodayLoading(false)
     }
-  }, [supabase, today, enrichTasks])
+  }, [])
 
   const fetchWeekTasks = useCallback(async () => {
     setWeekLoading(true)
     setWeekError(null)
     try {
-      const { data, error } = await supabase
-        .from('tasks')
-        .select('*')
-        .eq('organization_id', ORG_ID)
-        .in('status', ['a_faire', 'en_cours'])
-        .gte('due_date', tomorrow)
-        .lte('due_date', in7Days)
-        .order('due_date', { ascending: true })
-        .order('priority', { ascending: false })
-
-      if (error) throw error
-      const enriched = await enrichTasks(data ?? [])
-      setWeekTasks(enriched)
+      const data = await getWeekTasks()
+      setWeekTasks(data)
     } catch (err: unknown) {
       setWeekError(errorMessage(err))
     } finally {
       setWeekLoading(false)
     }
-  }, [supabase, tomorrow, in7Days, enrichTasks])
+  }, [])
 
   const fetchStaleCandidates = useCallback(async () => {
     setStaleLoading(true)
     setStaleError(null)
     try {
-      const [womenRes, menRes] = await Promise.all([
-        supabase
-          .from('candidates')
-          .select('id, first_name, last_name, status, updated_at')
-          .eq('organization_id', ORG_ID)
-          .eq('status', 'validee')
-          .lt('updated_at', thirtyDaysAgo)
-          .order('updated_at', { ascending: true })
-          .limit(50),
-        supabase
-          .from('candidates_men')
-          .select('id, first_name, last_name, status, updated_at')
-          .eq('organization_id', ORG_ID)
-          .in('status', ['actif', 'en_rencontre'])
-          .lt('updated_at', thirtyDaysAgo)
-          .order('updated_at', { ascending: true })
-          .limit(50),
-      ])
-
-      if (womenRes.error) throw womenRes.error
-      if (menRes.error) throw menRes.error
-
-      const combined: StaleCandidateRow[] = [
-        ...(womenRes.data ?? []).map((c) => ({ ...c, type: 'woman' as const })),
-        ...(menRes.data ?? []).map((c) => ({ ...c, type: 'man' as const })),
-      ].sort(
-        (a, b) => new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime()
-      )
-      setStaleCandidates(combined)
+      const data = await getStaleCandidates()
+      setStaleCandidates(data)
     } catch (err: unknown) {
       setStaleError(errorMessage(err))
     } finally {
       setStaleLoading(false)
     }
-  }, [supabase, thirtyDaysAgo])
+  }, [])
 
   const fetchDanglingProposals = useCallback(async () => {
     setProposalsLoading(true)
     setProposalsError(null)
     try {
-      const excludedStatuses = ['refusee', 'interrompue', 'aboutie']
-      const { data, error } = await supabase
-        .from('proposals')
-        .select(
-          '*, candidate_woman:candidates!proposals_candidate_woman_id_fkey(id, first_name, last_name), candidate_man:candidates_men!proposals_candidate_man_id_fkey(id, first_name, last_name)'
-        )
-        .eq('organization_id', ORG_ID)
-        .not('status', 'in', `(${excludedStatuses.join(',')})`)
-        .is('next_action_date', null)
-        .order('created_at', { ascending: false })
-        .limit(50)
-
-      if (error) throw error
-
-      const rows: ProposalWithNames[] = (data ?? []).map((p: Record<string, unknown>) => {
-        const woman = p.candidate_woman as { first_name: string; last_name: string } | null
-        const man = p.candidate_man as { first_name: string; last_name: string } | null
-        return {
-          ...(p as unknown as Proposal),
-          woman_name: woman ? `${woman.first_name} ${woman.last_name}` : 'Inconnue',
-          man_name: man ? `${man.first_name} ${man.last_name}` : 'Inconnu',
-        }
-      })
-      setDanglingProposals(rows)
+      const data = await getDanglingProposals()
+      setDanglingProposals(data)
     } catch (err: unknown) {
       setProposalsError(errorMessage(err))
     } finally {
       setProposalsLoading(false)
     }
-  }, [supabase])
+  }, [])
 
-  // -----------------------------------------------------------------------
-  // Load candidate lists for modal
-  // -----------------------------------------------------------------------
   const fetchCandidateLists = useCallback(async () => {
-    const [w, m] = await Promise.all([
-      supabase
-        .from('candidates')
-        .select('id, first_name, last_name')
-        .eq('organization_id', ORG_ID)
-        .eq('status', 'active')
-        .order('last_name', { ascending: true })
-        .limit(500),
-      supabase
-        .from('candidates_men')
-        .select('id, first_name, last_name')
-        .eq('organization_id', ORG_ID)
-        .eq('status', 'active')
-        .order('last_name', { ascending: true })
-        .limit(500),
-    ])
-    setAllWomen(w.data ?? [])
-    setAllMen(m.data ?? [])
-  }, [supabase])
+    try {
+      const { women, men } = await getCandidateLists()
+      setAllWomen(women)
+      setAllMen(men)
+    } catch {
+      // silently ignore – modal will show empty lists
+    }
+  }, [])
 
   // -----------------------------------------------------------------------
   // Initial fetch
@@ -366,22 +225,15 @@ export default function AgendaPage() {
   // -----------------------------------------------------------------------
   // Actions
   // -----------------------------------------------------------------------
-  async function completeTask(taskId: string) {
+  async function handleCompleteTask(taskId: string) {
     setCompletingId(taskId)
     try {
-      const { error } = await supabase
-        .from('tasks')
-        .update({
-          status: 'terminee' as TaskStatus,
-          completed_at: new Date().toISOString(),
-        })
-        .eq('id', taskId)
-
-      if (error) throw error
-
-      // Remove from local state
-      setTodayTasks((prev) => prev.filter((t) => t.id !== taskId))
-      setWeekTasks((prev) => prev.filter((t) => t.id !== taskId))
+      const result = await completeTaskAction(taskId)
+      if (result.success) {
+        // Remove from local state
+        setTodayTasks((prev) => prev.filter((t) => t.id !== taskId))
+        setWeekTasks((prev) => prev.filter((t) => t.id !== taskId))
+      }
     } catch {
       // silently ignore – the task stays in the list
     } finally {
@@ -390,26 +242,15 @@ export default function AgendaPage() {
   }
 
   async function relancerCandidate(candidate: StaleCandidateRow) {
-    // Create a follow-up task
-    const taskInput: TaskCreateInput = {
-      title: `Relancer ${candidate.first_name} ${candidate.last_name}`,
-      description: `Fiche sans nouvelles depuis le ${formatDate(candidate.updated_at)}. Prendre contact pour mise a jour.`,
-      status: 'a_faire',
-      priority: 'normale',
-      due_date: today,
-      related_candidate_id: candidate.id,
-      related_candidate_type: candidate.type,
-      assigned_to: null,
-      completed_at: null,
-      related_proposal_id: null,
-      tags: ['relance'],
-    }
-    const { error } = await supabase.from('tasks').insert({
-      ...taskInput,
-      organization_id: ORG_ID,
-    })
+    const result = await createRelanceTask(
+      candidate.id,
+      candidate.type,
+      candidate.first_name,
+      candidate.last_name,
+      candidate.updated_at
+    )
 
-    if (!error) {
+    if (result.success) {
       // Remove from stale list
       setStaleCandidates((prev) => prev.filter((c) => c.id !== candidate.id))
       // Refresh today tasks
@@ -418,26 +259,15 @@ export default function AgendaPage() {
   }
 
   async function definirAction(proposal: ProposalWithNames) {
-    // Create a follow-up task linked to the proposal
-    const taskInput: TaskCreateInput = {
-      title: `Definir prochaine action : ${proposal.woman_name} / ${proposal.man_name}`,
-      description: `Proposition sans prochaine action definie. Statut actuel : ${proposalStatusLabel(proposal.status)}.`,
-      status: 'a_faire',
-      priority: 'haute',
-      due_date: today,
-      related_proposal_id: proposal.id,
-      related_candidate_id: proposal.candidate_woman_id,
-      related_candidate_type: 'woman',
-      assigned_to: null,
-      completed_at: null,
-      tags: ['suivi-proposition'],
-    }
-    const { error } = await supabase.from('tasks').insert({
-      ...taskInput,
-      organization_id: ORG_ID,
-    })
+    const result = await createActionTask(
+      proposal.id,
+      proposal.candidate_woman_id,
+      proposal.woman_name,
+      proposal.man_name,
+      proposal.status
+    )
 
-    if (!error) {
+    if (result.success) {
       setDanglingProposals((prev) => prev.filter((p) => p.id !== proposal.id))
       fetchTodayTasks()
     }
@@ -465,26 +295,17 @@ export default function AgendaPage() {
     setSaving(true)
     setFormError(null)
 
-    const input: TaskCreateInput = {
-      title: newTitle.trim(),
-      description: newDescription.trim() || null,
-      status: 'a_faire',
-      priority: newPriority,
-      due_date: newDueDate || null,
-      related_candidate_type: newCandidateType === '' ? null : newCandidateType,
-      related_candidate_id: newCandidateId || null,
-      related_proposal_id: null,
-      assigned_to: null,
-      completed_at: null,
-      tags: [],
-    }
-
     try {
-      const { error } = await supabase
-        .from('tasks')
-        .insert({ ...input, organization_id: ORG_ID })
+      const result = await createTask({
+        title: newTitle.trim(),
+        description: newDescription.trim() || null,
+        priority: newPriority,
+        due_date: newDueDate || null,
+        related_candidate_type: newCandidateType === '' ? null : newCandidateType,
+        related_candidate_id: newCandidateId || null,
+      })
 
-      if (error) throw error
+      if (!result.success) throw new Error(result.error ?? 'Erreur lors de la creation')
 
       setModalOpen(false)
       resetForm()
@@ -589,7 +410,7 @@ export default function AgendaPage() {
             loading={completingId === task.id}
             disabled={completingId === task.id}
             icon={<CheckCircle2 className="h-4 w-4" />}
-            onClick={() => completeTask(task.id)}
+            onClick={() => handleCompleteTask(task.id)}
           >
             Terminer
           </Button>

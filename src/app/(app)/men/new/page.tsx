@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { createCandidateMan } from '@/lib/proposals/actions'
 import { ArrowLeft, Save, UserPlus } from 'lucide-react'
 import Link from 'next/link'
 import Button from '@/components/ui/Button'
@@ -21,8 +21,6 @@ import {
   communityEthnicOptions,
   childrenEducationOptions,
 } from '@/lib/constants/orthodox'
-
-const ORG_ID = '00000000-0000-0000-0000-000000000001'
 
 const MARITAL_STATUS_OPTIONS = [
   { value: '', label: 'Choisir...' },
@@ -176,13 +174,10 @@ export default function NewManPage() {
     setLoading(true)
 
     try {
-      const supabase = createClient()
-
       const hasDateOfBirth = !!form.date_of_birth
       const ageEstimate = form.age_estimate ? parseInt(form.age_estimate, 10) : null
 
       const insertData = {
-        organization_id: ORG_ID,
         status: 'actif' as const,
 
         first_name: form.first_name.trim(),
@@ -237,16 +232,12 @@ export default function NewManPage() {
         notes: form.notes.trim() || null,
       }
 
-      const { error } = await supabase
-        .from('candidates_men')
-        .insert(insertData)
-
-      if (error) {
-        setSubmitError(error.message)
-        return
+      const result = await createCandidateMan(insertData)
+      if (!result.success) {
+        setSubmitError(result.error || 'Erreur lors de la creation')
+      } else if (result.id) {
+        router.push(`/men/${result.id}`)
       }
-
-      router.push('/men')
     } catch (err) {
       setSubmitError(
         err instanceof Error ? err.message : 'Une erreur est survenue lors de la création du profil.'

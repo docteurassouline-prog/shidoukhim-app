@@ -1,7 +1,13 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import {
+  getSettingsData,
+  updateOrganizationName,
+  updateProfile,
+  updatePassword,
+  updateOrganizationSettings,
+} from '@/lib/settings/actions'
 import type { UserProfile, Organization } from '@/lib/types'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
@@ -16,8 +22,6 @@ import {
   AlertCircle,
   Loader2,
 } from 'lucide-react'
-
-const ORG_ID = '00000000-0000-0000-0000-000000000001'
 
 // ---------------------------------------------------------------------------
 // Feedback message component
@@ -78,8 +82,6 @@ function SectionCard({
 // Main settings page
 // ---------------------------------------------------------------------------
 export default function SettingsPage() {
-  const supabase = createClient()
-
   // ---- Global loading state ----
   const [pageLoading, setPageLoading] = useState(true)
   const [profile, setProfile] = useState<UserProfile | null>(null)
@@ -132,37 +134,16 @@ export default function SettingsPage() {
     try {
       setPageLoading(true)
 
-      // Get current auth user
-      const {
-        data: { user },
-        error: authError,
-      } = await supabase.auth.getUser()
+      const { profile: p, organization: o, isAdmin: admin } = await getSettingsData()
 
-      if (authError || !user) {
-        return
-      }
-
-      // Fetch profile and organization in parallel
-      const [profileResult, orgResult] = await Promise.all([
-        supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('auth_user_id', user.id)
-          .eq('organization_id', ORG_ID)
-          .single(),
-        supabase.from('organizations').select('*').eq('id', ORG_ID).single(),
-      ])
-
-      if (profileResult.data) {
-        const p = profileResult.data as UserProfile
+      if (p) {
         setProfile(p)
         setProfileFullName(p.full_name)
         setProfilePhone(p.phone || '')
-        setIsAdmin(p.role === 'admin')
+        setIsAdmin(admin)
       }
 
-      if (orgResult.data) {
-        const o = orgResult.data as Organization
+      if (o) {
         setOrganization(o)
         setOrgName(o.name)
 
@@ -187,7 +168,7 @@ export default function SettingsPage() {
     } finally {
       setPageLoading(false)
     }
-  }, [supabase])
+  }, [])
 
   useEffect(() => {
     loadData()
@@ -228,15 +209,12 @@ export default function SettingsPage() {
     setOrgSaving(true)
     setOrgFeedback(null)
 
-    const { error } = await supabase
-      .from('organizations')
-      .update({ name: orgName.trim() })
-      .eq('id', ORG_ID)
+    const result = await updateOrganizationName(orgName)
 
-    if (error) {
+    if (!result.success) {
       setOrgFeedback({
         type: 'error',
-        message: `Erreur lors de la sauvegarde : ${error.message}`,
+        message: `Erreur lors de la sauvegarde : ${result.error}`,
       })
     } else {
       setOrgFeedback({
@@ -254,18 +232,12 @@ export default function SettingsPage() {
     setProfileSaving(true)
     setProfileFeedback(null)
 
-    const { error } = await supabase
-      .from('user_profiles')
-      .update({
-        full_name: profileFullName.trim(),
-        phone: profilePhone.trim() || null,
-      })
-      .eq('id', profile.id)
+    const result = await updateProfile(profile.id, profileFullName, profilePhone)
 
-    if (error) {
+    if (!result.success) {
       setProfileFeedback({
         type: 'error',
-        message: `Erreur lors de la sauvegarde : ${error.message}`,
+        message: `Erreur lors de la sauvegarde : ${result.error}`,
       })
     } else {
       setProfileFeedback({
@@ -294,14 +266,12 @@ export default function SettingsPage() {
 
     setPasswordSaving(true)
 
-    const { error } = await supabase.auth.updateUser({
-      password: newPassword,
-    })
+    const result = await updatePassword(newPassword)
 
-    if (error) {
+    if (!result.success) {
       setPasswordFeedback({
         type: 'error',
-        message: `Erreur : ${error.message}`,
+        message: `Erreur : ${result.error}`,
       })
     } else {
       setPasswordFeedback({
@@ -323,28 +293,23 @@ export default function SettingsPage() {
     setDelaysSaving(true)
     setDelaysFeedback(null)
 
-    const currentSettings = (organization.settings || {}) as Record<
-      string,
-      unknown
-    >
-    const updatedSettings = {
-      ...currentSettings,
+    const delaySettings = {
       relance_sans_nouvelles_jours: relanceSansNouvellesJours,
       relance_proposition_jours: relancePropositionJours,
       expiration_invitation_jours: expirationInvitationJours,
     }
 
-    const { error } = await supabase
-      .from('organizations')
-      .update({ settings: updatedSettings })
-      .eq('id', ORG_ID)
+    const result = await updateOrganizationSettings(delaySettings)
 
-    if (error) {
+    if (!result.success) {
       setDelaysFeedback({
         type: 'error',
-        message: `Erreur lors de la sauvegarde : ${error.message}`,
+        message: `Erreur lors de la sauvegarde : ${result.error}`,
       })
     } else {
+      // Update local org state with merged settings
+      const currentSettings = (organization.settings || {}) as Record<string, unknown>
+      const updatedSettings = { ...currentSettings, ...delaySettings }
       setOrganization({ ...organization, settings: updatedSettings })
       setDelaysFeedback({
         type: 'success',

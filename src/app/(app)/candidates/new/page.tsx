@@ -17,6 +17,7 @@ import {
   ClipboardCheck,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { createCandidateWoman, assignCandidateToUser } from '@/lib/proposals/actions'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
@@ -33,8 +34,6 @@ import {
   communityEthnicOptions,
   childrenEducationOptions,
 } from '@/lib/constants/orthodox'
-
-const ORG_ID = '00000000-0000-0000-0000-000000000001'
 
 const STEPS = [
   { key: 'identity', label: 'Identité & Contact', icon: User },
@@ -202,7 +201,6 @@ export default function NewCandidatePage() {
     const ageEstimate = formData.age_estimate ? parseInt(formData.age_estimate, 10) : null
 
     return {
-      organization_id: ORG_ID,
       first_name: formData.first_name.trim(),
       last_name: formData.last_name.trim(),
       hebrew_name: formData.hebrew_name || null,
@@ -263,7 +261,6 @@ export default function NewCandidatePage() {
     }
 
     setSavingDraft(true)
-    const supabase = createClient()
 
     const payload = {
       ...buildCandidatePayload(),
@@ -271,17 +268,13 @@ export default function NewCandidatePage() {
       availability: 'a_confirmer' as const,
     }
 
-    const { data, error } = await supabase
-      .from('candidates')
-      .insert(payload)
-      .select('id')
-      .single()
+    const result = await createCandidateWoman(payload)
 
-    if (error) {
-      console.error('Erreur sauvegarde brouillon:', error)
+    if (!result.success) {
+      console.error('Erreur sauvegarde brouillon:', result.error)
       alert('Erreur lors de la sauvegarde. Veuillez reessayer.')
-    } else if (data) {
-      router.push(`/candidates/${data.id}`)
+    } else if (result.id) {
+      router.push(`/candidates/${result.id}`)
     }
     setSavingDraft(false)
   }
@@ -297,7 +290,6 @@ export default function NewCandidatePage() {
     }
 
     setSubmitting(true)
-    const supabase = createClient()
 
     const payload = {
       ...buildCandidatePayload(),
@@ -305,37 +297,20 @@ export default function NewCandidatePage() {
       availability: 'a_confirmer' as const,
     }
 
-    const { data, error } = await supabase
-      .from('candidates')
-      .insert(payload)
-      .select('id')
-      .single()
+    const result = await createCandidateWoman(payload)
 
-    if (error) {
-      console.error('Erreur creation candidate:', error)
+    if (!result.success) {
+      console.error('Erreur creation candidate:', result.error)
       alert('Erreur lors de la creation. Veuillez reessayer.')
-    } else if (data) {
+    } else if (result.id) {
       // Create assignment for current user
+      const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
-        const { data: profile } = await supabase
-          .from('user_profiles')
-          .select('id')
-          .eq('auth_user_id', user.id)
-          .eq('organization_id', ORG_ID)
-          .single()
-
-        if (profile) {
-          await supabase.from('candidate_assignments').insert({
-            candidate_id: data.id,
-            candidate_type: 'woman',
-            user_id: profile.id,
-            is_primary: true,
-          })
-        }
+        await assignCandidateToUser(result.id, 'woman', user.id)
       }
 
-      router.push(`/candidates/${data.id}`)
+      router.push(`/candidates/${result.id}`)
     }
     setSubmitting(false)
   }
