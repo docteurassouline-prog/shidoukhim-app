@@ -26,7 +26,6 @@ import {
   AlertCircle,
   Trash2,
 } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
 import type {
   CandidateMan,
   CandidateManStatus,
@@ -63,9 +62,13 @@ import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import Badge from '@/components/ui/Badge'
-import { deleteCandidateMan } from '@/lib/candidates-men/actions'
-
-const ORG_ID = '00000000-0000-0000-0000-000000000001'
+import {
+  deleteCandidateMan,
+  getManCandidate,
+  getManProposals,
+  updateManCandidate,
+  updateManStatus,
+} from '@/lib/candidates-men/actions'
 
 const statusOptions: { value: CandidateManStatus; label: string }[] = [
   { value: 'actif', label: 'Actif' },
@@ -193,7 +196,6 @@ export default function ManDetailPage({
 }) {
   const { id } = use(params)
   const router = useRouter()
-  const supabase = createClient()
 
   // ── State ──────────────────────────────────────────────────
   const [man, setMan] = useState<CandidateMan | null>(null)
@@ -213,43 +215,24 @@ export default function ManDetailPage({
     setLoading(true)
     setError(null)
 
-    const { data, error: fetchError } = await supabase
-      .from('candidates_men')
-      .select('*')
-      .eq('id', id)
-      .eq('organization_id', ORG_ID)
-      .single()
+    const data = await getManCandidate(id)
 
-    if (fetchError || !data) {
-      setError(fetchError?.message || 'Candidat introuvable')
+    if (!data) {
+      setError('Candidat introuvable')
       setLoading(false)
       return
     }
 
-    setMan(data as CandidateMan)
-    setFormData(data as CandidateMan)
+    setMan(data as unknown as CandidateMan)
+    setFormData(data as unknown as CandidateMan)
     setLoading(false)
-  }, [id, supabase])
+  }, [id])
 
   // ── Fetch proposals ────────────────────────────────────────
   const fetchProposals = useCallback(async () => {
-    const { data } = await supabase
-      .from('proposals')
-      .select(
-        `
-        *,
-        candidate_woman:candidates!candidate_woman_id(id, first_name, last_name, age_estimate, city, status),
-        candidate_man:candidates_men!candidate_man_id(id, first_name, last_name, age_estimate, city, status)
-      `
-      )
-      .eq('candidate_man_id', id)
-      .eq('organization_id', ORG_ID)
-      .order('updated_at', { ascending: false })
-
-    if (data) {
-      setProposals(data as unknown as ProposalWithCandidates[])
-    }
-  }, [id, supabase])
+    const data = await getManProposals(id)
+    setProposals(data as unknown as ProposalWithCandidates[])
+  }, [id])
 
   useEffect(() => {
     fetchMan()
@@ -267,23 +250,10 @@ export default function ManDetailPage({
     setSaving(true)
     setError(null)
 
-    const {
-      id: _id,
-      organization_id: _org,
-      created_by: _cb,
-      created_at: _ca,
-      updated_at: _ua,
-      ...updateData
-    } = formData as CandidateMan
+    const result = await updateManCandidate(man.id, formData as Record<string, unknown>)
 
-    const { error: updateError } = await supabase
-      .from('candidates_men')
-      .update(updateData)
-      .eq('id', man.id)
-      .eq('organization_id', ORG_ID)
-
-    if (updateError) {
-      setError(`Erreur lors de la sauvegarde : ${updateError.message}`)
+    if (!result.success) {
+      setError(`Erreur lors de la sauvegarde : ${result.error}`)
       setSaving(false)
       return
     }
@@ -300,14 +270,10 @@ export default function ManDetailPage({
     if (!man) return
     setStatusDropdownOpen(false)
 
-    const { error: updateError } = await supabase
-      .from('candidates_men')
-      .update({ status: newStatus })
-      .eq('id', man.id)
-      .eq('organization_id', ORG_ID)
+    const result = await updateManStatus(man.id, newStatus)
 
-    if (updateError) {
-      setError(`Erreur lors du changement de statut : ${updateError.message}`)
+    if (!result.success) {
+      setError(`Erreur lors du changement de statut : ${result.error}`)
       return
     }
 

@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import {
   calculateAge,
   formatDate,
@@ -405,7 +405,7 @@ export default async function CandidateDetailPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const supabase = await createClient()
+  const supabase = createAdminClient()
 
   // Fetch candidate
   const { data: candidate, error } = await supabase
