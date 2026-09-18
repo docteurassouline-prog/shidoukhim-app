@@ -40,8 +40,7 @@ const navSections = [
   {
     label: 'Dossiers',
     items: [
-      { href: '/candidates', label: 'Fiches femmes', icon: Users },
-      { href: '/men', label: 'Fiches hommes', icon: UserCheck },
+      { href: '/candidates', label: 'Shidoukhim', icon: Users },
       { href: '/proposals', label: 'Propositions', icon: Heart },
     ],
   },

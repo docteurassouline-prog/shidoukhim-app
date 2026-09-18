@@ -1,37 +1,22 @@
 'use client'
 
-import { useEffect, useState, useCallback, useTransition } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useState, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
   Plus,
-  LayoutGrid,
-  Table,
-  Columns3,
-  ChevronLeft,
-  ChevronRight,
+  Camera,
+  Search,
   ArrowUpDown,
-  MapPin,
-  Calendar,
-  User,
   Users,
 } from 'lucide-react'
-import { getCandidates, getMatchmakers } from '@/lib/candidates/actions'
-import type {
-  Candidate,
-  CandidateStatus,
-  CandidateAvailability,
-  UserProfile,
-} from '@/lib/types'
+import { getAllCandidates } from '@/lib/candidates/actions'
+import { uploadCandidatePhoto } from '@/lib/candidates/photos'
 import {
   calculateAge,
-  formatDate,
   getStatusLabel,
-  getAvailabilityLabel,
   getStatusColor,
-  getAvailabilityColor,
   cn,
-  truncate,
 } from '@/lib/utils'
 import {
   getCourantLabel,
@@ -40,571 +25,307 @@ import {
   communityEthnicOptions,
 } from '@/lib/constants/orthodox'
 import Button from '@/components/ui/Button'
-import SearchInput from '@/components/ui/SearchInput'
 import Select from '@/components/ui/Select'
-import Card from '@/components/ui/Card'
-import Badge from '@/components/ui/Badge'
 import Avatar from '@/components/ui/Avatar'
-import LoadingSpinner from '@/components/ui/LoadingSpinner'
-import EmptyState from '@/components/ui/EmptyState'
-
-const ORG_ID = '00000000-0000-0000-0000-000000000001'
-const PER_PAGE = 20
-
-type ViewMode = 'cards' | 'table' | 'status'
-type SortField = 'last_name' | 'date_of_birth' | 'city' | 'availability' | 'status' | 'updated_at'
-type SortOrder = 'asc' | 'desc'
-
-const statusOptions = [
-  { value: '', label: 'Tous les statuts' },
-  { value: 'a_valider', label: 'A valider' },
-  { value: 'validee', label: 'Validee' },
-  { value: 'archivee', label: 'Archivee' },
-  { value: 'brouillon', label: 'Brouillon' },
-  { value: 'invitation_envoyee', label: 'Invitation envoyee' },
-]
-
-const availabilityOptions = [
-  { value: '', label: 'Toutes les disponibilites' },
-  { value: 'disponible', label: 'Disponible' },
-  { value: 'en_rencontre', label: 'En rencontre' },
-  { value: 'en_pause', label: 'En pause' },
-  { value: 'a_confirmer', label: 'A confirmer' },
-  { value: 'fiancee', label: 'Fiancee' },
-  { value: 'mariee', label: 'Mariee' },
-]
-
-const availabilityColumns: CandidateAvailability[] = [
-  'a_confirmer',
-  'disponible',
-  'en_rencontre',
-  'en_pause',
-  'fiancee',
-  'mariee',
-]
-
-interface CandidateWithAssignment extends Candidate {
-  assignments?: Array<{
-    chadkhanit_id: string | null
-    role: string | null
-    user_profiles: { full_name: string } | null
-  }>
-}
 
 export default function CandidatesPage() {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const [, startTransition] = useTransition()
-
-  // View mode
-  const [viewMode, setViewMode] = useState<ViewMode>('table')
-
-  // Filters from URL
-  const search = searchParams.get('search') ?? ''
-  const statusFilter = searchParams.get('status') ?? ''
-  const availabilityFilter = searchParams.get('availability') ?? ''
-  const cityFilter = searchParams.get('city') ?? ''
-  const courantFilter = searchParams.get('courant') ?? ''
-  const communityFilter = searchParams.get('community') ?? ''
-  const maritalFilter = searchParams.get('marital') ?? ''
-  const assigneeFilter = searchParams.get('assignee') ?? ''
-  const page = parseInt(searchParams.get('page') ?? '1', 10)
-
-  // Sort
-  const [sortField, setSortField] = useState<SortField>('updated_at')
-  const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
-
-  // Data
-  const [candidates, setCandidates] = useState<CandidateWithAssignment[]>([])
-  const [totalCount, setTotalCount] = useState(0)
+  const [allCandidates, setAllCandidates] = useState<Record<string, unknown>[]>([])
   const [loading, setLoading] = useState(true)
-  const [matchmakers, setMatchmakers] = useState<
-    Pick<UserProfile, 'id' | 'full_name'>[]
-  >([])
+  const [uploadingFor, setUploadingFor] = useState<string | null>(null)
 
-  // Update URL params
-  const updateParams = useCallback(
-    (updates: Record<string, string>) => {
-      const params = new URLSearchParams(searchParams.toString())
-      for (const [key, value] of Object.entries(updates)) {
-        if (value) {
-          params.set(key, value)
-        } else {
-          params.delete(key)
-        }
-      }
-      // Reset page when filters change (unless page itself is being set)
-      if (!('page' in updates)) {
-        params.delete('page')
-      }
-      startTransition(() => {
-        router.push(`/candidates?${params.toString()}`, { scroll: false })
-      })
-    },
-    [searchParams, router, startTransition]
-  )
+  // Shared filters
+  const [courantFilter, setCourantFilter] = useState('')
+  const [communityFilter, setCommunityFilter] = useState('')
+  const [maritalFilter, setMaritalFilter] = useState('')
 
-  // Load matchmakers for filter
+  // Per-side search
+  const [searchW, setSearchW] = useState('')
+  const [searchM, setSearchM] = useState('')
+
   useEffect(() => {
-    async function loadMatchmakers() {
-      const data = await getMatchmakers()
-      if (data) setMatchmakers(data)
-    }
-    loadMatchmakers()
-  }, [])
-
-  // Load candidates
-  useEffect(() => {
-    async function loadCandidates() {
+    async function load() {
       setLoading(true)
-
-      const result = await getCandidates({
-        search: search || undefined,
-        status: statusFilter || undefined,
-        availability: availabilityFilter || undefined,
-        city: cityFilter || undefined,
+      const result = await getAllCandidates({
         courant: courantFilter || undefined,
         community: communityFilter || undefined,
         marital_status: maritalFilter || undefined,
-        sortField,
-        sortOrder,
-        page,
-        perPage: PER_PAGE,
+        sortField: 'last_name',
+        sortOrder: 'asc',
+        perPage: 9999,
       })
-
-      setCandidates(result.candidates as unknown as CandidateWithAssignment[])
-      setTotalCount(result.totalCount)
+      setAllCandidates(result.candidates)
       setLoading(false)
     }
+    load()
+  }, [courantFilter, communityFilter, maritalFilter])
 
-    loadCandidates()
-  }, [search, statusFilter, availabilityFilter, cityFilter, courantFilter, communityFilter, maritalFilter, assigneeFilter, page, sortField, sortOrder])
+  const women = useMemo(() => {
+    let list = allCandidates.filter(c => c._gender === 'F')
+    if (searchW.trim()) {
+      const q = searchW.trim().toLowerCase()
+      list = list.filter(c => `${c.first_name} ${c.last_name}`.toLowerCase().includes(q))
+    }
+    return list
+  }, [allCandidates, searchW])
 
-  const totalPages = Math.max(1, Math.ceil(totalCount / PER_PAGE))
+  const men = useMemo(() => {
+    let list = allCandidates.filter(c => c._gender === 'H')
+    if (searchM.trim()) {
+      const q = searchM.trim().toLowerCase()
+      list = list.filter(c => `${c.first_name} ${c.last_name}`.toLowerCase().includes(q))
+    }
+    return list
+  }, [allCandidates, searchM])
 
-  function getAssigneeName(c: CandidateWithAssignment): string | null {
-    const primary = c.assignments?.find((a) => a.role === 'principale' || a.role === 'primary')
-    return primary?.user_profiles?.full_name ?? c.assignments?.[0]?.user_profiles?.full_name ?? null
-  }
-
-  function handleSort(field: SortField) {
-    if (field === sortField) {
-      setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))
-    } else {
-      setSortField(field)
-      setSortOrder('asc')
+  async function handlePhotoUpload(candidateId: string, gender: string, file: File) {
+    setUploadingFor(candidateId)
+    try {
+      const table = gender === 'H' ? 'candidates_men' : 'candidates'
+      const formData = new FormData()
+      formData.append('photo', file)
+      await uploadCandidatePhoto(candidateId, table, formData)
+      // Refresh
+      const result = await getAllCandidates({
+        courant: courantFilter || undefined,
+        community: communityFilter || undefined,
+        marital_status: maritalFilter || undefined,
+        sortField: 'last_name',
+        sortOrder: 'asc',
+        perPage: 9999,
+      })
+      setAllCandidates(result.candidates)
+    } catch (err) {
+      console.error('Erreur upload photo:', err)
+    } finally {
+      setUploadingFor(null)
     }
   }
 
-  // =================== Render helpers ===================
+  function renderCandidateRow(c: Record<string, unknown>) {
+    const id = c.id as string
+    const gender = c._gender as string
+    const firstName = c.first_name as string
+    const lastName = c.last_name as string
+    const photoUrl = c.photo_url as string | null
+    const detailPath = gender === 'H' ? `/men/${id}` : `/candidates/${id}`
+    const dash = <span className="text-ink-soft/30">-</span>
 
-  function renderFilters() {
     return (
-      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center flex-wrap">
-        <SearchInput
-          value={search}
-          onChange={(val) => updateParams({ search: val })}
-          placeholder="Rechercher par nom..."
-          className="w-full sm:w-64"
-        />
-        <Select
-          options={availabilityOptions}
-          value={availabilityFilter}
-          onChange={(e) => updateParams({ availability: e.target.value })}
-          className="w-full sm:w-auto"
-        />
-        <Select
-          options={statusOptions}
-          value={statusFilter}
-          onChange={(e) => updateParams({ status: e.target.value })}
-          className="w-full sm:w-auto"
-        />
-        <input
-          type="text"
-          value={cityFilter}
-          onChange={(e) => updateParams({ city: e.target.value })}
-          placeholder="Ville..."
-          className="w-full sm:w-40 rounded-lg border border-line bg-surface px-3 py-2 text-sm h-10 placeholder:text-ink-soft/60 focus:outline-none focus:ring-2 focus:ring-sage focus:border-sage"
-        />
-        <Select
-          options={[
-            { value: '', label: 'Tous les courants' },
-            ...courantOptions.filter(o => o.value),
-          ]}
-          value={courantFilter}
-          onChange={(e) => updateParams({ courant: e.target.value })}
-          className="w-full sm:w-auto"
-        />
-        <Select
-          options={[
-            { value: '', label: 'Toutes communautes' },
-            ...communityEthnicOptions.filter(o => o.value),
-          ]}
-          value={communityFilter}
-          onChange={(e) => updateParams({ community: e.target.value })}
-          className="w-full sm:w-auto"
-        />
-        <Select
-          options={[
-            { value: '', label: 'Toute situation' },
-            { value: 'celibataire', label: 'Celibataire' },
-            { value: 'divorce', label: 'Divorce(e)' },
-            { value: 'veuf', label: 'Veuf/Veuve' },
-          ]}
-          value={maritalFilter}
-          onChange={(e) => updateParams({ marital: e.target.value })}
-          className="w-full sm:w-auto"
-        />
-        {matchmakers.length > 0 && (
-          <Select
-            options={[
-              { value: '', label: 'Toutes les chadkhaniot' },
-              ...matchmakers.map((m) => ({ value: m.id, label: m.full_name })),
-            ]}
-            value={assigneeFilter}
-            onChange={(e) => updateParams({ assignee: e.target.value })}
-            className="w-full sm:w-auto"
-          />
-        )}
-      </div>
+      <tr
+        key={id}
+        className="hover:bg-sage/5 cursor-pointer transition-colors group"
+      >
+        {/* Photo */}
+        <td className="py-1.5 px-2">
+          <div className="relative w-9 h-9 shrink-0">
+            {photoUrl ? (
+              <img
+                src={photoUrl}
+                alt={`${firstName} ${lastName}`}
+                className="w-9 h-9 rounded-full object-cover border border-line"
+              />
+            ) : (
+              <Avatar src={null} name={`${firstName} ${lastName}`} size="sm" />
+            )}
+            <label className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+              <Camera className="h-3.5 w-3.5 text-white" />
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (file) handlePhotoUpload(id, gender, file)
+                  e.target.value = ''
+                }}
+                onClick={(e) => e.stopPropagation()}
+              />
+            </label>
+            {uploadingFor === id && (
+              <div className="absolute inset-0 flex items-center justify-center bg-white/70 rounded-full">
+                <div className="w-3 h-3 border-2 border-sage border-t-transparent rounded-full animate-spin" />
+              </div>
+            )}
+          </div>
+        </td>
+        {/* Nom */}
+        <td className="py-1.5 px-2" onClick={() => router.push(detailPath)}>
+          <span className="font-medium text-ink text-sm whitespace-nowrap hover:text-plum transition-colors">
+            {firstName} {lastName}
+          </span>
+        </td>
+        {/* Age */}
+        <td className="py-1.5 px-2 text-ink-soft text-xs whitespace-nowrap" onClick={() => router.push(detailPath)}>
+          {calculateAge(c.date_of_birth as string | null, c.age_estimate as number | null, (c.is_age_estimate as boolean | null) ?? false)}
+        </td>
+        {/* Ville */}
+        <td className="py-1.5 px-2 text-ink-soft text-xs whitespace-nowrap" onClick={() => router.push(detailPath)}>
+          {(c.city as string) || dash}
+        </td>
+        {/* Courant */}
+        <td className="py-1.5 px-2 text-ink-soft text-xs whitespace-nowrap" onClick={() => router.push(detailPath)}>
+          {c.courant ? getCourantLabel(c.courant as string) : dash}
+        </td>
+        {/* Communaute */}
+        <td className="py-1.5 px-2 text-ink-soft text-xs whitespace-nowrap" onClick={() => router.push(detailPath)}>
+          {c.community ? getCommunityEthnicLabel(c.community as string) : dash}
+        </td>
+        {/* Statut */}
+        <td className="py-1.5 px-2" onClick={() => router.push(detailPath)}>
+          <span className={cn(
+            'inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium',
+            getStatusColor(c.status as string)
+          )}>
+            {getStatusLabel(c.status as string)}
+          </span>
+        </td>
+      </tr>
     )
   }
 
-  function renderPagination() {
-    if (totalPages <= 1) return null
-
+  function renderPanel(
+    title: string,
+    items: Record<string, unknown>[],
+    search: string,
+    setSearch: (v: string) => void,
+    newLink: string,
+    colorAccent: string,
+    bgAccent: string
+  ) {
     return (
-      <div className="flex items-center justify-between pt-4">
-        <p className="text-sm text-ink-soft">
-          {totalCount} resultat{totalCount > 1 ? 's' : ''}
-        </p>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="secondary"
-            size="sm"
-            disabled={page <= 1}
-            onClick={() => updateParams({ page: String(page - 1) })}
-            icon={<ChevronLeft className="h-4 w-4" />}
-          >
-            Precedent
-          </Button>
-          <span className="text-sm text-ink-soft px-2">
-            {page} / {totalPages}
-          </span>
-          <Button
-            variant="secondary"
-            size="sm"
-            disabled={page >= totalPages}
-            onClick={() => updateParams({ page: String(page + 1) })}
-            iconRight={<ChevronRight className="h-4 w-4" />}
-          >
-            Suivant
-          </Button>
+      <div className="flex flex-col h-full min-h-0">
+        {/* Panel header */}
+        <div className={cn('flex items-center justify-between px-4 py-3 border-b border-line', bgAccent)}>
+          <div className="flex items-center gap-2">
+            <h2 className={cn('text-base font-semibold', colorAccent)}>{title}</h2>
+            <span className="text-xs text-ink-soft bg-surface rounded-full px-2 py-0.5 border border-line">
+              {items.length}
+            </span>
+          </div>
+          <Link href={newLink}>
+            <Button variant="ghost" size="sm" icon={<Plus className="h-3.5 w-3.5" />}>
+              Ajouter
+            </Button>
+          </Link>
+        </div>
+
+        {/* Search */}
+        <div className="px-3 py-2 border-b border-line">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-ink-soft/60" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Rechercher..."
+              className="w-full pl-8 pr-3 py-1.5 rounded-lg border border-line bg-surface text-sm placeholder:text-ink-soft/60 focus:outline-none focus:ring-1 focus:ring-sage focus:border-sage"
+            />
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className="flex-1 overflow-auto min-h-0">
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="w-6 h-6 border-2 border-sage border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : items.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-ink-soft">
+              <Users className="h-8 w-8 mb-2 text-line" />
+              <p className="text-sm">Aucun profil</p>
+            </div>
+          ) : (
+            <table className="w-full text-sm">
+              <thead className="sticky top-0 bg-surface z-10">
+                <tr className="border-b border-line">
+                  <th className="text-left py-2 px-2 text-[10px] font-medium text-ink-soft uppercase w-10"></th>
+                  <th className="text-left py-2 px-2 text-[10px] font-medium text-ink-soft uppercase">Nom</th>
+                  <th className="text-left py-2 px-2 text-[10px] font-medium text-ink-soft uppercase">Age</th>
+                  <th className="text-left py-2 px-2 text-[10px] font-medium text-ink-soft uppercase">Ville</th>
+                  <th className="text-left py-2 px-2 text-[10px] font-medium text-ink-soft uppercase">Courant</th>
+                  <th className="text-left py-2 px-2 text-[10px] font-medium text-ink-soft uppercase">Comm.</th>
+                  <th className="text-left py-2 px-2 text-[10px] font-medium text-ink-soft uppercase">Statut</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-line/50">
+                {items.map(renderCandidateRow)}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     )
   }
-
-  function renderCardView() {
-    return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {candidates.map((c) => (
-          <Link key={c.id} href={`/candidates/${c.id}`}>
-            <Card className="card-hover cursor-pointer h-full">
-              <div className="flex items-start gap-3">
-                <Avatar
-                  src={null}
-                  name={`${c.first_name} ${c.last_name}`}
-                  size="lg"
-                />
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-semibold text-ink truncate">
-                    {c.first_name} {c.last_name}
-                  </h3>
-                  <p className="text-xs text-ink-soft mt-0.5">
-                    {calculateAge(c.date_of_birth, c.age_estimate, c.is_age_estimate)}
-                  </p>
-                  {c.city && (
-                    <p className="text-xs text-ink-soft flex items-center gap-1 mt-0.5">
-                      <MapPin className="h-3 w-3" />
-                      {c.city}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex flex-wrap gap-1.5 mt-3">
-                <span
-                  className={cn(
-                    'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium',
-                    getAvailabilityColor(c.availability)
-                  )}
-                >
-                  {getAvailabilityLabel(c.availability)}
-                </span>
-                <span
-                  className={cn(
-                    'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium',
-                    getStatusColor(c.status)
-                  )}
-                >
-                  {getStatusLabel(c.status)}
-                </span>
-              </div>
-
-              <div className="mt-3 pt-3 border-t border-line flex items-center justify-between text-xs text-ink-soft">
-                {getAssigneeName(c) ? (
-                  <span className="flex items-center gap-1 truncate">
-                    <User className="h-3 w-3" />
-                    {getAssigneeName(c)}
-                  </span>
-                ) : (
-                  <span className="italic">Non assignee</span>
-                )}
-                <span className="flex items-center gap-1 shrink-0">
-                  <Calendar className="h-3 w-3" />
-                  {formatDate(c.updated_at)}
-                </span>
-              </div>
-            </Card>
-          </Link>
-        ))}
-      </div>
-    )
-  }
-
-  function renderTableView() {
-    const sortableColumns: { key: SortField; label: string }[] = [
-      { key: 'last_name', label: 'Nom' },
-      { key: 'date_of_birth', label: 'Age' },
-      { key: 'city', label: 'Ville' },
-    ]
-
-    const fixedColumns = ['Profession', 'Courant', 'Communaute', 'Situation', 'Disponibilite', 'Statut']
-
-    const dash = <span className="text-ink-soft/40">--</span>
-
-    return (
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-line">
-              {sortableColumns.map((col) => (
-                <th
-                  key={col.key}
-                  className="text-left py-3 px-3 text-xs font-medium text-ink-soft uppercase tracking-wider whitespace-nowrap"
-                >
-                  <button
-                    onClick={() => handleSort(col.key)}
-                    className="flex items-center gap-1 hover:text-ink transition-colors"
-                  >
-                    {col.label}
-                    <ArrowUpDown className={cn(
-                      'h-3 w-3',
-                      sortField === col.key ? 'text-sage' : 'text-ink-soft/40'
-                    )} />
-                  </button>
-                </th>
-              ))}
-              {fixedColumns.map((label) => (
-                <th key={label} className="text-left py-3 px-3 text-xs font-medium text-ink-soft uppercase tracking-wider whitespace-nowrap">
-                  {label}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-line">
-            {candidates.map((c) => {
-              const raw = c as unknown as Record<string, unknown>
-              return (
-                <tr
-                  key={c.id}
-                  onClick={() => router.push(`/candidates/${c.id}`)}
-                  className="hover:bg-stone-50/50 cursor-pointer transition-colors"
-                >
-                  <td className="py-2.5 px-3">
-                    <div className="flex items-center gap-2.5">
-                      <Avatar src={null} name={`${c.first_name} ${c.last_name}`} size="sm" />
-                      <span className="font-medium text-ink whitespace-nowrap">
-                        {c.first_name} {c.last_name}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="py-2.5 px-3 text-ink-soft whitespace-nowrap">
-                    {calculateAge(c.date_of_birth, c.age_estimate, c.is_age_estimate)}
-                  </td>
-                  <td className="py-2.5 px-3 text-ink-soft whitespace-nowrap">
-                    {c.city || dash}
-                  </td>
-                  <td className="py-2.5 px-3 text-ink-soft whitespace-nowrap">
-                    {(raw.profession as string) || dash}
-                  </td>
-                  <td className="py-2.5 px-3 text-ink-soft whitespace-nowrap">
-                    {getCourantLabel(raw.courant as string | null) !== (raw.courant as string | null)
-                      ? getCourantLabel(raw.courant as string | null)
-                      : (raw.courant as string) || dash}
-                  </td>
-                  <td className="py-2.5 px-3 text-ink-soft whitespace-nowrap">
-                    {getCommunityEthnicLabel(raw.community as string | null) !== (raw.community as string | null)
-                      ? getCommunityEthnicLabel(raw.community as string | null)
-                      : (raw.community as string) || dash}
-                  </td>
-                  <td className="py-2.5 px-3 text-ink-soft whitespace-nowrap">
-                    {(raw.marital_status as string) || dash}
-                  </td>
-                  <td className="py-2.5 px-3">
-                    <span className={cn(
-                      'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium',
-                      getAvailabilityColor(c.availability)
-                    )}>
-                      {getAvailabilityLabel(c.availability)}
-                    </span>
-                  </td>
-                  <td className="py-2.5 px-3">
-                    <span className={cn(
-                      'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium',
-                      getStatusColor(c.status)
-                    )}>
-                      {getStatusLabel(c.status)}
-                    </span>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-      </div>
-    )
-  }
-
-  function renderStatusView() {
-    return (
-      <div className="flex gap-4 overflow-x-auto pb-4">
-        {availabilityColumns.map((avail) => {
-          const colCandidates = candidates.filter(
-            (c) => c.availability === avail
-          )
-          return (
-            <div
-              key={avail}
-              className="shrink-0 w-72 bg-stone-50/50 rounded-xl p-3"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold text-ink">
-                  {getAvailabilityLabel(avail)}
-                </h3>
-                <span className="text-xs text-ink-soft bg-surface rounded-full px-2 py-0.5 border border-line">
-                  {colCandidates.length}
-                </span>
-              </div>
-              <div className="space-y-2">
-                {colCandidates.map((c) => (
-                  <Link key={c.id} href={`/candidates/${c.id}`}>
-                    <div className="bg-surface rounded-lg border border-line p-3 hover:shadow-card transition-shadow cursor-pointer">
-                      <p className="text-sm font-medium text-ink truncate">
-                        {c.first_name} {c.last_name}
-                      </p>
-                      <p className="text-xs text-ink-soft mt-0.5">
-                        {calculateAge(c.date_of_birth, c.age_estimate, c.is_age_estimate)}
-                        {c.city && ` - ${c.city}`}
-                      </p>
-                    </div>
-                  </Link>
-                ))}
-                {colCandidates.length === 0 && (
-                  <p className="text-xs text-ink-soft text-center py-4 italic">
-                    Aucune candidate
-                  </p>
-                )}
-              </div>
-            </div>
-          )
-        })}
-      </div>
-    )
-  }
-
-  // =================== Main render ===================
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-[30px] font-semibold text-ink">Candidates</h1>
-          <p className="text-sm text-ink-soft mt-1">
-            {totalCount} fiche{totalCount > 1 ? 's' : ''} au total
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          {/* View toggle */}
-          <div className="flex items-center bg-surface border border-line rounded-lg p-0.5">
-            {(
-              [
-                { mode: 'cards' as ViewMode, icon: LayoutGrid, label: 'Cartes' },
-                { mode: 'table' as ViewMode, icon: Table, label: 'Tableau' },
-                { mode: 'status' as ViewMode, icon: Columns3, label: 'Par statut' },
-              ] as const
-            ).map(({ mode, icon: Icon, label }) => (
-              <button
-                key={mode}
-                onClick={() => setViewMode(mode)}
-                className={cn(
-                  'p-2 rounded-md transition-colors',
-                  viewMode === mode
-                    ? 'bg-sage/10 text-sage'
-                    : 'text-ink-soft hover:bg-stone-100'
-                )}
-                title={label}
-                aria-label={label}
-              >
-                <Icon className="h-4 w-4" />
-              </button>
-            ))}
+    <div className="flex flex-col h-[calc(100vh-4rem)]">
+      {/* Top bar with shared filters */}
+      <div className="shrink-0 px-4 py-3 border-b border-line bg-surface">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <h1 className="text-xl font-semibold text-ink">Shidoukhim</h1>
+          <div className="flex flex-wrap items-center gap-2">
+            <Select
+              options={[
+                { value: '', label: 'Tous les courants' },
+                ...courantOptions.filter(o => o.value),
+              ]}
+              value={courantFilter}
+              onChange={(e) => setCourantFilter(e.target.value)}
+              className="w-auto text-xs"
+            />
+            <Select
+              options={[
+                { value: '', label: 'Toutes communautes' },
+                ...communityEthnicOptions.filter(o => o.value),
+              ]}
+              value={communityFilter}
+              onChange={(e) => setCommunityFilter(e.target.value)}
+              className="w-auto text-xs"
+            />
+            <Select
+              options={[
+                { value: '', label: 'Toute situation' },
+                { value: 'celibataire', label: 'Celibataire' },
+                { value: 'divorce', label: 'Divorce(e)' },
+                { value: 'veuf', label: 'Veuf/Veuve' },
+              ]}
+              value={maritalFilter}
+              onChange={(e) => setMaritalFilter(e.target.value)}
+              className="w-auto text-xs"
+            />
           </div>
-
-          <Link href="/candidates/new">
-            <Button icon={<Plus className="h-4 w-4" />}>Nouvelle fiche</Button>
-          </Link>
         </div>
       </div>
 
-      {/* Filters */}
-      {renderFilters()}
+      {/* Split panels */}
+      <div className="flex flex-1 min-h-0">
+        {/* Left: Women */}
+        <div className="w-1/2 border-r-2 border-plum/20 flex flex-col min-h-0">
+          {renderPanel(
+            'Filles',
+            women,
+            searchW,
+            setSearchW,
+            '/candidates/new',
+            'text-pink-700',
+            'bg-pink-50/50'
+          )}
+        </div>
 
-      {/* Content */}
-      <Card padding="none" className={viewMode !== 'table' && !loading && candidates.length > 0 ? 'hidden' : 'overflow-hidden'}>
-        {loading ? (
-          <LoadingSpinner text="Chargement des candidates..." />
-        ) : candidates.length === 0 ? (
-          <EmptyState
-            icon={<Users className="h-8 w-8" />}
-            title="Aucune candidate trouvee"
-            description={
-              search || statusFilter || availabilityFilter || cityFilter
-                ? 'Essayez de modifier vos filtres de recherche.'
-                : 'Commencez par creer une nouvelle fiche candidate.'
-            }
-            actionLabel={
-              !search && !statusFilter && !availabilityFilter && !cityFilter
-                ? 'Creer une fiche'
-                : undefined
-            }
-            onAction={
-              !search && !statusFilter && !availabilityFilter && !cityFilter
-                ? () => router.push('/candidates/new')
-                : undefined
-            }
-          />
-        ) : viewMode === 'table' ? (
-          renderTableView()
-        ) : null}
-      </Card>
-      {!loading && candidates.length > 0 && viewMode === 'cards' && renderCardView()}
-      {!loading && candidates.length > 0 && viewMode === 'status' && renderStatusView()}
-
-      {/* Pagination */}
-      {!loading && candidates.length > 0 && renderPagination()}
+        {/* Right: Men */}
+        <div className="w-1/2 flex flex-col min-h-0">
+          {renderPanel(
+            'Garcons',
+            men,
+            searchM,
+            setSearchM,
+            '/men/new',
+            'text-blue-700',
+            'bg-blue-50/50'
+          )}
+        </div>
+      </div>
     </div>
   )
 }
