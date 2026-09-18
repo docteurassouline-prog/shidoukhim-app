@@ -16,7 +16,6 @@ import {
   Heart,
   ClipboardCheck,
 } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
 import { createCandidateWoman, assignCandidateToUser } from '@/lib/proposals/actions'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
@@ -303,13 +302,6 @@ export default function NewCandidatePage() {
       console.error('Erreur creation candidate:', result.error)
       alert('Erreur lors de la creation. Veuillez reessayer.')
     } else if (result.id) {
-      // Create assignment for current user
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        await assignCandidateToUser(result.id, 'woman', user.id)
-      }
-
       router.push(`/candidates/${result.id}`)
     }
     setSubmitting(false)

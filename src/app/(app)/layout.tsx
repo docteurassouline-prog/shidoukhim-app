@@ -1,6 +1,7 @@
-import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import Sidebar from '@/components/layout/Sidebar'
+
+export const dynamic = 'force-dynamic'
 
 const ORG_ID = '00000000-0000-0000-0000-000000000001'
 
@@ -9,27 +10,20 @@ export default async function AppLayout({
 }: {
   children: React.ReactNode
 }) {
-  const supabase = await createClient()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect('/login')
-  }
+  const supabase = createAdminClient()
 
   const { data: profileRow } = await supabase
     .from('user_profiles')
     .select('id, full_name, email, role')
-    .eq('auth_user_id', user.id)
     .eq('organization_id', ORG_ID)
+    .eq('role', 'admin')
+    .limit(1)
     .maybeSingle()
 
   const profile = profileRow ?? {
-    full_name: user.user_metadata?.full_name ?? user.email ?? 'Utilisateur',
-    email: user.email ?? '',
-    role: 'viewer',
+    full_name: 'Hava Dahan',
+    email: '',
+    role: 'admin',
   }
 
   return (

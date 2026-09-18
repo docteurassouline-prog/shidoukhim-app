@@ -5,7 +5,6 @@ import {
   getSettingsData,
   updateOrganizationName,
   updateProfile,
-  updatePassword,
   updateOrganizationSettings,
 } from '@/lib/settings/actions'
 import type { UserProfile, Organization } from '@/lib/types'
@@ -15,7 +14,6 @@ import {
   Settings,
   Building2,
   User,
-  Lock,
   Clock,
   Save,
   CheckCircle,
@@ -105,19 +103,6 @@ export default function SettingsPage() {
     message: string
   } | null>(null)
 
-  // ---- Password form ----
-  const [currentPassword, setCurrentPassword] = useState('')
-  const [newPassword, setNewPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [passwordSaving, setPasswordSaving] = useState(false)
-  const [passwordFeedback, setPasswordFeedback] = useState<{
-    type: 'success' | 'error'
-    message: string
-  } | null>(null)
-  const [passwordErrors, setPasswordErrors] = useState<{
-    newPassword?: string
-    confirmPassword?: string
-  }>({})
 
   // ---- Delays form ----
   const [relanceSansNouvellesJours, setRelanceSansNouvellesJours] = useState(30)
@@ -190,13 +175,6 @@ export default function SettingsPage() {
   }, [profileFeedback])
 
   useEffect(() => {
-    if (passwordFeedback) {
-      const t = setTimeout(() => setPasswordFeedback(null), 4000)
-      return () => clearTimeout(t)
-    }
-  }, [passwordFeedback])
-
-  useEffect(() => {
     if (delaysFeedback) {
       const t = setTimeout(() => setDelaysFeedback(null), 4000)
       return () => clearTimeout(t)
@@ -247,44 +225,6 @@ export default function SettingsPage() {
     }
 
     setProfileSaving(false)
-  }
-
-  // ---- Change password ----
-  async function handleChangePassword() {
-    setPasswordFeedback(null)
-    const errors: { newPassword?: string; confirmPassword?: string } = {}
-
-    if (newPassword.length < 6) {
-      errors.newPassword = 'Le mot de passe doit contenir au moins 6 caractères.'
-    }
-    if (newPassword !== confirmPassword) {
-      errors.confirmPassword = 'Les mots de passe ne correspondent pas.'
-    }
-
-    setPasswordErrors(errors)
-    if (Object.keys(errors).length > 0) return
-
-    setPasswordSaving(true)
-
-    const result = await updatePassword(newPassword)
-
-    if (!result.success) {
-      setPasswordFeedback({
-        type: 'error',
-        message: `Erreur : ${result.error}`,
-      })
-    } else {
-      setPasswordFeedback({
-        type: 'success',
-        message: 'Mot de passe modifié avec succès.',
-      })
-      setCurrentPassword('')
-      setNewPassword('')
-      setConfirmPassword('')
-      setPasswordErrors({})
-    }
-
-    setPasswordSaving(false)
   }
 
   // ---- Save delays ----
@@ -442,78 +382,7 @@ export default function SettingsPage() {
       </SectionCard>
 
       {/* ============================================================ */}
-      {/* SECTION 3 — Changer le mot de passe */}
-      {/* ============================================================ */}
-      <SectionCard
-        title="Changer le mot de passe"
-        icon={<Lock className="h-5 w-5 text-plum" />}
-      >
-        <div className="space-y-4">
-          <Input
-            label="Mot de passe actuel"
-            inputType="password"
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-            placeholder="••••••••"
-            autoComplete="current-password"
-          />
-
-          <Input
-            label="Nouveau mot de passe"
-            inputType="password"
-            value={newPassword}
-            onChange={(e) => {
-              setNewPassword(e.target.value)
-              if (passwordErrors.newPassword) {
-                setPasswordErrors((prev) => ({ ...prev, newPassword: undefined }))
-              }
-            }}
-            placeholder="6 caractères minimum"
-            error={passwordErrors.newPassword}
-            autoComplete="new-password"
-          />
-
-          <Input
-            label="Confirmer le nouveau mot de passe"
-            inputType="password"
-            value={confirmPassword}
-            onChange={(e) => {
-              setConfirmPassword(e.target.value)
-              if (passwordErrors.confirmPassword) {
-                setPasswordErrors((prev) => ({
-                  ...prev,
-                  confirmPassword: undefined,
-                }))
-              }
-            }}
-            placeholder="Retapez le nouveau mot de passe"
-            error={passwordErrors.confirmPassword}
-            autoComplete="new-password"
-          />
-
-          {passwordFeedback && (
-            <FeedbackMessage
-              type={passwordFeedback.type}
-              message={passwordFeedback.message}
-            />
-          )}
-
-          <div className="flex justify-end">
-            <Button
-              onClick={handleChangePassword}
-              loading={passwordSaving}
-              disabled={!newPassword || !confirmPassword}
-              variant="accent"
-              icon={<Lock className="h-4 w-4" />}
-            >
-              Modifier le mot de passe
-            </Button>
-          </div>
-        </div>
-      </SectionCard>
-
-      {/* ============================================================ */}
-      {/* SECTION 4 — Délais de relance (admin only) */}
+      {/* SECTION 3 — Délais de relance (admin only) */}
       {/* ============================================================ */}
       {isAdmin && (
         <SectionCard

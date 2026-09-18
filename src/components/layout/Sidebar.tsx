@@ -2,22 +2,19 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter, usePathname } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import Image from 'next/image'
 import {
   LayoutDashboard,
   Users,
-  UserCheck,
   Heart,
   Calendar,
   BookUser,
   UserCog,
   Settings,
-  LogOut,
   X,
   Menu,
 } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
 
 interface SidebarUser {
   full_name: string
@@ -62,14 +59,7 @@ const roleLabels: Record<string, string> = {
 
 export default function Sidebar({ user }: SidebarProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
-  const router = useRouter()
   const currentPath = usePathname()
-
-  async function handleLogout() {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    router.push('/login')
-  }
 
   const initials = user.full_name
     .split(' ')
@@ -199,14 +189,6 @@ export default function Sidebar({ user }: SidebarProps) {
                 {roleLabels[user.role] ?? user.role}
               </p>
             </div>
-            <button
-              onClick={handleLogout}
-              className="rounded-lg p-2 text-white/50 hover:bg-white/10 hover:text-white transition-colors"
-              aria-label="Déconnexion"
-              title="Déconnexion"
-            >
-              <LogOut className="h-4 w-4" strokeWidth={1.75} />
-            </button>
           </div>
         </div>
       </div>

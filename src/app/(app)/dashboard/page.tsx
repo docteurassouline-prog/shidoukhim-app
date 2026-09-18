@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { formatDate, formatDateTime, getStatusLabel, getAvailabilityLabel } from '@/lib/utils'
 import { getTopMatches } from '@/lib/scoring/actions'
@@ -32,20 +31,15 @@ interface StatCard {
 }
 
 export default async function DashboardPage() {
-  const supabaseAuth = await createClient()
   const supabase = createAdminClient()
 
-  const {
-    data: { user },
-  } = await supabaseAuth.auth.getUser()
-
-  // Fetch user profile
   const { data: profile } = await supabase
     .from('user_profiles')
     .select('full_name')
-    .eq('auth_user_id', user?.id ?? '')
     .eq('organization_id', ORG_ID)
-    .single()
+    .eq('role', 'admin')
+    .limit(1)
+    .maybeSingle()
 
   // Fetch all stats in parallel
   const today = new Date().toISOString().split('T')[0]
