@@ -9,6 +9,9 @@ export interface CandidatesFilter {
   status?: string
   availability?: string
   city?: string
+  courant?: string
+  community?: string
+  marital_status?: string
   sortField?: string
   sortOrder?: 'asc' | 'desc'
   page?: number
@@ -44,6 +47,15 @@ export async function getCandidates(filter: CandidatesFilter): Promise<Candidate
   }
   if (filter.city) {
     query = query.ilike('city', `%${filter.city}%`)
+  }
+  if (filter.courant) {
+    query = query.eq('courant', filter.courant)
+  }
+  if (filter.community) {
+    query = query.eq('community', filter.community)
+  }
+  if (filter.marital_status) {
+    query = query.eq('marital_status', filter.marital_status)
   }
 
   const sortField = filter.sortField ?? 'updated_at'

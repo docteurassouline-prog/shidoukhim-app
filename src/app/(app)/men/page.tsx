@@ -10,6 +10,8 @@ import { calculateAge, getStatusLabel, getStatusColor, cn } from '@/lib/utils'
 import {
   getCourantLabel,
   getCommunityEthnicLabel,
+  courantOptions,
+  communityEthnicOptions,
 } from '@/lib/constants/orthodox'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
@@ -35,7 +37,10 @@ export default function MenPage() {
   const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('')
-  const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards')
+  const [viewMode, setViewMode] = useState<'cards' | 'table'>('table')
+  const [courantFilter, setCourantFilter] = useState<string>('')
+  const [communityFilter, setCommunityFilter] = useState<string>('')
+  const [maritalFilter, setMaritalFilter] = useState<string>('')
 
   useEffect(() => {
     async function fetchMen() {
@@ -62,6 +67,15 @@ export default function MenPage() {
     if (statusFilter) {
       results = results.filter((m) => m.status === statusFilter)
     }
+    if (courantFilter) {
+      results = results.filter((m) => m.courant === courantFilter)
+    }
+    if (communityFilter) {
+      results = results.filter((m) => m.community === communityFilter)
+    }
+    if (maritalFilter) {
+      results = results.filter((m) => m.marital_status === maritalFilter)
+    }
 
     if (searchQuery.trim()) {
       const query = searchQuery.trim().toLowerCase()
@@ -72,7 +86,7 @@ export default function MenPage() {
     }
 
     return results
-  }, [men, searchQuery, statusFilter])
+  }, [men, searchQuery, statusFilter, courantFilter, communityFilter, maritalFilter])
 
   return (
     <div className="min-h-screen bg-canvas">
@@ -117,8 +131,8 @@ export default function MenPage() {
         </div>
 
         {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="flex-1">
+        <div className="flex flex-col sm:flex-row gap-3 mb-6 flex-wrap items-start sm:items-center">
+          <div className="w-full sm:w-64">
             <Input
               placeholder="Rechercher par nom..."
               value={searchQuery}
@@ -127,12 +141,44 @@ export default function MenPage() {
               }
             />
           </div>
-          <div className="w-full sm:w-56">
+          <div className="w-full sm:w-auto">
             <Select
               options={STATUS_OPTIONS}
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
               placeholder="Filtrer par statut"
+            />
+          </div>
+          <div className="w-full sm:w-auto">
+            <Select
+              options={[
+                { value: '', label: 'Tous les courants' },
+                ...courantOptions.filter(o => o.value),
+              ]}
+              value={courantFilter}
+              onChange={(e) => setCourantFilter(e.target.value)}
+            />
+          </div>
+          <div className="w-full sm:w-auto">
+            <Select
+              options={[
+                { value: '', label: 'Toutes communautes' },
+                ...communityEthnicOptions.filter(o => o.value),
+              ]}
+              value={communityFilter}
+              onChange={(e) => setCommunityFilter(e.target.value)}
+            />
+          </div>
+          <div className="w-full sm:w-auto">
+            <Select
+              options={[
+                { value: '', label: 'Toute situation' },
+                { value: 'celibataire', label: 'Celibataire' },
+                { value: 'divorce', label: 'Divorce(e)' },
+                { value: 'veuf', label: 'Veuf/Veuve' },
+              ]}
+              value={maritalFilter}
+              onChange={(e) => setMaritalFilter(e.target.value)}
             />
           </div>
         </div>

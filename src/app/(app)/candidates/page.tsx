@@ -36,6 +36,8 @@ import {
 import {
   getCourantLabel,
   getCommunityEthnicLabel,
+  courantOptions,
+  communityEthnicOptions,
 } from '@/lib/constants/orthodox'
 import Button from '@/components/ui/Button'
 import SearchInput from '@/components/ui/SearchInput'
@@ -95,13 +97,16 @@ export default function CandidatesPage() {
   const [, startTransition] = useTransition()
 
   // View mode
-  const [viewMode, setViewMode] = useState<ViewMode>('cards')
+  const [viewMode, setViewMode] = useState<ViewMode>('table')
 
   // Filters from URL
   const search = searchParams.get('search') ?? ''
   const statusFilter = searchParams.get('status') ?? ''
   const availabilityFilter = searchParams.get('availability') ?? ''
   const cityFilter = searchParams.get('city') ?? ''
+  const courantFilter = searchParams.get('courant') ?? ''
+  const communityFilter = searchParams.get('community') ?? ''
+  const maritalFilter = searchParams.get('marital') ?? ''
   const assigneeFilter = searchParams.get('assignee') ?? ''
   const page = parseInt(searchParams.get('page') ?? '1', 10)
 
@@ -158,6 +163,9 @@ export default function CandidatesPage() {
         status: statusFilter || undefined,
         availability: availabilityFilter || undefined,
         city: cityFilter || undefined,
+        courant: courantFilter || undefined,
+        community: communityFilter || undefined,
+        marital_status: maritalFilter || undefined,
         sortField,
         sortOrder,
         page,
@@ -170,7 +178,7 @@ export default function CandidatesPage() {
     }
 
     loadCandidates()
-  }, [search, statusFilter, availabilityFilter, cityFilter, assigneeFilter, page, sortField, sortOrder])
+  }, [search, statusFilter, availabilityFilter, cityFilter, courantFilter, communityFilter, maritalFilter, assigneeFilter, page, sortField, sortOrder])
 
   const totalPages = Math.max(1, Math.ceil(totalCount / PER_PAGE))
 
@@ -217,6 +225,35 @@ export default function CandidatesPage() {
           onChange={(e) => updateParams({ city: e.target.value })}
           placeholder="Ville..."
           className="w-full sm:w-40 rounded-lg border border-line bg-surface px-3 py-2 text-sm h-10 placeholder:text-ink-soft/60 focus:outline-none focus:ring-2 focus:ring-sage focus:border-sage"
+        />
+        <Select
+          options={[
+            { value: '', label: 'Tous les courants' },
+            ...courantOptions.filter(o => o.value),
+          ]}
+          value={courantFilter}
+          onChange={(e) => updateParams({ courant: e.target.value })}
+          className="w-full sm:w-auto"
+        />
+        <Select
+          options={[
+            { value: '', label: 'Toutes communautes' },
+            ...communityEthnicOptions.filter(o => o.value),
+          ]}
+          value={communityFilter}
+          onChange={(e) => updateParams({ community: e.target.value })}
+          className="w-full sm:w-auto"
+        />
+        <Select
+          options={[
+            { value: '', label: 'Toute situation' },
+            { value: 'celibataire', label: 'Celibataire' },
+            { value: 'divorce', label: 'Divorce(e)' },
+            { value: 'veuf', label: 'Veuf/Veuve' },
+          ]}
+          value={maritalFilter}
+          onChange={(e) => updateParams({ marital: e.target.value })}
+          className="w-full sm:w-auto"
         />
         {matchmakers.length > 0 && (
           <Select
